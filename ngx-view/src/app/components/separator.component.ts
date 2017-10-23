@@ -3,20 +3,23 @@ import { Component } from '@angular/core';
 import { Logger } from '../util/logger';
 
 @Component({
-    selector: 'ct-separator',
-    template: `
-    
-    {{renderTemplate()}}
-    `
+	selector: 'ct-separator',
+	template: `
+
+		{{renderTemplate()}}
+	`
 })
 export class SeparatorComponent {
 
 
-    log(text: string): void {
-        Logger.log(text);
-    }
+	constructor(private logger: Logger) {
+	}
 
-    renderTemplate(): void {
-        this.log('🐋 separator - render input');
-    }
+	log(text: string): void {
+		this.logger.log(text);
+	}
+
+	renderTemplate(): void {
+		this.log('🐋 separator - render input');
+	}
 }

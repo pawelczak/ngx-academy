@@ -1,7 +1,10 @@
+import { Injectable } from '@angular/core';
+
+@Injectable()
 export class Logger {
 
-    static log(text: any) {
-        console.log(text);
-    }
+	log(text: any) {
+		console.log(text);
+	}
 
 }

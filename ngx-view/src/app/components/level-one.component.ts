@@ -1,48 +1,53 @@
 import {
-    AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, Component, ContentChild, DoCheck, ElementRef, Injector, Input, OnChanges, OnDestroy,
-    OnInit, TemplateRef, ViewChild, ViewContainerRef, ViewRef
+	AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, Component, ComponentRef, ContentChild, DoCheck, ElementRef, Host, Injector, Input,
+	OnChanges, OnDestroy,
+	OnInit, TemplateRef, ViewChild, ViewContainerRef, ViewRef
 } from "@angular/core";
 
 import { Logger } from '../util/logger';
 import { LifeCyclesComponent } from './life-cycles.component';
 
 @Component({
-    selector: 'ct-level-one',
-    template: `
-        
-        <h1>Level One {{renderInput()}}</h1>
-        <!--<h1>Level One</h1>-->
-        
+	selector: 'ct-level-one',
+	template: `
+
+		<h1>Level One {{renderInput()}}</h1>
+		<!--<h1>Level One</h1>-->
+
 		<!--<ct-level-two [input]="input" >-->
-            <!---->
-			<!--<ng-template #template >-->
-				<!--<div>Template {{renderTemplateInput()}}</div>-->
-			<!--</ng-template>-->
+		<!---->
+		<!--<ng-template #template >-->
+		<!--<div>Template {{renderTemplateInput()}}</div>-->
+		<!--</ng-template>-->
 		<!--</ct-level-two>-->
-    `
+	`
 })
 export class LevelOneComponent extends LifeCyclesComponent {
 
-    @Input()
-    input: any;
+	@ContentChild('text')
+	text: ComponentRef<any>;
 
-    private prefix: string = '🍕 LevelOne';
 
-    constructor() {
-        super();
-    }
+	@Input()
+	input: any;
 
-    log(text: any): void {
-        Logger.log(`${this.prefix} - ${text}`);
-    }
+	prefix: string = '🍕 LevelOne - ';
 
-    renderInput(): string {
-        Logger.log(`${this.prefix} - render input`);
-        return this.input;
-    }
+	constructor(private logger: Logger) {
+		super();
+	}
 
-    renderTemplateInput(): string {
-        Logger.log(`🐯 ngTemplate - render input`);
-        return this.input;
-    }
+	log(text: any): void {
+		this.logger.log(`${this.prefix}${text}`);
+	}
+
+	renderInput(): string {
+		this.logger.log(`${this.prefix} - render input`);
+		return this.input;
+	}
+
+	renderTemplateInput(): string {
+		this.logger.log(`🐯 ngTemplate - render input`);
+		return this.input;
+	}
 }

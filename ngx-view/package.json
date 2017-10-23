@@ -12,6 +12,7 @@
     "author": "Łukasz Pawełczak",
     "license": "MIT",
     "scripts": {
+        "purge": "rimraf node_modules && rimraf dist",
         "clean": "rimraf dist",
         "clean:aot": "rimraf dist-aot",
         "clean:install": "npm run clean && rimraf node_modules && npm i",

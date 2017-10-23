@@ -1,6 +1,14 @@
 <p>Hello Angular</p>
 
-<ct-level-one >
+<ct-level-one [input]="1">
+	<p >{{renderInput()}}</p>
+
+	<ct-level-two #text [input]="input" >
+	</ct-level-two>
+
+	<ng-template>
+
+	</ng-template>
 </ct-level-one>
 
 <!--<button (click)="changeInput()" >Change Input</button>-->
