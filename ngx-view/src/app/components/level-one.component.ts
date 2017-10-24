@@ -11,8 +11,8 @@ import { LifeCyclesComponent } from './life-cycles.component';
 	selector: 'ct-level-one',
 	template: `
 
-		<h1>Level One {{renderInput()}}</h1>
-		<!--<h1>Level One</h1>-->
+		<!--<h1>Level One {{renderInput()}}</h1>-->
+		<h1>Level One</h1>
 
 		<!--<ct-level-two [input]="input" >-->
 		<!---->
@@ -38,7 +38,7 @@ export class LevelOneComponent extends LifeCyclesComponent {
 	}
 
 	log(text: any): void {
-		this.logger.log(`${this.prefix}${text}`);
+		this.logger.log(text);
 	}
 
 	renderInput(): string {
