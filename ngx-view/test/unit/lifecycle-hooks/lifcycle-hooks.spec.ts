@@ -1,14 +1,14 @@
+import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import { LevelOneComponent } from '../../src/app/components/level-one.component';
-import { Logger } from '../../src/app/util/logger';
-import { Component } from '@angular/core';
+import { Logger } from '../../../src/app/util/logger';
+import { FlatComponent } from './flat.component';
 
 
-describe('View test', () => {
+describe('Life cycle hooks - ', () => {
 
 
-	describe('Life cycle hooks - One level of component', () => {
+	describe('Flat, one level component', () => {
 
 
 		beforeEach(() => {
@@ -16,7 +16,7 @@ describe('View test', () => {
 				.configureTestingModule({
 					imports: [],
 					declarations: [
-						LevelOneComponent
+						FlatComponent
 					],
 					providers: [
 						{provide: Logger, useValue: {log: () => {}}}
@@ -47,11 +47,9 @@ describe('View test', () => {
 			let mockLogger = new MockLogger();
 
 			TestBed.overrideProvider(Logger, {useValue: mockLogger});
-			TestBed.overrideTemplate(LevelOneComponent, `<p>Level one Component</p>`);
+			TestBed.overrideTemplate(FlatComponent, `<p>Level one Component</p>`);
 
-			const fixture = TestBed.createComponent(LevelOneComponent);
-
-			fixture.componentInstance.prefix = '';
+			const fixture = TestBed.createComponent(FlatComponent);
 
 			// when
 			fixture.detectChanges();
@@ -71,7 +69,7 @@ describe('View test', () => {
 
 		@Component({
 			selector: 'test',
-			template: `<ct-level-one [input]="'value'" ></ct-level-one>`
+			template: `<ct-flat [input]="'value'" ></ct-flat>`
 		})
 		class TestComponent {}
 
@@ -83,7 +81,7 @@ describe('View test', () => {
 					imports: [],
 					declarations: [
 						TestComponent,
-						LevelOneComponent
+						FlatComponent
 					],
 					providers: [{
 						provide: Logger, useValue: {log: () => {}}
