@@ -8,12 +8,13 @@ import { Logger } from '../util/logger';
 	template: `
 
 		<!--<ct-separator></ct-separator>-->
+		<p>Nice</p>
+		
+		<!--<h2>Level Two {{renderInput()}}</h2>-->
 
-		<h2>Level Two {{renderInput()}}</h2>
+		<!--<ng-container [ngTemplateOutlet]="template"></ng-container>-->
 
-		<ng-container [ngTemplateOutlet]="template"></ng-container>
-
-		<ct-level-three [template]="template"></ct-level-three>
+		<!--<ct-level-three [template]="template"></ct-level-three>-->
 	`
 })
 export class LevelTwoComponent extends LifeCyclesComponent {
@@ -25,7 +26,7 @@ export class LevelTwoComponent extends LifeCyclesComponent {
 	@Input()
 	input: any;
 
-	private prefix: string = '🦄 LevelTwo';
+	private prefix: string = 'LevelTwo';
 
 	constructor(private logger: Logger) {
 		super();

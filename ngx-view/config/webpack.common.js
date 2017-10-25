@@ -1,4 +1,5 @@
-const webpack = require('webpack'),
+const helpers = require('./helpers'),
+	webpack = require('webpack'),
 	path = require('path'),
 	HtmlWebpackPlugin = require('html-webpack-plugin'),
 	CopyWebpackPlugin = require('copy-webpack-plugin'),

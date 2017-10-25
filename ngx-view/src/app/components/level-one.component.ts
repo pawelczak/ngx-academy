@@ -11,15 +11,23 @@ import { LifeCyclesComponent } from './life-cycles.component';
 	selector: 'ct-level-one',
 	template: `
 
-		<!--<h1>Level One {{renderInput()}}</h1>-->
-		<h1>Level One</h1>
+		<h1>Level One {{renderInput()}}</h1>
+		
 
-		<!--<ct-level-two [input]="input" >-->
-		<!---->
-		<!--<ng-template #template >-->
-		<!--<div>Template {{renderTemplateInput()}}</div>-->
-		<!--</ng-template>-->
-		<!--</ct-level-two>-->
+		<ct-level-two >
+			
+			<!--<h1>Level One</h1>-->
+
+			<!--<ng-template #template >-->
+				<!--<p>Aaaa</p>-->
+			<!--</ng-template>-->
+			<!---->
+		</ct-level-two>
+
+		<ct-level-two [input]="input" >
+		
+		
+		</ct-level-two>
 	`
 })
 export class LevelOneComponent extends LifeCyclesComponent {
@@ -31,14 +39,14 @@ export class LevelOneComponent extends LifeCyclesComponent {
 	@Input()
 	input: any;
 
-	prefix: string = '🍕 LevelOne - ';
+	prefix: string = 'LevelOne - ';
 
 	constructor(private logger: Logger) {
 		super();
 	}
 
 	log(text: any): void {
-		this.logger.log(text);
+		this.logger.log(`${this.prefix}${text}`);
 	}
 
 	renderInput(): string {
