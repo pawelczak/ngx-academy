@@ -5,7 +5,6 @@ const helpers = require('./helpers'),
 	CopyWebpackPlugin = require('copy-webpack-plugin'),
 	precss = require('precss'),
 	autoprefixer = require('autoprefixer'),
-	CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin'),
 	LoaderOptionsPlugin = require('webpack/lib/LoaderOptionsPlugin');
 
 module.exports = {
@@ -99,11 +98,6 @@ module.exports = {
 	},
 
 	plugins: [
-		// new webpack.optimize.OccurenceOrderPlugin(true),
-		new CommonsChunkPlugin({
-			name: ['main', 'vendor', 'polyfills'],
-			minChunks: Infinity
-		}),
 		new HtmlWebpackPlugin({
 			template: 'src/index.html',
 			chunksSortMode: 'dependency'

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 import { LifeCyclesComponent } from '../../../../src/app/components/life-cycles.component';
 import { Logger } from '../../../../src/app/util/logger';
@@ -10,6 +10,11 @@ import { Logger } from '../../../../src/app/util/logger';
 	`
 })
 export class FirstLevelComponent extends LifeCyclesComponent {
+
+	@Input()
+	input: string;
+
+	text = '9';
 
 	constructor(private logger: Logger) {
 		super();

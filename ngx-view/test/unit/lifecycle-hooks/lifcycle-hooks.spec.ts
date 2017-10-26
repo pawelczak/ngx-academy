@@ -256,6 +256,42 @@ describe('Life cycle hooks - ', () => {
 
 		});
 
+		it('Change input value of a component', () => {
+
+			// given
+			const expectedCycles = [
+				'Second level - ngOnChanges',
+				'Second level - ngDoCheck',
+				'Second level - ngAfterContentChecked',
+				'Second level - ngAfterViewChecked'
+			];
+			let cycles: Array<string> = [];
+
+			class MockLogger {
+				log(text: string): void {
+					cycles.push(text);
+				}
+			}
+
+			let mockLogger = new MockLogger();
+			let text = 'o';
+
+			TestBed.overrideProvider(Logger, {useValue: mockLogger});
+			TestBed.overrideTemplate(FirstLevelComponent, `<ct-second-level [input]="text" ></ct-second-level>`);
+			const fixture = TestBed.createComponent(FirstLevelComponent);
+
+
+			// when
+			fixture.detectChanges();
+			cycles = [];
+			text = 'w';
+			// fixture.detectChanges();
+			console.log(fixture.componentInstance.input);
+
+			// then
+			expect(cycles).toEqual(expectedCycles);
+		});
+
 	})
 
 
