@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ApplicationRef, Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { Logger } from '../../../src/app/util/logger';
@@ -10,8 +10,27 @@ import { SecondLevelComponent } from './components/second-level.component';
 describe('Life cycle hooks - ', () => {
 
 
-	describe('Flat, one level component', () => {
 
+	class MockLogger {
+
+		private cycles: Array<string> = [];
+
+		log(text: string): void {
+			this.cycles.push(text);
+		}
+
+		print(): Array<string> {
+			return this.cycles;
+		}
+
+		clear(): void {
+			this.cycles = [];
+		}
+	}
+
+	let mockLogger = new MockLogger();
+
+	describe('Flat, one level component', () => {
 
 		beforeEach(() => {
 			TestBed
@@ -22,10 +41,7 @@ describe('Life cycle hooks - ', () => {
 					],
 					providers: [
 						{
-							provide: Logger, useValue: {
-							log: () => {
-							}
-						}
+							provide: Logger, useValue: mockLogger
 						}
 					]
 				});
@@ -43,17 +59,6 @@ describe('Life cycle hooks - ', () => {
 				'ngAfterViewChecked',
 				'ngOnDestroy'
 			];
-			let cycles: Array<string> = [];
-
-			class MockLogger {
-				log(text: string): void {
-					cycles.push(text);
-				}
-			}
-
-			let mockLogger = new MockLogger();
-
-			TestBed.overrideProvider(Logger, {useValue: mockLogger});
 			TestBed.overrideTemplate(FlatComponent, `<p>Level one Component</p>`);
 
 			const fixture = TestBed.createComponent(FlatComponent);
@@ -63,7 +68,7 @@ describe('Life cycle hooks - ', () => {
 			fixture.destroy();
 
 			// then
-			expect(cycles).toEqual(expectedCycles);
+			expect(mockLogger.print()).toEqual(expectedCycles);
 
 		});
 
@@ -84,6 +89,7 @@ describe('Life cycle hooks - ', () => {
 
 
 		beforeEach(() => {
+			mockLogger.clear();
 
 			TestBed
 				.configureTestingModule({
@@ -93,10 +99,7 @@ describe('Life cycle hooks - ', () => {
 						FlatComponent
 					],
 					providers: [{
-						provide: Logger, useValue: {
-							log: () => {
-							}
-						}
+						provide: Logger, useValue: mockLogger
 					}]
 				});
 
@@ -115,18 +118,6 @@ describe('Life cycle hooks - ', () => {
 				'ngAfterViewChecked',
 				'ngOnDestroy'
 			];
-			let cycles: Array<string> = [];
-
-			class MockLogger {
-				log(text: string): void {
-					cycles.push(text);
-				}
-			}
-
-			let mockLogger = new MockLogger();
-
-			TestBed.overrideProvider(Logger, {useValue: mockLogger});
-
 			const fixture = TestBed.createComponent(TestComponent);
 
 			// when
@@ -134,7 +125,7 @@ describe('Life cycle hooks - ', () => {
 			fixture.destroy();
 
 			// then
-			expect(cycles).toEqual(expectedCycles);
+			expect(mockLogger.print()).toEqual(expectedCycles);
 
 		})
 
@@ -144,6 +135,7 @@ describe('Life cycle hooks - ', () => {
 
 
 		beforeEach(() => {
+			mockLogger.clear();
 
 			TestBed
 				.configureTestingModule({
@@ -153,15 +145,11 @@ describe('Life cycle hooks - ', () => {
 						SecondLevelComponent
 					],
 					providers: [{
-						provide: Logger, useValue: {
-							log: () => {
-							}
-						}
+						provide: Logger, useValue: mockLogger
 					}]
 				});
 
 		});
-
 
 		/**
 		 *
@@ -189,18 +177,6 @@ describe('Life cycle hooks - ', () => {
 				'Second level - ngOnDestroy',
 				'First level - ngOnDestroy'
 			];
-			let cycles: Array<string> = [];
-
-			class MockLogger {
-				log(text: string): void {
-					cycles.push(text);
-				}
-			}
-
-			let mockLogger = new MockLogger();
-
-			TestBed.overrideProvider(Logger, {useValue: mockLogger});
-
 			const fixture = TestBed.createComponent(FirstLevelComponent);
 
 			// when
@@ -208,7 +184,7 @@ describe('Life cycle hooks - ', () => {
 			fixture.destroy();
 
 			// then
-			expect(cycles).toEqual(expectedCycles);
+			expect(mockLogger.print()).toEqual(expectedCycles);
 
 		});
 
@@ -232,17 +208,7 @@ describe('Life cycle hooks - ', () => {
 				'Second level - ngOnDestroy',
 				'First level - ngOnDestroy'
 			];
-			let cycles: Array<string> = [];
 
-			class MockLogger {
-				log(text: string): void {
-					cycles.push(text);
-				}
-			}
-
-			let mockLogger = new MockLogger();
-
-			TestBed.overrideProvider(Logger, {useValue: mockLogger});
 			TestBed.overrideTemplate(FirstLevelComponent, `<ct-second-level [input]="'Text'" ></ct-second-level>`);
 
 			const fixture = TestBed.createComponent(FirstLevelComponent);
@@ -252,7 +218,40 @@ describe('Life cycle hooks - ', () => {
 			fixture.destroy();
 
 			// then
-			expect(cycles).toEqual(expectedCycles);
+			expect(mockLogger.print()).toEqual(expectedCycles);
+
+		});
+
+	});
+
+	describe('input modifications', () => {
+
+		@Component({
+			selector: 'test',
+			template: `<ct-first-level [input]="val" ></ct-first-level>`
+		})
+		class InputTestComponent {
+
+			val = 8;
+
+			changeVal() {
+				this.val = 10;
+			}
+		}
+
+		beforeEach(() => {
+
+			TestBed
+				.configureTestingModule({
+					imports: [],
+					declarations: [
+						InputTestComponent,
+						FirstLevelComponent
+					],
+					providers: [{
+						provide: Logger, useValue: mockLogger
+					}]
+				});
 
 		});
 
@@ -260,39 +259,25 @@ describe('Life cycle hooks - ', () => {
 
 			// given
 			const expectedCycles = [
-				'Second level - ngOnChanges',
-				'Second level - ngDoCheck',
-				'Second level - ngAfterContentChecked',
-				'Second level - ngAfterViewChecked'
+				'First level - ngOnChanges',
+				'First level - ngDoCheck',
+				'First level - ngAfterContentChecked',
+				'First level - ngAfterViewChecked'
 			];
-			let cycles: Array<string> = [];
 
-			class MockLogger {
-				log(text: string): void {
-					cycles.push(text);
-				}
-			}
-
-			let mockLogger = new MockLogger();
-			let text = 'o';
-
-			TestBed.overrideProvider(Logger, {useValue: mockLogger});
-			TestBed.overrideTemplate(FirstLevelComponent, `<ct-second-level [input]="text" ></ct-second-level>`);
-			const fixture = TestBed.createComponent(FirstLevelComponent);
-
+			TestBed.overrideTemplate(FirstLevelComponent, `no content`);
+			const fixture = TestBed.createComponent(InputTestComponent);
 
 			// when
 			fixture.detectChanges();
-			cycles = [];
-			text = 'w';
-			// fixture.detectChanges();
-			console.log(fixture.componentInstance.input);
+			mockLogger.clear();
+			fixture.componentInstance.changeVal();
+			fixture.detectChanges();
 
 			// then
-			expect(cycles).toEqual(expectedCycles);
+			expect(mockLogger.print()).toEqual(expectedCycles);
 		});
 
-	})
-
+	});
 
 });
