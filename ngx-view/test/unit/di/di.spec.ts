@@ -1,5 +1,5 @@
 import {
-	ApplicationRef, ChangeDetectorRef, Component, Directive, ElementRef, Injector, TemplateRef, ViewChild, ViewContainerRef
+	ApplicationRef, ChangeDetectorRef, Component, Directive, ElementRef, Injector, Renderer2, TemplateRef, ViewChild, ViewContainerRef
 } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
@@ -23,6 +23,7 @@ describe('Dependency Injection -', () => {
 				public viewContainerRef: ViewContainerRef,
 				public injector: Injector,
 				public parentInjector: Injector,
+				public renderer: Renderer2,
 				public changeDetectionRef: ChangeDetectorRef) {}
 		}
 
@@ -49,6 +50,7 @@ describe('Dependency Injection -', () => {
 			expect(compInstance.viewContainerRef).toBeDefined();
 			expect(compInstance.injector).toBeDefined();
 			expect(compInstance.parentInjector).toBeDefined();
+			expect(compInstance.renderer).toBeDefined();
 			expect(compInstance.changeDetectionRef).toBeDefined();
 		});
 
@@ -68,6 +70,7 @@ describe('Dependency Injection -', () => {
 				public viewContainerRef: ViewContainerRef,
 				public injector: Injector,
 				public parentInjector: Injector,
+				public renderer: Renderer2,
 				public changeDetectionRef: ChangeDetectorRef) {}
 
 			methodOnDirective() {}
@@ -112,6 +115,7 @@ describe('Dependency Injection -', () => {
 			expect(testCompInstance.dirRef.injector).toBeDefined();
 			expect(testCompInstance.dirRef.parentInjector).toBeDefined();
 			expect(testCompInstance.dirRef.changeDetectionRef).toBeDefined();
+			expect(testCompInstance.dirRef.renderer).toBeDefined();
 			expect(testCompInstance.dirRef.methodOnDirective).toBeDefined();
 		});
 
@@ -253,10 +257,10 @@ describe('Dependency Injection -', () => {
 			fixture.detectChanges();
 
 			// then
-			expect(compInstance.containerRef instanceof ElementRef).toBe(true, 'ng-container templateRef as ElementRef');
-			expect(compInstance.containerRefAsTempRef instanceof TemplateRef).toBe(false, 'ng-container templateRef as TemplateRef');
-			expect(isViewContainerRef(compInstance.containerRefAsVcr)).toBe(true, 'ng-container templateRef as ViewContainerRef');
-			expect(compInstance.viewContainerRefAsBlankComponent instanceof BlankComponent).toBe(false, 'ng-container templateRef as BlankComponent');
+			expect(compInstance.containerRef instanceof ElementRef).toBe(true, 'ng-container templateRef as ElementRef'); // TRUE
+			expect(compInstance.containerRefAsTempRef instanceof TemplateRef).toBe(false, 'ng-container templateRef as TemplateRef'); // FALSE
+			expect(isViewContainerRef(compInstance.containerRefAsVcr)).toBe(true, 'ng-container templateRef as ViewContainerRef'); // TRUE
+			expect(compInstance.viewContainerRefAsBlankComponent instanceof BlankComponent).toBe(false, 'ng-container templateRef as BlankComponent'); // FALSE
 		});
 
 		it ('should have reference to component element', () => {
@@ -269,11 +273,13 @@ describe('Dependency Injection -', () => {
 			fixture.detectChanges();
 
 			// then
-			expect(compInstance.compRef instanceof BlankComponent).toBe(true, 'componentRef as BlankComponent');
-			expect(compInstance.compRefAsElemRef instanceof ElementRef).toBe(true, 'componentRef as ElementRef');
-			expect(compInstance.compRefAsTemplateRef instanceof TemplateRef).toBe(false, 'componentRef as TemplateRef');
-			expect(isViewContainerRef(compInstance.compRefAsVcr)).toBe(true, 'componentRef as ViewContainerRef');
+			expect(compInstance.compRef instanceof BlankComponent).toBe(true, 'componentRef as BlankComponent'); // TRUE
+			expect(compInstance.compRefAsElemRef instanceof ElementRef).toBe(true, 'componentRef as ElementRef'); // TRUE
+			expect(compInstance.compRefAsTemplateRef instanceof TemplateRef).toBe(false, 'componentRef as TemplateRef'); // FALSE
+			expect(isViewContainerRef(compInstance.compRefAsVcr)).toBe(true, 'componentRef as ViewContainerRef'); // TRUE
 		});
+
+
 
 
 	});
