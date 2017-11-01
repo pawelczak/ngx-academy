@@ -5,7 +5,6 @@ import { TestBed } from '@angular/core/testing';
 
 import { BlankComponent } from './helpers/blank.component';
 import { isViewContainerRef } from './helpers/matchers';
-import { NgTemplateOutlet } from '@angular/common';
 
 describe('ViewChildren -', () => {
 

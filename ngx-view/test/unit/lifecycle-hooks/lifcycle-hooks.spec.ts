@@ -5,6 +5,7 @@ import { Logger } from '../../../src/app/util/logger';
 import { FlatComponent } from './components/flat.component';
 import { FirstLevelComponent } from './components/first-level.component';
 import { SecondLevelComponent } from './components/second-level.component';
+import { ThirdLevelComponent } from './components/third-level.component';
 
 
 describe('Life cycle hooks - ', () => {
@@ -154,7 +155,7 @@ describe('Life cycle hooks - ', () => {
 		/**
 		 *
 		 * <ct-first-level>
-		 *     <ct-second-level></<ct-second-level>
+		 *     <ct-second-level></ct-second-level>
 		 * </ct-first-level>
 		 *
 		 */
@@ -222,6 +223,75 @@ describe('Life cycle hooks - ', () => {
 
 		});
 
+	});
+
+	describe('Simple Three level components tree -', () => {
+
+
+		beforeEach(() => {
+			mockLogger.clear();
+
+			TestBed
+				.configureTestingModule({
+					imports: [],
+					declarations: [
+						FirstLevelComponent,
+						SecondLevelComponent,
+						ThirdLevelComponent
+					],
+					providers: [{
+						provide: Logger, useValue: mockLogger
+					}]
+				});
+
+		});
+
+		/**
+		 *
+		 * <ct-first-level>
+		 *     <ct-second-level>
+		 *         <ct-third-level></ct-third-level>
+		 *     </ct-second-level>
+		 * </ct-first-level>
+		 *
+		 */
+		it('components does not have content', () => {
+
+			// given
+			const expectedCycles = [
+				'First level - ngOnInit',
+				'First level - ngDoCheck',
+				'First level - ngAfterContentInit',
+				'First level - ngAfterContentChecked',
+				'Second level - ngOnInit',
+				'Second level - ngDoCheck',
+				'Second level - ngAfterContentInit',
+				'Second level - ngAfterContentChecked',
+				'Third level - ngOnInit',
+				'Third level - ngDoCheck',
+				'Third level - ngAfterContentInit',
+				'Third level - ngAfterContentChecked',
+				'Third level - ngAfterViewInit',
+				'Third level - ngAfterViewChecked',
+				'Second level - ngAfterViewInit',
+				'Second level - ngAfterViewChecked',
+				'First level - ngAfterViewInit',
+				'First level - ngAfterViewChecked',
+				'Third level - ngOnDestroy',
+				'Second level - ngOnDestroy',
+				'First level - ngOnDestroy'
+			];
+			TestBed.overrideTemplate(SecondLevelComponent, `<ct-third-level ></ct-third-level>`);
+			const fixture = TestBed.createComponent(FirstLevelComponent);
+
+			// when
+			fixture.detectChanges();
+			fixture.destroy();
+
+			// then
+			expect(mockLogger.print()).toEqual(expectedCycles);
+
+		});
 	});
 
 	describe('input modifications', () => {
