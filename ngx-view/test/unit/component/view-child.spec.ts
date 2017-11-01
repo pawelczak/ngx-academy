@@ -3,6 +3,10 @@ import {
 } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
+import { BlankComponent } from './helpers/blank.component';
+import { isViewContainerRef } from './helpers/matchers';
+
+
 describe('ViewChild -', () => {
 
 	describe('template references -', () => {
@@ -17,7 +21,7 @@ describe('ViewChild -', () => {
 	
 				<ng-container #containerRef ></ng-container>
 	
-				<di-blank #compRef ></di-blank>
+				<blank #compRef ></blank>
 			`
 		})
 		class ViewChildComponent {
@@ -84,6 +88,9 @@ describe('ViewChild -', () => {
 
 			@ViewChild('compRef', { read: ViewContainerRef })
 			compRefAsVcr: ViewContainerRef;
+
+			@ViewChild('p')
+			pTag: ElementRef;
 
 		}
 
@@ -163,6 +170,19 @@ describe('ViewChild -', () => {
 			expect(isViewContainerRef(compInstance.compRefAsVcr)).toBe(true, 'componentRef as ViewContainerRef'); // TRUE
 		});
 
+		it ('is not possible to get reference to element by html tag', () => {
+
+			// given
+			const fixture = TestBed.createComponent(ViewChildComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(compInstance.pTag).not.toBeDefined('element by tag selector');
+		})
+
 	});
 
 	describe('component reference -', () => {
@@ -217,30 +237,4 @@ describe('ViewChild -', () => {
 		});
 	});
 
-
 });
-
-
-/**
- * Checks if argument is of ViewContainerRef type
- *
- * @param vcr
- * @returns {boolean}
- */
-function isViewContainerRef(vcr: ViewContainerRef): boolean {
-
-	if (vcr.element &&
-		vcr.injector &&
-		vcr.parentInjector &&
-		vcr.createEmbeddedView) {
-		return true;
-	}
-
-	return false;
-}
-
-@Component({
-	selector: 'di-blank',
-	template: 'blank'
-})
-class BlankComponent {}
