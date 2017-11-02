@@ -1,5 +1,5 @@
 import {
-	ApplicationRef, ChangeDetectorRef, Component, Directive, ElementRef, Injector, Renderer2, TemplateRef, ViewChild, ViewContainerRef
+	ApplicationRef, ChangeDetectorRef, Component, Directive, ElementRef, Injectable, Injector, Optional, Renderer2, TemplateRef, ViewChild, ViewContainerRef
 } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
@@ -116,6 +116,49 @@ describe('Dependency Injection -', () => {
 			expect(testCompInstance.dirRef.changeDetectionRef).toBeDefined();
 			expect(testCompInstance.dirRef.renderer).toBeDefined();
 			expect(testCompInstance.dirRef.methodOnDirective).toBeDefined();
+		});
+
+	});
+
+	describe('injection decorators -', () => {
+
+		@Injectable()
+		class Service {}
+
+		describe('@Optional() -', () => {
+
+			@Component({
+				selector: 'di-comp',
+				template: ``
+			})
+			class OptionalComponent {
+
+				constructor(@Optional() public service: Service) {}
+			}
+
+			beforeEach(() => {
+				TestBed
+					.configureTestingModule({
+						imports: [],
+						declarations: [
+							OptionalComponent
+						],
+						providers: []
+					});
+			});
+
+			it ('should not throw errors, despite not having service defined in providers', () => {
+
+				// given
+				const fixture = TestBed.createComponent(OptionalComponent),
+					compInstance = fixture.componentInstance;
+
+				// when & then
+				expect(compInstance.service).toBeNull();
+			});
+
+
+
 		});
 
 	});
