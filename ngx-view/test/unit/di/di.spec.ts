@@ -1,5 +1,6 @@
 import {
 	ApplicationRef, ChangeDetectorRef, Component, ComponentFactoryResolver, Directive, ElementRef, Injectable, Injector, Optional, Renderer2, RendererFactory2,
+	Self,
 	SkipSelf,
 	TemplateRef, ViewChild,
 	ViewContainerRef
@@ -212,7 +213,7 @@ describe('Dependency Injection -', () => {
 		describe('@SkipSelf() -', () => {
 
 			@Component({
-				selector: '',
+				selector: 'skip',
 				template: ``,
 				providers: [{
 					provide: Service,
@@ -267,8 +268,93 @@ describe('Dependency Injection -', () => {
 				expect(compInstance.service).toBeNull();
 			});
 
+			it ('should start from first parent component',() => {
+
+				// given
+
+				@Component({
+					selector: '',
+					template: `<skip></skip>`,
+					providers: [{
+						provide: Service,
+						useValue: {
+							value: 'Parent context'
+						}
+					}]
+				})
+				class ParentSkipComponent {
+					@ViewChild(SkipComponent)
+					skipCompRef: SkipComponent;
+				}
+
+				TestBed
+					.configureTestingModule({
+						imports: [],
+						declarations: [
+							ParentSkipComponent,
+							SkipComponent
+						],
+						providers: [{
+							provide: Service,
+							useValue: {
+								value: 'Module context'
+							}
+						}]
+					});
+
+				const fixture = TestBed.createComponent(ParentSkipComponent),
+					compInstance = fixture.componentInstance;
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				expect(compInstance.skipCompRef.service.value).toBe('Parent context');
+
+			});
+
 		});
 
+		/**
+		 * @Self makes component to use providers only from component declaration
+		 */
+		describe('@Self() -', () => {
+
+			@Component({
+				selector: 'self',
+				template: ``,
+				providers: []
+			})
+			class SelfComponent {
+				constructor(@Optional() @Self() public service: Service) {
+				}
+			}
+
+			it ('should not take provider from module context', () => {
+
+				TestBed
+					.configureTestingModule({
+						imports: [],
+						declarations: [
+							SelfComponent
+						],
+						providers: [{
+							provide: Service,
+							useValue: {
+								value: 'Module context'
+							}
+						}]
+					});
+
+				// given
+				const fixture = TestBed.createComponent(SelfComponent),
+					compInstance = fixture.componentInstance;
+
+				// when & then
+				expect(compInstance.service).toBeNull();
+			});
+
+		});
 	});
 
 });
