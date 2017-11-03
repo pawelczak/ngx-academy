@@ -1,8 +1,10 @@
 import {
-	ApplicationRef, ChangeDetectorRef, Component, Directive, ElementRef, Injectable, Injector, Optional, Renderer2, SkipSelf, TemplateRef, ViewChild,
+	ApplicationRef, ChangeDetectorRef, Component, ComponentFactoryResolver, Directive, ElementRef, Injectable, Injector, Optional, Renderer2, RendererFactory2,
+	SkipSelf,
+	TemplateRef, ViewChild,
 	ViewContainerRef
 } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { inject, TestBed } from '@angular/core/testing';
 
 describe('Dependency Injection -', () => {
 
@@ -24,6 +26,8 @@ describe('Dependency Injection -', () => {
 				public injector: Injector,
 				public parentInjector: Injector,
 				public renderer: Renderer2,
+				public rendererFactory: RendererFactory2,
+				public componentFactoryResolver: ComponentFactoryResolver,
 				public changeDetectionRef: ChangeDetectorRef) {}
 		}
 
@@ -51,6 +55,8 @@ describe('Dependency Injection -', () => {
 			expect(compInstance.injector).toBeDefined();
 			expect(compInstance.parentInjector).toBeDefined();
 			expect(compInstance.renderer).toBeDefined();
+			expect(compInstance.rendererFactory).toBeDefined();
+			expect(compInstance.componentFactoryResolver).toBeDefined();
 			expect(compInstance.changeDetectionRef).toBeDefined();
 		});
 
@@ -71,6 +77,8 @@ describe('Dependency Injection -', () => {
 				public injector: Injector,
 				public parentInjector: Injector,
 				public renderer: Renderer2,
+				public rendererFactory: RendererFactory2,
+				public componentFactoryResolver: ComponentFactoryResolver,
 				public changeDetectionRef: ChangeDetectorRef) {}
 
 			methodOnDirective() {}
@@ -116,8 +124,47 @@ describe('Dependency Injection -', () => {
 			expect(testCompInstance.dirRef.parentInjector).toBeDefined();
 			expect(testCompInstance.dirRef.changeDetectionRef).toBeDefined();
 			expect(testCompInstance.dirRef.renderer).toBeDefined();
+			expect(testCompInstance.dirRef.rendererFactory).toBeDefined();
+			expect(testCompInstance.dirRef.componentFactoryResolver).toBeDefined();
 			expect(testCompInstance.dirRef.methodOnDirective).toBeDefined();
 		});
+
+	});
+
+	describe('Service -', () => {
+
+		@Injectable()
+		class InjectService {
+
+			constructor(
+				public applicationRef: ApplicationRef,
+				public injector: Injector,
+				public parentInjector: Injector,
+				public rendererFactory: RendererFactory2,
+				public componentFactoryResolver: ComponentFactoryResolver) {}
+		}
+
+		beforeEach(() => {
+			TestBed
+				.configureTestingModule({
+					imports: [],
+					providers: [
+						InjectService
+					]
+				});
+		});
+
+
+		it ('should have all native services injected',
+			inject([InjectService], (injectService: InjectService) => {
+
+			// when & then
+			expect(injectService.applicationRef).toBeDefined();
+			expect(injectService.injector).toBeDefined();
+			expect(injectService.parentInjector).toBeDefined();
+			expect(injectService.rendererFactory).toBeDefined();
+			expect(injectService.componentFactoryResolver).toBeDefined();
+		}));
 
 	});
 
@@ -217,7 +264,7 @@ describe('Dependency Injection -', () => {
 					compInstance = fixture.componentInstance;
 
 				// when & then
-				expect(compInstance.service).not.toBeDefined();
+				expect(compInstance.service).toBeNull();
 			});
 
 		});
