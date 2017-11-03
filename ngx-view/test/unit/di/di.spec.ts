@@ -1,5 +1,6 @@
 import {
-	ApplicationRef, ChangeDetectorRef, Component, Directive, ElementRef, Injectable, Injector, Optional, Renderer2, TemplateRef, ViewChild, ViewContainerRef
+	ApplicationRef, ChangeDetectorRef, Component, Directive, ElementRef, Injectable, Injector, Optional, Renderer2, SkipSelf, TemplateRef, ViewChild,
+	ViewContainerRef
 } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
@@ -123,7 +124,9 @@ describe('Dependency Injection -', () => {
 	describe('injection decorators -', () => {
 
 		@Injectable()
-		class Service {}
+		class Service {
+			value: string;
+		}
 
 		describe('@Optional() -', () => {
 
@@ -157,11 +160,68 @@ describe('Dependency Injection -', () => {
 				expect(compInstance.service).toBeNull();
 			});
 
+		});
 
+		describe('@SkipSelf() -', () => {
+
+			@Component({
+				selector: '',
+				template: ``,
+				providers: [{
+					provide: Service,
+					useValue: {
+						value: 'Component context'
+					}
+				}]
+			})
+			class SkipComponent {
+				constructor(@Optional() @SkipSelf() public service: Service) {}
+			}
+
+			it ('should start to search provider from parent context', () => {
+
+				// given
+				TestBed
+					.configureTestingModule({
+						imports: [],
+						declarations: [
+							SkipComponent
+						],
+						providers: [{
+							provide: Service,
+							useValue: {
+								value: 'Module context'
+							}
+						}]
+					});
+
+				const fixture = TestBed.createComponent(SkipComponent),
+					compInstance = fixture.componentInstance;
+
+				// when & then
+				expect(compInstance.service.value).toBe('Module context');
+			});
+
+			it ('should not use service from component context if module doesn\'t have it in context', () => {
+
+				// given
+				TestBed
+					.resetTestingModule()
+					.configureTestingModule({
+						imports: [],
+						declarations: [
+							SkipComponent
+						]
+					});
+				const fixture = TestBed.createComponent(SkipComponent),
+					compInstance = fixture.componentInstance;
+
+				// when & then
+				expect(compInstance.service).not.toBeDefined();
+			});
 
 		});
 
 	});
-
 
 });
