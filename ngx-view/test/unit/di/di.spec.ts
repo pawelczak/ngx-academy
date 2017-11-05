@@ -1,5 +1,6 @@
 import {
-	ApplicationRef, ChangeDetectorRef, Component, ComponentFactoryResolver, Directive, ElementRef, Injectable, Injector, Optional, Renderer2, RendererFactory2,
+	ApplicationRef, ChangeDetectorRef, Component, ComponentFactoryResolver, Directive, ElementRef, Host, Injectable, Injector, Optional, Renderer2,
+	RendererFactory2,
 	Self,
 	SkipSelf,
 	TemplateRef, ViewChild,
@@ -352,6 +353,126 @@ describe('Dependency Injection -', () => {
 
 				// when & then
 				expect(compInstance.service).toBeNull();
+			});
+
+		});
+
+		/**
+		 * @Host makes component to use providers only from component or parent component
+		 */
+		describe('@Host() -', () => {
+
+			@Component({
+				selector: 'host',
+				template: ``,
+				providers: [{
+					provide: Service,
+					useValue: {
+						value: 'Component context'
+					}
+				}]
+			})
+			class HostComponent {
+				constructor(@Optional() @Host() public service: Service) {}
+			}
+
+			@Component({
+				selector: '',
+				template: `<host></host>`,
+				providers: [{
+					provide: Service,
+					useValue: {
+						value: 'Parent context'
+					}
+				}]
+			})
+			class ParentHostComponent {
+				@ViewChild(HostComponent)
+				hostComp: HostComponent;
+			}
+
+			it ('should not use provider declared in component', () => {
+
+				// given
+				TestBed
+					.configureTestingModule({
+						imports: [],
+						declarations: [
+							HostComponent
+						],
+						providers: []
+					});
+
+				const fixture = TestBed.createComponent(HostComponent),
+					compInstance = fixture.componentInstance;
+
+				// when & then
+				expect(compInstance.service.value).toBe('Component context');
+			});
+
+			it ('should use provider declared in parent component', () => {
+
+				// given
+				TestBed
+					.configureTestingModule({
+						imports: [],
+						declarations: [
+							HostComponent,
+							ParentHostComponent
+						],
+						providers: []
+					});
+
+				const fixture = TestBed.createComponent(ParentHostComponent),
+					compInstance = fixture.componentInstance;
+
+				// when & then
+				expect(compInstance.hostComp.service.value).toBe('Component context');
+			});
+
+			it ('should not use provider declared in module', () => {
+
+				@Component({
+					selector: 'host',
+					template: ``
+				})
+				class EmptyHostComponent {
+					constructor(@Optional() @Host() public service: Service) {}
+				}
+
+				@Component({
+					selector: '',
+					template: `<host></host>`
+				})
+				class ParentEmptyHostComponent {
+					@ViewChild(EmptyHostComponent)
+					hostComp: HostComponent;
+				}
+
+				TestBed
+					.configureTestingModule({
+						imports: [],
+						declarations: [
+							EmptyHostComponent,
+							ParentEmptyHostComponent
+						],
+						providers: [{
+							provide: Service,
+							useValue: {
+								value: 'Module context'
+							}
+						}]
+					});
+
+				// given
+				const fixture = TestBed.createComponent(ParentEmptyHostComponent),
+					compInstance = fixture.componentInstance;
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				expect(compInstance.hostComp.service).toBeNull();
 			});
 
 		});
