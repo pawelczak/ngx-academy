@@ -1,5 +1,6 @@
 import {
-	ApplicationRef, ChangeDetectorRef, Component, ComponentFactoryResolver, Directive, ElementRef, Host, Injectable, Injector, Optional, Renderer2,
+	ApplicationRef, ChangeDetectorRef, Component, ComponentFactoryResolver, Directive, ElementRef, Host, Inject, Injectable, InjectionToken, Injector, Optional,
+	Renderer2,
 	RendererFactory2,
 	Self,
 	SkipSelf,
@@ -177,6 +178,51 @@ describe('Dependency Injection -', () => {
 			value: string;
 		}
 
+		describe('@Inject() -', () => {
+
+			const injectionToken = new InjectionToken('token.service');
+
+			@Component({
+				selector: 'di-comp',
+				template: ``
+			})
+			class InjectComponent {
+				constructor(
+					@Inject(Service) public service: any,
+					@Inject(injectionToken) public serviceFromToken: any) {}
+			}
+
+			beforeEach(() => {
+				TestBed
+					.configureTestingModule({
+						imports: [],
+						declarations: [
+							InjectComponent
+						],
+						providers: [
+							Service,
+							{
+								provide: injectionToken,
+								useClass: Service
+							}
+						]
+					});
+			});
+
+			it ('should be possible to inject objects from context', () => {
+
+				// given
+				const fixture = TestBed.createComponent(InjectComponent),
+					compInstance = fixture.componentInstance;
+
+				// when & then
+				expect(compInstance.service).toBeDefined();
+				expect(compInstance.service instanceof Service).toBe(true);
+				expect(compInstance.serviceFromToken).toBeDefined();
+				expect(compInstance.serviceFromToken instanceof Service).toBe(true);
+			});
+		});
+
 		describe('@Optional() -', () => {
 
 			@Component({
@@ -184,7 +230,6 @@ describe('Dependency Injection -', () => {
 				template: ``
 			})
 			class OptionalComponent {
-
 				constructor(@Optional() public service: Service) {}
 			}
 

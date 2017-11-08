@@ -143,7 +143,6 @@ describe('Dependency injection - providers -', () => {
 				// then
 				expect(injector.get(token)).toEqual(providerValues);
 			});
-
 		});
 	});
 
