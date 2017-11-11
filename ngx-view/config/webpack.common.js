@@ -56,7 +56,6 @@ module.exports = {
 				loaders: [
 					'style-loader',
 					'css-loader',
-					// 'postcss-loader',
 					'sass-loader'
 				]
 			},
@@ -65,7 +64,6 @@ module.exports = {
 				loaders: [
 					'to-string-loader',
 					'css-loader',
-					// 'postcss-loader',
 					'sass-loader'
 				]
 			},

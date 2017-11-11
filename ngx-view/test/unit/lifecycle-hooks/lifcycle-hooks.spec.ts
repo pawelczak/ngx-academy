@@ -1,4 +1,4 @@
-import { ApplicationRef, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { Logger } from '../../../src/app/util/logger';
@@ -9,8 +9,6 @@ import { ThirdLevelComponent } from './components/third-level.component';
 
 
 describe('Life cycle hooks - ', () => {
-
-
 
 	class MockLogger {
 
