@@ -16,11 +16,11 @@ const config = webpackMerge(commonConfig, {
 		new LoaderOptionsPlugin({
 			debug: true,
 			options: {
-				// tslint: {
-				// 	emitErrors: true,
-				// 	failOnHint: true,
-				// 	resourcePath: 'src'
-				// }
+				tslint: {
+					emitErrors: true,
+					failOnHint: true,
+					resourcePath: 'src'
+				}
 			}
 		})
 	]

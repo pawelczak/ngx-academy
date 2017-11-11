@@ -1,4 +1,4 @@
-import { InjectionToken, ReflectiveInjector } from '@angular/core';
+import { InjectionToken, Injector, StaticProvider } from '@angular/core';
 
 describe('Dependency injection - providers -', () => {
 
@@ -12,11 +12,12 @@ describe('Dependency injection - providers -', () => {
 			//given
 			const providers = [{
 				provide: Service,
-				useClass: Service
-			}];
+				useClass: Service,
+				deps: []
+			} as StaticProvider];
 
 			// when
-			const injector = ReflectiveInjector.resolveAndCreate(providers);
+			const injector = Injector.create(providers);
 
 			// then
 			expect(injector.get(Service)).toBeDefined();
@@ -36,7 +37,7 @@ describe('Dependency injection - providers -', () => {
 			}];
 
 			// when
-			const injector = ReflectiveInjector.resolveAndCreate(providers);
+			const injector = Injector.create(providers);
 
 			// then
 			expect(injector.get(Service)).toBe(service);
@@ -50,14 +51,17 @@ describe('Dependency injection - providers -', () => {
 			//given
 			const serviceInjectionToken = new InjectionToken('existing.service');
 			const providers = [
-				Service,
+				{
+					provide: Service,
+					deps: []
+				} as StaticProvider,
 				{
 				provide: serviceInjectionToken,
 				useExisting: Service
 			}];
 
 			// when
-			const injector = ReflectiveInjector.resolveAndCreate(providers);
+			const injector = Injector.create(providers);
 
 			// then
 			expect(injector.get(serviceInjectionToken)).toBeDefined();
@@ -75,11 +79,12 @@ describe('Dependency injection - providers -', () => {
 					provide: Service,
 					useFactory: () => {
 						return new Service();
-					}
-				}];
+					},
+					deps: []
+				} as StaticProvider];
 
 			// when
-			const injector = ReflectiveInjector.resolveAndCreate(providers);
+			const injector = Injector.create(providers);
 
 			// then
 			expect(injector.get(Service)).toBeDefined();
@@ -95,7 +100,10 @@ describe('Dependency injection - providers -', () => {
 
 			//given
 			const providers = [
-				Service,
+				{
+					provide: Service,
+					deps: []
+				} as StaticProvider,
 				{
 					provide: ServiceWithDeps,
 					useFactory: (service: Service) => {
@@ -107,7 +115,7 @@ describe('Dependency injection - providers -', () => {
 				}];
 
 			// when
-			const injector = ReflectiveInjector.resolveAndCreate(providers);
+			const injector = Injector.create(providers);
 
 			// then
 			expect(injector.get(ServiceWithDeps)).toBeDefined();
@@ -138,7 +146,7 @@ describe('Dependency injection - providers -', () => {
 				}];
 
 				// when
-				const injector = ReflectiveInjector.resolveAndCreate(providers);
+				const injector = Injector.create(providers);
 
 				// then
 				expect(injector.get(token)).toEqual(providerValues);
