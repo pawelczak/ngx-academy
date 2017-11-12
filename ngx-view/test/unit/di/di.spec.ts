@@ -1,5 +1,6 @@
 import {
-	ApplicationRef, ChangeDetectorRef, Component, ComponentFactoryResolver, Directive, ElementRef, Host, Inject, Injectable, InjectionToken, Injector, Optional,
+	ApplicationRef, ChangeDetectorRef, Component, ComponentFactoryResolver, Directive, ElementRef, Host, Inject, Injectable, InjectionToken, Injector, NgZone,
+	Optional,
 	Renderer2,
 	RendererFactory2,
 	Self,
@@ -31,7 +32,8 @@ describe('Dependency Injection -', () => {
 				public renderer: Renderer2,
 				public rendererFactory: RendererFactory2,
 				public componentFactoryResolver: ComponentFactoryResolver,
-				public changeDetectionRef: ChangeDetectorRef) {}
+				public changeDetectionRef: ChangeDetectorRef,
+				public ngZone: NgZone) {}
 		}
 
 		beforeEach(() => {
@@ -61,6 +63,7 @@ describe('Dependency Injection -', () => {
 			expect(compInstance.rendererFactory).toBeDefined();
 			expect(compInstance.componentFactoryResolver).toBeDefined();
 			expect(compInstance.changeDetectionRef).toBeDefined();
+			expect(compInstance.ngZone).toBeDefined();
 		});
 
 	});
@@ -82,7 +85,8 @@ describe('Dependency Injection -', () => {
 				public renderer: Renderer2,
 				public rendererFactory: RendererFactory2,
 				public componentFactoryResolver: ComponentFactoryResolver,
-				public changeDetectionRef: ChangeDetectorRef) {}
+				public changeDetectionRef: ChangeDetectorRef,
+				public ngZone: NgZone) {}
 
 			methodOnDirective() {}
 		}
@@ -129,6 +133,7 @@ describe('Dependency Injection -', () => {
 			expect(testCompInstance.dirRef.renderer).toBeDefined();
 			expect(testCompInstance.dirRef.rendererFactory).toBeDefined();
 			expect(testCompInstance.dirRef.componentFactoryResolver).toBeDefined();
+			expect(testCompInstance.dirRef.ngZone).toBeDefined();
 			expect(testCompInstance.dirRef.methodOnDirective).toBeDefined();
 		});
 
@@ -144,7 +149,8 @@ describe('Dependency Injection -', () => {
 				public injector: Injector,
 				public parentInjector: Injector,
 				public rendererFactory: RendererFactory2,
-				public componentFactoryResolver: ComponentFactoryResolver) {}
+				public componentFactoryResolver: ComponentFactoryResolver,
+				public ngZone: NgZone) {}
 		}
 
 		beforeEach(() => {
@@ -167,6 +173,7 @@ describe('Dependency Injection -', () => {
 			expect(injectService.parentInjector).toBeDefined();
 			expect(injectService.rendererFactory).toBeDefined();
 			expect(injectService.componentFactoryResolver).toBeDefined();
+			expect(injectService.ngZone).toBeDefined();
 		}));
 
 	});
