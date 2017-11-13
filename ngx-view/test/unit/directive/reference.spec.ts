@@ -52,6 +52,39 @@ describe('Directive - reference -', () => {
 
 	});
 
+	describe('injector -', () => {
+
+		@Directive({
+			selector: '[simple-dir]'
+		})
+		class SimpleDirective {}
+
+		@Component({
+			selector: 'test',
+			template: `<span export-dir ></span>`
+		})
+		class TestComponent {
+			constructor(public simpleDirective: SimpleDirective) {}
+		}
+
+		it ('should not be added to injector', () => {
+
+			// given
+			TestBed
+				.configureTestingModule({
+					imports: [],
+					declarations: [
+						TestComponent,
+						SimpleDirective
+					]
+				});
+
+			// when & then
+			expect(() => TestBed.createComponent(TestComponent)).toThrowError();
+		});
+
+	});
+
 	describe('shared injector -', () => {
 
 		const DIDIRECTIVE_VALUE = 'DIDirective';

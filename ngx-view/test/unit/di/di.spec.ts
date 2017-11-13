@@ -373,17 +373,18 @@ describe('Dependency Injection -', () => {
 		 */
 		describe('@Self() -', () => {
 
-			@Component({
-				selector: 'self',
-				template: ``,
-				providers: []
-			})
-			class SelfComponent {
-				constructor(@Optional() @Self() public service: Service) {
-				}
-			}
-
 			it ('should not take provider from module context', () => {
+
+				@Component({
+					selector: 'self',
+					template: ``,
+					providers: []
+				})
+				class SelfComponent {
+					constructor(@Optional() @Self() public selfService: Service,
+								@Optional() public notSelfService: Service) {
+					}
+				}
 
 				TestBed
 					.configureTestingModule({
@@ -404,7 +405,9 @@ describe('Dependency Injection -', () => {
 					compInstance = fixture.componentInstance;
 
 				// when & then
-				expect(compInstance.service).toBeNull();
+				expect(compInstance.selfService).toBeNull();
+				expect(compInstance.notSelfService).not.toBeNull();
+				expect(compInstance.notSelfService.value).toBe('Module context');
 			});
 
 		});
