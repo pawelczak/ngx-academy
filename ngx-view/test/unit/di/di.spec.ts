@@ -1,5 +1,7 @@
 import {
-	ApplicationRef, ChangeDetectorRef, Component, ComponentFactoryResolver, Directive, ElementRef, Host, Inject, Injectable, InjectionToken, Injector, NgZone,
+	ApplicationRef, ChangeDetectorRef, Compiler, Component, ComponentFactoryResolver, Directive, ElementRef, Host, Inject, Injectable, InjectionToken, Injector,
+	NgModuleRef,
+	NgZone,
 	Optional,
 	Renderer2,
 	RendererFactory2,
@@ -33,6 +35,8 @@ describe('Dependency Injection -', () => {
 				public rendererFactory: RendererFactory2,
 				public componentFactoryResolver: ComponentFactoryResolver,
 				public changeDetectionRef: ChangeDetectorRef,
+				public compiler: Compiler,
+				public ngModuleRef: NgModuleRef<any>,
 				public ngZone: NgZone) {}
 		}
 
@@ -63,6 +67,8 @@ describe('Dependency Injection -', () => {
 			expect(compInstance.rendererFactory).toBeDefined();
 			expect(compInstance.componentFactoryResolver).toBeDefined();
 			expect(compInstance.changeDetectionRef).toBeDefined();
+			expect(compInstance.compiler).toBeDefined();
+			expect(compInstance.ngModuleRef).toBeDefined();
 			expect(compInstance.ngZone).toBeDefined();
 		});
 
@@ -86,6 +92,8 @@ describe('Dependency Injection -', () => {
 				public rendererFactory: RendererFactory2,
 				public componentFactoryResolver: ComponentFactoryResolver,
 				public changeDetectionRef: ChangeDetectorRef,
+				public compiler: Compiler,
+				public ngModuleRef: NgModuleRef<any>,
 				public ngZone: NgZone) {}
 
 			methodOnDirective() {}
@@ -133,6 +141,8 @@ describe('Dependency Injection -', () => {
 			expect(testCompInstance.dirRef.renderer).toBeDefined();
 			expect(testCompInstance.dirRef.rendererFactory).toBeDefined();
 			expect(testCompInstance.dirRef.componentFactoryResolver).toBeDefined();
+			expect(testCompInstance.dirRef.compiler).toBeDefined();
+			expect(testCompInstance.dirRef.ngModuleRef).toBeDefined();
 			expect(testCompInstance.dirRef.ngZone).toBeDefined();
 			expect(testCompInstance.dirRef.methodOnDirective).toBeDefined();
 		});
@@ -150,6 +160,8 @@ describe('Dependency Injection -', () => {
 				public parentInjector: Injector,
 				public rendererFactory: RendererFactory2,
 				public componentFactoryResolver: ComponentFactoryResolver,
+				public compiler: Compiler,
+				public ngModuleRef: NgModuleRef<any>,
 				public ngZone: NgZone) {}
 		}
 
@@ -173,6 +185,8 @@ describe('Dependency Injection -', () => {
 			expect(injectService.parentInjector).toBeDefined();
 			expect(injectService.rendererFactory).toBeDefined();
 			expect(injectService.componentFactoryResolver).toBeDefined();
+			expect(injectService.compiler).toBeDefined();
+			expect(injectService.ngModuleRef).toBeDefined();
 			expect(injectService.ngZone).toBeDefined();
 		}));
 
