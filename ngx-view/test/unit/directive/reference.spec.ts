@@ -61,7 +61,7 @@ describe('Directive - reference -', () => {
 
 		@Component({
 			selector: 'test',
-			template: `<span export-dir ></span>`
+			template: `<span simple-dir ></span>`
 		})
 		class TestComponent {
 			constructor(public simpleDirective: SimpleDirective) {}
