@@ -1,4 +1,4 @@
-import { Component, Directive, Host, Self, ViewChild } from '@angular/core';
+import { Component, Directive, forwardRef, Host, Injector, Self, ViewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
@@ -59,15 +59,15 @@ describe('Directive - reference -', () => {
 		})
 		class SimpleDirective {}
 
-		@Component({
-			selector: 'test',
-			template: `<span simple-dir ></span>`
-		})
-		class TestComponent {
-			constructor(public simpleDirective: SimpleDirective) {}
-		}
+		it ('should NOT be possible to inject directive to component, without adding it to providers', () => {
 
-		it ('should not be added to injector', () => {
+			@Component({
+				selector: 'test',
+				template: `<span simple-dir ></span>`
+			})
+			class TestComponent {
+				constructor(public simpleDirective: SimpleDirective) {}
+			}
 
 			// given
 			TestBed
@@ -81,6 +81,50 @@ describe('Directive - reference -', () => {
 
 			// when & then
 			expect(() => TestBed.createComponent(TestComponent)).toThrowError();
+		});
+
+		it ('should NOT be possible to get directive from injector', () => {
+
+			@Component({
+				selector: 'test',
+				template: `
+					<span simple-dir ></span>
+					<test-child></test-child>
+				`
+			})
+			class TestComponent {
+				@ViewChild(forwardRef(() => TestChildComponent))
+				testChild: TestChildComponent;
+
+				constructor(public injector: Injector) {}
+			}
+
+			@Component({
+				selector: 'test-child',
+				template: `<span simple-dir ></span>`
+			})
+			class TestChildComponent {
+				constructor(public injector: Injector) {}
+			}
+
+			// given
+			TestBed
+				.configureTestingModule({
+					imports: [],
+					declarations: [
+						TestComponent,
+						TestChildComponent,
+						SimpleDirective
+					]
+				});
+			const fixture = TestBed.createComponent(TestComponent);
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(() => fixture.componentInstance.injector.get(SimpleDirective)).toThrowError();
+			expect(() => fixture.componentInstance.testChild.injector.get(SimpleDirective)).toThrowError();
 		});
 
 	});
