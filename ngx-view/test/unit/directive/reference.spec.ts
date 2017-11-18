@@ -174,11 +174,11 @@ describe('Directive - reference -', () => {
 						SharedNodeComponent,
 						DIDirective
 					],
-					providers: [{
-						provide: DIDirective,
-						useClass: DIDirective,
-						deps: []
-					}]
+					// providers: [{
+					// 	provide: DIDirective,
+					// 	useClass: DIDirective,
+					// 	deps: []
+					// }]
 				});
 
 			const fixture = TestBed.createComponent(TestComponent);
