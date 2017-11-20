@@ -83,7 +83,7 @@ describe('Directive - reference -', () => {
 			expect(() => TestBed.createComponent(TestComponent)).toThrowError();
 		});
 
-		it ('should NOT be possible to get directive from injector', () => {
+		it ('should NOT be possible to get directive from child injector', () => {
 
 			@Component({
 				selector: 'test',
@@ -136,11 +136,7 @@ describe('Directive - reference -', () => {
 		class DIDirectiveRef {}
 
 		@Directive({
-			selector: '[di-dir]',
-			providers: [{
-				provide: DIDirectiveRef,
-				useExisting: DIDirective
-			}]
+			selector: '[di-dir]'
 		})
 		class DIDirective {
 			value = DIDIRECTIVE_VALUE;
@@ -148,10 +144,13 @@ describe('Directive - reference -', () => {
 
 		@Component({
 			selector: 'shared-node',
-			template: ``
+			template: `<shared-node-child></shared-node-child>`
 		})
 		class SharedNodeComponent {
-			constructor(@Host() public diDirectiveRef: DIDirectiveRef) {}
+			@ViewChild(forwardRef(() => SharedNodeChildComponent))
+			sharedChild: SharedNodeChildComponent;
+
+			constructor(@Host() public diDirective: DIDirective) {}
 		}
 
 		@Component({
@@ -163,6 +162,14 @@ describe('Directive - reference -', () => {
 			compRef: SharedNodeComponent;
 		}
 
+		@Component({
+			selector: 'shared-node-child',
+			template: ``
+		})
+		class SharedNodeChildComponent {
+			constructor(public diDirective: DIDirective) {}
+		}
+
 		it ('should be possible to get reference to a directive using dependency injection', () => {
 
 			// given
@@ -172,13 +179,9 @@ describe('Directive - reference -', () => {
 					declarations: [
 						TestComponent,
 						SharedNodeComponent,
+						SharedNodeChildComponent,
 						DIDirective
-					],
-					// providers: [{
-					// 	provide: DIDirective,
-					// 	useClass: DIDirective,
-					// 	deps: []
-					// }]
+					]
 				});
 
 			const fixture = TestBed.createComponent(TestComponent);
@@ -188,9 +191,35 @@ describe('Directive - reference -', () => {
 
 			// then
 			const sharedNodeComp = fixture.componentInstance.compRef;
-			expect(sharedNodeComp.diDirectiveRef).toBeDefined();
-			expect(sharedNodeComp.diDirectiveRef instanceof DIDirective).toBe(true);
-			expect((sharedNodeComp.diDirectiveRef as DIDirective).value).toBe(DIDIRECTIVE_VALUE);
+			expect(sharedNodeComp.diDirective).toBeDefined();
+			expect(sharedNodeComp.diDirective instanceof DIDirective).toBe(true);
+			expect((sharedNodeComp.diDirective as DIDirective).value).toBe(DIDIRECTIVE_VALUE);
+		});
+
+		it ('child should have access to directive on shared-component', () => {
+
+			// given
+			TestBed
+				.configureTestingModule({
+					imports: [],
+					declarations: [
+						TestComponent,
+						SharedNodeComponent,
+						SharedNodeChildComponent,
+						DIDirective
+					]
+				});
+
+			const fixture = TestBed.createComponent(TestComponent);
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			const sharedNodeComp = fixture.componentInstance.compRef;
+			expect(sharedNodeComp.sharedChild.diDirective).toBeDefined();
+			expect(sharedNodeComp.sharedChild.diDirective instanceof DIDirective).toBe(true);
+			expect((sharedNodeComp.sharedChild.diDirective as DIDirective).value).toBe(DIDIRECTIVE_VALUE);
 		});
 
 	});
