@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClient, HttpEvent, HttpHandler, HttpInterceptor, HttpParams, HttpRequest } from '@angular/common/http';
 import { getTestBed, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { Observable } from 'rxjs/Observable';
 
 
 describe('HttpClient -', () => {
@@ -30,95 +31,208 @@ describe('HttpClient -', () => {
 
 	const cars = [new Car('combi'), new Car('suv')];
 
-	beforeEach(() => {
-		TestBed
-			.configureTestingModule({
-				imports: [
-					HttpClientTestingModule
-				],
-				providers: [
-					CarsService
-				]
+	describe ('basic http calls -', () => {
+
+		beforeEach(() => {
+			TestBed
+				.configureTestingModule({
+					imports: [
+						HttpClientTestingModule
+					],
+					providers: [
+						CarsService
+					]
+				});
+
+			const injector = getTestBed();
+			carsService = injector.get(CarsService);
+			httpMock = injector.get(HttpTestingController);
+		});
+
+		afterEach(() => {
+			httpMock.verify();
+		});
+
+
+		it ('mock simple http calls', (done) => {
+
+			// when & then
+			carsService.getCars().subscribe((requestedCars) => {
+				expect(requestedCars).toEqual(cars);
+				expect(requestedCars[0] instanceof Car).toBeTruthy();
+				expect(requestedCars[0].getType()).toBe(cars[0].getType());
+				done();
 			});
 
-		const injector = getTestBed();
-		carsService = injector.get(CarsService);
-		httpMock = injector.get(HttpTestingController);
-	});
-
-	afterEach(() => {
-		httpMock.verify();
-	});
-
-
-	it ('mock simple http calls', (done) => {
-
-		// when & then
-		carsService.getCars().subscribe((requestedCars) => {
-			expect(requestedCars).toEqual(cars);
-			expect(requestedCars[0] instanceof Car).toBeTruthy();
-			expect(requestedCars[0].getType()).toBe(cars[0].getType());
-			done();
+			httpMock.expectOne('cars')
+				.flush(cars);
 		});
 
-		httpMock.expectOne('cars')
-			.flush(cars);
-	});
+		it ('should return type of request and params', (done) => {
 
-	it ('should return type of request and params', (done) => {
+			// given
+			const url = 'cars?max=100';
 
-		// given
-		const url = 'cars?max=100';
+			// when & then
+			carsService.getCars(url).subscribe((requestedCars) => {
+				expect(requestedCars).toEqual(cars);
+				done();
+			});
 
-		// when & then
-		carsService.getCars(url).subscribe((requestedCars) => {
-			expect(requestedCars).toEqual(cars);
-			done();
+			const request = httpMock.expectOne(url);
+			expect(request.request.url).toBe(url);
+			expect(request.request.params).toEqual(new HttpParams());
+
+			request.flush(cars);
 		});
 
-		const request = httpMock.expectOne(url);
-		expect(request.request.url).toBe(url);
-		expect(request.request.params).toEqual(new HttpParams());
+		it ('should handle errors', (done) => {
 
-		request.flush(cars);
+			// given
+			const url = 'cars';
+
+			// when & then
+			carsService
+				.getCars(url)
+				.subscribe(
+					(next) => {},
+					(error) => {
+						done();
+					}
+				);
+
+			const request = httpMock.expectOne(url);
+			request.error(new ErrorEvent(null, null));
+		});
+
+		it ('should return Http params', (done) => {
+
+			// given
+			const url = 'cars';
+			const params = new HttpParams().set('max', '200');
+
+			// when & then
+			carsService.getCars(url, params).subscribe((requestedCars) => {
+				expect(requestedCars).toEqual(cars);
+				done();
+			});
+
+			const request = httpMock.expectOne(url + '?max=200');
+			expect(request.request.url).toBe(url);
+			expect(request.request.params).toEqual(params);
+
+			request.flush(cars);
+		});
+
 	});
 
-	it ('should handle errors', (done) => {
+	describe( 'interceptors -', () => {
 
-		// given
-		const url = 'cars';
 
-		// when & then
-		carsService
-			.getCars(url)
-			.subscribe(
-				(next) => {},
-				(error) => {
-					done();
+		describe ('should work in order of declaration -', () => {
+
+			let intercepts: Array<string> = [];
+
+			class FirstInterceptor implements HttpInterceptor {
+
+				intercept(request: HttpRequest<any>, next: HttpHandler): Observable<any> {
+
+					intercepts.push('first');
+
+					return next.handle(request);
 				}
-			);
+			}
 
-		const request = httpMock.expectOne(url);
-		request.error(new ErrorEvent(null, null));
-	});
+			class SecondInterceptor implements HttpInterceptor {
 
-	it ('should return Http params', (done) => {
+				intercept(request: HttpRequest<any>, next: HttpHandler): Observable<any> {
 
-		// given
-		const url = 'cars';
-		const params = new HttpParams().set('max', '200');
+					intercepts.push('second');
 
-		// when & then
-		carsService.getCars(url, params).subscribe((requestedCars) => {
-			expect(requestedCars).toEqual(cars);
-			done();
+					return next.handle(request);
+				}
+			}
+
+			it ('alphabetical interceptors injection', (done) => {
+
+				// given
+				TestBed
+					.configureTestingModule({
+						imports: [
+							HttpClientTestingModule
+						],
+						providers: [
+							CarsService,
+							{
+								provide: HTTP_INTERCEPTORS,
+								useClass: FirstInterceptor,
+								multi: true,
+							},
+							{
+								provide: HTTP_INTERCEPTORS,
+								useClass: SecondInterceptor,
+								multi: true,
+							}
+						]
+					});
+
+				const url = 'cars';
+				const injector = getTestBed();
+				carsService = injector.get(CarsService);
+				httpMock = injector.get(HttpTestingController);
+				intercepts = [];
+
+				carsService.getCars(url).subscribe(() => {
+					expect(intercepts).toEqual(['first', 'second']);
+					done();
+				});
+
+				const request = httpMock.expectOne(url);
+
+				request.flush(cars);
+			});
+
+			it ('reverse order of interceptors', (done) => {
+
+				// given
+				TestBed
+					.configureTestingModule({
+						imports: [
+							HttpClientTestingModule
+						],
+						providers: [
+							CarsService,
+							{
+								provide: HTTP_INTERCEPTORS,
+								useClass: SecondInterceptor,
+								multi: true,
+							},
+							{
+								provide: HTTP_INTERCEPTORS,
+								useClass: FirstInterceptor,
+								multi: true,
+							}
+						]
+					});
+
+				const url = 'cars';
+				const injector = getTestBed();
+				carsService = injector.get(CarsService);
+				httpMock = injector.get(HttpTestingController);
+				intercepts = [];
+
+				carsService.getCars(url).subscribe(() => {
+					expect(intercepts).toEqual(['second', 'first']);
+					done();
+				});
+
+				const request = httpMock.expectOne(url);
+
+				request.flush(cars);
+			});
+
 		});
 
-		const request = httpMock.expectOne(url + '?max=200');
-		expect(request.request.url).toBe(url);
-		expect(request.request.params).toEqual(params);
-
-		request.flush(cars);
 	});
 
 });
