@@ -6,6 +6,7 @@ import {
 
 import { Logger } from '../util/logger';
 import { LifeCyclesComponent } from './life-cycles.component';
+import { GithubApiService } from '../http/github-api.service';
 
 @Component({
 	selector: 'ct-level-one',
@@ -41,7 +42,8 @@ export class LevelOneComponent extends LifeCyclesComponent {
 
 	prefix: string = 'LevelOne - ';
 
-	constructor(private logger: Logger) {
+	constructor(private logger: Logger,
+				private githubApiService: GithubApiService) {
 		super();
 	}
 
