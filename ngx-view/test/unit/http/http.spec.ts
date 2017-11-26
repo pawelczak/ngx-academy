@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HTTP_INTERCEPTORS, HttpClient, HttpEvent, HttpHandler, HttpInterceptor, HttpParams, HttpRequest } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClient, HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpParams, HttpRequest } from '@angular/common/http';
 import { getTestBed, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Observable } from 'rxjs/Observable';
+import { filter } from 'rxjs/operators';
 
 
 describe('HttpClient -', () => {
@@ -89,20 +90,27 @@ describe('HttpClient -', () => {
 		it ('should handle errors', (done) => {
 
 			// given
-			const url = 'cars';
+			const url = 'cars',
+				errorMessage = {'error': 'Error message'},
+				errorStatus = 500;
 
 			// when & then
 			carsService
 				.getCars(url)
 				.subscribe(
 					(next) => {},
-					(error) => {
+					(error: HttpErrorResponse) => {
+						expect(error.status).toEqual(errorStatus);
+						expect(error.error).toEqual(errorMessage);
 						done();
 					}
 				);
 
 			const request = httpMock.expectOne(url);
-			request.error(new ErrorEvent(null, null));
+			request.flush(
+						errorMessage,
+						{status: errorStatus, statusText: 'Server error'}
+					);
 		});
 
 		it ('should return Http params', (done) => {
@@ -127,6 +135,87 @@ describe('HttpClient -', () => {
 	});
 
 	describe( 'interceptors -', () => {
+
+		describe ('response manipulation -', () => {
+
+			class OnlyErrorsInterceptor implements HttpInterceptor {
+
+				intercept(request: HttpRequest<any>, next: HttpHandler): Observable<any> {
+
+					let errRequest = request.clone();
+
+					return next.handle(request)
+								.pipe(
+									filter((response: any) => {
+										return response.status === 500;
+									})
+								);
+				}
+			}
+
+			beforeEach(() => {
+				TestBed
+					.configureTestingModule({
+						imports: [
+							HttpClientTestingModule
+						],
+						providers: [
+							CarsService,
+							{
+								provide: HTTP_INTERCEPTORS,
+								useClass: OnlyErrorsInterceptor,
+								multi: true,
+							}
+						]
+					});
+
+				const injector = getTestBed();
+				carsService = injector.get(CarsService);
+				httpMock = injector.get(HttpTestingController);
+			});
+
+			afterEach(() => {
+				httpMock.verify();
+			});
+
+			it ('should pass through only errors', (done) => {
+
+				// given
+				const errorUrl = 'cars/errors',
+					successUrl = 'cars/success',
+					errorMessage = {'error': 'Error message'},
+					errorStatus = 500;
+
+				// when & then
+				carsService
+					.getCars(successUrl)
+					.subscribe((next) => {
+						expect(next).not.toHaveBeenCalled();
+					});
+
+				carsService
+					.getCars(errorUrl)
+					.subscribe(
+						(next) => {},
+						(error) => {
+							expect(error.status).toEqual(errorStatus);
+							expect(error.error).toEqual(errorMessage);
+							done();
+						}
+					);
+
+				const emptyRequest = httpMock.expectOne(successUrl);
+				emptyRequest.flush({});
+
+				const request = httpMock.expectOne(errorUrl);
+				request.flush(
+					errorMessage,
+					{status: errorStatus, statusText: 'Server error'}
+				);
+
+			});
+
+		});
 
 
 		describe ('should work in order of declaration -', () => {
