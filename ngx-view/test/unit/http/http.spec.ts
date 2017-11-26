@@ -3,7 +3,7 @@ import { HTTP_INTERCEPTORS, HttpClient, HttpErrorResponse, HttpEvent, HttpHandle
 import { getTestBed, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Observable } from 'rxjs/Observable';
-import { filter } from 'rxjs/operators';
+import { filter, map, tap } from 'rxjs/operators';
 
 
 describe('HttpClient -', () => {
@@ -136,13 +136,86 @@ describe('HttpClient -', () => {
 
 	describe( 'interceptors -', () => {
 
-		describe ('response manipulation -', () => {
+		describe ('response success manipulation -', () => {
+
+			class CarsCounterInterceptor implements HttpInterceptor {
+
+				intercept(request: HttpRequest<any>, next: HttpHandler): Observable<any> {
+
+					return next.handle(request)
+								.pipe(
+									map((response: any) => {
+
+										if (response.status === 200) {
+											const newResponse = response.clone();
+											const newBody = {
+												cars: response.body,
+												numberOfCars: response.body.length
+											};
+
+											newResponse.body = newBody;
+
+											return newResponse;
+										} else {
+											return response;
+										}
+
+									})
+								);
+				}
+			}
+
+			beforeEach(() => {
+				TestBed
+					.configureTestingModule({
+						imports: [
+							HttpClientTestingModule
+						],
+						providers: [
+							CarsService,
+							{
+								provide: HTTP_INTERCEPTORS,
+								useClass: CarsCounterInterceptor,
+								multi: true,
+							}
+						]
+					});
+
+				const injector = getTestBed();
+				carsService = injector.get(CarsService);
+				httpMock = injector.get(HttpTestingController);
+			});
+
+			it ('should reformat response', (done) => {
+
+				// given
+				const url = 'cars',
+					expectedResponse = {
+						cars: cars,
+						numberOfCars: cars.length
+					};
+
+				// when & then
+				carsService
+					.getCars(url)
+					.subscribe((res: any) => {
+						expect(res).toEqual(expectedResponse);
+						done();
+					});
+
+				const emptyRequest = httpMock.expectOne(url);
+				emptyRequest.flush(cars);
+
+			});
+
+		});
+
+
+		describe ('response error manipulation -', () => {
 
 			class OnlyErrorsInterceptor implements HttpInterceptor {
 
 				intercept(request: HttpRequest<any>, next: HttpHandler): Observable<any> {
-
-					let errRequest = request.clone();
 
 					return next.handle(request)
 								.pipe(
