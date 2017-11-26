@@ -1,4 +1,5 @@
-import { InjectionToken, Injector, StaticProvider } from '@angular/core';
+import { Component, forwardRef, Inject, InjectionToken, Injector, NgModule, StaticProvider, ViewChild } from '@angular/core';
+import { getTestBed, TestBed } from '@angular/core/testing';
 
 describe('Dependency injection - providers -', () => {
 
@@ -124,34 +125,137 @@ describe('Dependency injection - providers -', () => {
 			expect(injector.get(ServiceWithDeps).service instanceof Service).toBe(true);
 		});
 
-		describe('multi -', () => {
+	});
 
-			it ('should create array of services', () => {
 
-				//given
-				const token = new InjectionToken('token');
-				const providerValues = ['providerOne', 'providerTwo', 'providerThree'];
-				const providers = [{
+	describe('multi -', () => {
+
+		it ('should create array of services', () => {
+
+			//given
+			const token = new InjectionToken('token');
+			const providerValues = ['providerOne', 'providerTwo', 'providerThree'];
+			const providers = [{
+				provide: token,
+				useValue: providerValues[0],
+				multi: true
+			}, {
+				provide: token,
+				useValue: providerValues[1],
+				multi: true
+			}, {
+				provide: token,
+				useValue: providerValues[2],
+				multi: true
+			}];
+
+			// when
+			const injector = Injector.create(providers);
+
+			// then
+			expect(injector.get(token)).toEqual(providerValues);
+		});
+
+		describe ('modules imports -', () => {
+
+			const token = new InjectionToken('multi_modules');
+
+			@NgModule({
+				imports: [
+					forwardRef(() => ChildModule)
+				],
+				providers: [{
 					provide: token,
-					useValue: providerValues[0],
+					useValue: 'root module',
 					multi: true
-				}, {
+				}]
+			})
+			class RootModule {}
+
+			@NgModule({
+				declarations: [
+					forwardRef(() => ParentComponent),
+					forwardRef(() => ChildComponent)
+				],
+				providers: [{
 					provide: token,
-					useValue: providerValues[1],
+					useValue: 'child module',
 					multi: true
-				}, {
+				}]
+			})
+			class ChildModule {}
+
+			@Component({
+				selector: 'parent',
+				template: `<child></child>`,
+				providers: [{
 					provide: token,
-					useValue: providerValues[2],
+					useValue: 'parent component',
 					multi: true
-				}];
+				}]
+			})
+			class ParentComponent {
+				@ViewChild(forwardRef(() => ChildComponent))
+				child: ChildComponent;
+
+				constructor(public injector: Injector,
+							@Inject(token) public multiValue: any) {}
+			}
+
+			@Component({
+				selector: 'child',
+				template: ``,
+				providers: [{
+					provide: token,
+					useValue: 'child component',
+					multi: true
+				}]
+			})
+			class ChildComponent {
+				constructor(public injector: Injector,
+							@Inject(token) public multiValue: any) {}
+			}
+
+			beforeEach(() => {
+				TestBed.configureTestingModule({
+					imports: [
+						RootModule
+					]
+				});
+			});
+
+			it ('should provide values only from component context', () => {
+
+				// given
+				const fixture = TestBed.createComponent(ParentComponent),
+					compInstance = fixture.componentInstance,
+					expectedParentCompValues = ['parent component'],
+					expectedChildCompValues = ['child component'];
 
 				// when
-				const injector = Injector.create(providers);
+				fixture.detectChanges();
 
 				// then
-				expect(injector.get(token)).toEqual(providerValues);
+				expect(compInstance.multiValue).toEqual(expectedParentCompValues);
+				expect(compInstance.injector.get(token)).toEqual(expectedParentCompValues);
+
+				expect(compInstance.child.multiValue).toEqual(expectedChildCompValues);
+				expect(compInstance.child.injector.get(token)).toEqual(expectedChildCompValues);
 			});
+
+
+			it ('should provide values only from one context - module', () => {
+
+				// given
+				const injector = getTestBed(),
+					expectedValues = ['child module', 'root module'];
+
+				// when & then
+				expect(injector.get(token)).toEqual(expectedValues);
+			});
+
 		});
+
 	});
 
 });
