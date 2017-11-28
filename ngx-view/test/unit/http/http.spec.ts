@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HTTP_INTERCEPTORS, HttpClient, HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpParams, HttpRequest } from '@angular/common/http';
+import {
+	HTTP_INTERCEPTORS, HttpClient, HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpParams, HttpRequest,
+	HttpResponse
+} from '@angular/common/http';
 import { getTestBed, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Observable } from 'rxjs/Observable';
@@ -19,7 +22,7 @@ describe('HttpClient -', () => {
 	@Injectable()
 	class CarsService {
 
-		constructor(private httpClient: HttpClient) {}
+		constructor(public httpClient: HttpClient) {}
 
 		getCars(url = 'cars', params?: HttpParams) {
 			return this.httpClient.get<Array<Car>>(url, { params });
@@ -129,6 +132,42 @@ describe('HttpClient -', () => {
 			expect(request.request.url).toBe(url);
 			expect(request.request.params).toEqual(params);
 
+			request.flush(cars);
+		});
+
+
+		it ('should return response as a text', (done) => {
+
+			// given
+			const url = 'cars';
+			const expectedResponse = JSON.stringify(cars);
+
+			// when & then
+			carsService.httpClient.get(url, {responseType: 'text'})
+				.subscribe((requestedCars) => {
+					expect(requestedCars).toEqual(expectedResponse);
+					done();
+				});
+
+			const request = httpMock.expectOne(url);
+			request.flush(cars);
+		});
+
+		it ('should return a Response as a response', (done) => {
+
+			// given
+			const url = 'cars';
+
+			// when & then
+			carsService.httpClient.get(url, {observe: 'response'})
+				.subscribe((response) => {
+					expect(response instanceof HttpResponse).toBeTruthy();
+					expect(response.status).toBe(200);
+					expect(response.body).toEqual(cars);
+					done();
+				});
+
+			const request = httpMock.expectOne(url);
 			request.flush(cars);
 		});
 
