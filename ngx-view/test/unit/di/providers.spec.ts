@@ -199,6 +199,7 @@ describe('Dependency injection - providers -', () => {
 				child: ChildComponent;
 
 				constructor(public injector: Injector,
+							// public parentInjector: Injector,
 							@Inject(token) public multiValue: any) {}
 			}
 
@@ -213,6 +214,7 @@ describe('Dependency injection - providers -', () => {
 			})
 			class ChildComponent {
 				constructor(public injector: Injector,
+							// public parentInjector: Injector,
 							@Inject(token) public multiValue: any) {}
 			}
 
@@ -241,6 +243,7 @@ describe('Dependency injection - providers -', () => {
 
 				expect(compInstance.child.multiValue).toEqual(expectedChildCompValues);
 				expect(compInstance.child.injector.get(token)).toEqual(expectedChildCompValues);
+				// expect(compInstance.child.parentInjector.get(token)).toEqual(expectedParentCompValues);
 			});
 
 
@@ -253,6 +256,25 @@ describe('Dependency injection - providers -', () => {
 				// when & then
 				expect(injector.get(token)).toEqual(expectedValues);
 			});
+
+			// fit ('modules and components have separate sets of providers', () => {
+			//
+			// 	// given
+			// 	const fixture = TestBed.createComponent(ParentComponent),
+			// 		compInstance = fixture.componentInstance,
+			// 		expectedParentCompValues = ['parent component'],
+			// 		expectedChildCompValues = ['child component'];
+			//
+			// 	// when
+			// 	fixture.detectChanges();
+			//
+			// 	// then
+			// 	// expect(compInstance.injector.get(token)).toEqual(expectedParentCompValues);
+			// 	// expect(compInstance.child.injector.get(token)).toEqual(expectedChildCompValues);
+			//
+			// 	// expect(compInstance.child.injector.get(Injector)).toEqual(['child module', 'root module']);
+			//
+			// });
 
 		});
 
