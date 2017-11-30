@@ -56,36 +56,45 @@ describe('Injector -', () => {
 		});
 	});
 
+	// describe ('modules', () => {})
+	// describe ('component', () => {})
+	// describe ('mixed', () => {})
 
-	it ('parent and child should have their own scopes of services', () => {
+	describe('ParentInjector -', () => {
 
-		// given
-		const fixture = TestBed.createComponent(ParentComponent),
-			parentInst = fixture.componentInstance,
-			childInst = parentInst.child;
+		it ('parent and child should have their own scopes of services', () => {
 
-		// when
-		fixture.detectChanges();
+			// given
+			const fixture = TestBed.createComponent(ParentComponent),
+				parentInst = fixture.componentInstance,
+				childInst = parentInst.child;
 
-		// then
-		expect(parentInst.value).toBe('parent component');
-		expect(childInst.value).toBe('child component');
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(parentInst.value).toBe('parent component');
+			expect(childInst.value).toBe('child component');
+		});
+
+		// This doesn't work :(
+		xit ('should be possible to get parent component injector from child level', () => {
+
+			// given
+			const fixture = TestBed.createComponent(ParentComponent),
+				parentInst = fixture.componentInstance,
+				childInst = parentInst.child;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			const parentInjector = parentInst.injector,
+				childInjector = childInst.parentInjector;
+
+			expect(parentInjector.get(token)).toBe(childInjector.get(token));
+		});
 
 	});
-
-	xit ('should be possible to get parent component injector from child level', () => {
-
-		// given
-		const fixture = TestBed.createComponent(ParentComponent),
-			parentInst = fixture.componentInstance,
-			childInst = parentInst.child;
-
-		// when
-		fixture.detectChanges();
-
-		// then
-		expect(parentInst.injector).toBe(childInst.parentInjector);
-	});
-
 
 });
