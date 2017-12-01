@@ -77,7 +77,6 @@ describe('Injector -', () => {
 			expect(childInst.value).toBe('child component');
 		});
 
-		// This doesn't work :(
 		xit ('should be possible to get parent component injector from child level', () => {
 
 			// given
@@ -90,9 +89,11 @@ describe('Injector -', () => {
 
 			// then
 			const parentInjector = parentInst.injector,
-				childInjector = childInst.parentInjector;
-
-			expect(parentInjector.get(token)).toBe(childInjector.get(token));
+				childInjector = childInst.injector;
+			//
+			// console.log(childInjector.view.root.injector.get(token));
+			//
+			// expect(childInjector.view.parent.injector.get(token)).toBe('aa');
 		});
 
 	});

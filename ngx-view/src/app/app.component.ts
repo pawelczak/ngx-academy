@@ -1,5 +1,5 @@
 // 3d party imports
-import { ChangeDetectionStrategy, Component, NgZone } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Injector, NgZone } from '@angular/core';
 
 import { Logger } from './util/logger';
 
@@ -18,8 +18,8 @@ export class AppComponent {
 
 	private prefix: string = '🐯 Root Level';
 
-	constructor(private logger: Logger) {
-
+	constructor(private logger: Logger,
+				public injector: Injector) {
 	}
 
 	changeInput(): void {
