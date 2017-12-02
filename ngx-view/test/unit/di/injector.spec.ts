@@ -30,7 +30,6 @@ describe('Injector -', () => {
 		child: ChildComponent;
 
 		constructor(public injector: Injector,
-					public parentInjector: Injector,
 					@Inject(token) public value: string) {}
 	}
 
@@ -44,7 +43,6 @@ describe('Injector -', () => {
 	})
 	class ChildComponent {
 		constructor(public injector: Injector,
-					public parentInjector: Injector,
 					@Inject(token) public value: string) {}
 	}
 
@@ -55,10 +53,6 @@ describe('Injector -', () => {
 			]
 		});
 	});
-
-	// describe ('modules', () => {})
-	// describe ('component', () => {})
-	// describe ('mixed', () => {})
 
 	describe('ParentInjector -', () => {
 
@@ -90,6 +84,9 @@ describe('Injector -', () => {
 			// then
 			const parentInjector = parentInst.injector,
 				childInjector = childInst.injector;
+
+			// expect((childInjector as any).parent.get(token)).toBe(parentInst.injector.get(token));
+
 			//
 			// console.log(childInjector.view.root.injector.get(token));
 			//

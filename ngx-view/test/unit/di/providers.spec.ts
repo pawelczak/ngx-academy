@@ -175,7 +175,8 @@ describe('Dependency injection - providers -', () => {
 			@NgModule({
 				declarations: [
 					forwardRef(() => ParentComponent),
-					forwardRef(() => ChildComponent)
+					forwardRef(() => ChildComponent),
+					forwardRef(() => EmptyComponent)
 				],
 				providers: [{
 					provide: token,
@@ -199,7 +200,6 @@ describe('Dependency injection - providers -', () => {
 				child: ChildComponent;
 
 				constructor(public injector: Injector,
-							// public parentInjector: Injector,
 							@Inject(token) public multiValue: any) {}
 			}
 
@@ -214,7 +214,15 @@ describe('Dependency injection - providers -', () => {
 			})
 			class ChildComponent {
 				constructor(public injector: Injector,
-							// public parentInjector: Injector,
+							@Inject(token) public multiValue: any) {}
+			}
+
+			@Component({
+				selector: 'empty',
+				template: ``
+			})
+			class EmptyComponent {
+				constructor(public injector: Injector,
 							@Inject(token) public multiValue: any) {}
 			}
 
@@ -226,7 +234,59 @@ describe('Dependency injection - providers -', () => {
 				});
 			});
 
-			it ('should provide values only from component context', () => {
+			describe ('component context -', () => {
+
+				it ('should provide values only from component context', () => {
+
+					// given
+					const fixture = TestBed.createComponent(ParentComponent),
+						compInstance = fixture.componentInstance,
+						expectedParentCompValues = ['parent component'],
+						expectedChildCompValues = ['child component'];
+
+					// when
+					fixture.detectChanges();
+
+					// then
+					expect(compInstance.multiValue).toEqual(expectedParentCompValues);
+					expect(compInstance.injector.get(token)).toEqual(expectedParentCompValues);
+
+					expect(compInstance.child.multiValue).toEqual(expectedChildCompValues);
+					expect(compInstance.child.injector.get(token)).toEqual(expectedChildCompValues);
+					// expect(compInstance.child.parentInjector.get(token)).toEqual(expectedParentCompValues);
+				});
+
+			});
+
+			describe ('modules context -', () => {
+
+				it ('should provide values from modules', () => {
+
+					// given
+					const fixture = TestBed.createComponent(EmptyComponent),
+						compInstance = fixture.componentInstance;
+
+					// when
+					fixture.detectChanges();
+
+					// then
+					expect(compInstance.multiValue).toEqual(['child module', 'root module']);
+				});
+
+				it ('should provide values only from one context - module', () => {
+
+					// given
+					const injector = getTestBed(),
+						expectedValues = ['child module', 'root module'];
+
+					// when & then
+					expect(injector.get(token)).toEqual(expectedValues);
+				});
+
+			});
+
+
+			xit ('modules and components have separate sets of providers', () => {
 
 				// given
 				const fixture = TestBed.createComponent(ParentComponent),
@@ -238,43 +298,12 @@ describe('Dependency injection - providers -', () => {
 				fixture.detectChanges();
 
 				// then
-				expect(compInstance.multiValue).toEqual(expectedParentCompValues);
-				expect(compInstance.injector.get(token)).toEqual(expectedParentCompValues);
+				// expect(compInstance.injector.get(token)).toEqual(expectedParentCompValues);
+				// expect(compInstance.child.injector.get(token)).toEqual(expectedChildCompValues);
 
-				expect(compInstance.child.multiValue).toEqual(expectedChildCompValues);
-				expect(compInstance.child.injector.get(token)).toEqual(expectedChildCompValues);
-				// expect(compInstance.child.parentInjector.get(token)).toEqual(expectedParentCompValues);
+				// expect(compInstance.child.injector.get(Injector)).toEqual(['child module', 'root module']);
+
 			});
-
-
-			it ('should provide values only from one context - module', () => {
-
-				// given
-				const injector = getTestBed(),
-					expectedValues = ['child module', 'root module'];
-
-				// when & then
-				expect(injector.get(token)).toEqual(expectedValues);
-			});
-
-			// fit ('modules and components have separate sets of providers', () => {
-			//
-			// 	// given
-			// 	const fixture = TestBed.createComponent(ParentComponent),
-			// 		compInstance = fixture.componentInstance,
-			// 		expectedParentCompValues = ['parent component'],
-			// 		expectedChildCompValues = ['child component'];
-			//
-			// 	// when
-			// 	fixture.detectChanges();
-			//
-			// 	// then
-			// 	// expect(compInstance.injector.get(token)).toEqual(expectedParentCompValues);
-			// 	// expect(compInstance.child.injector.get(token)).toEqual(expectedChildCompValues);
-			//
-			// 	// expect(compInstance.child.injector.get(Injector)).toEqual(['child module', 'root module']);
-			//
-			// });
 
 		});
 

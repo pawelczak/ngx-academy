@@ -57,7 +57,7 @@ describe('Component - input -', () => {
 			fixture.detectChanges();
 		});
 
-		it ('should be possible to declare component like "<basic></basic>"', () => {
+		it ('input changes should be triggered in specific order', () => {
 
 			// then
 			expect(valueChanges).toEqual([`Input - ${newValue}`, `OnChanges - ${newValue}`]);
