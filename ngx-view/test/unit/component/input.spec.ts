@@ -3,7 +3,8 @@ import { TestBed } from '@angular/core/testing';
 
 describe('Component - input -', () => {
 
-	describe('basic -', () => {
+
+	describe('order of changes -', () => {
 
 		const newValue = 'new value';
 		let fixture: any,
@@ -17,13 +18,34 @@ describe('Component - input -', () => {
 		class BasicComponent implements OnChanges {
 
 			@Input()
-			set value(value: string) {
-				valueChanges.push('Input - ' + value);
+			set inputOne(value: string) {
+				valueChanges.push('Setter inputOne');
+			}
+
+			@Input()
+			set inputTwo(value: string) {
+				valueChanges.push('Setter inputTwo');
+			}
+
+			@Input()
+			set inputThree(value: string) {
+				valueChanges.push('Setter inputThree');
 			}
 
 			ngOnChanges(changes: SimpleChanges) {
-				if (changes.value) {
-					valueChanges.push('OnChanges - ' + changes.value.currentValue);
+
+				valueChanges.push('OnChanges');
+
+				if (changes.inputOne) {
+					valueChanges.push('OnChanges inputOne');
+				}
+
+				if (changes.inputTwo) {
+					valueChanges.push('OnChanges inputTwo');
+				}
+
+				if (changes.inputThree) {
+					valueChanges.push('OnChanges inputThree');
 				}
 			}
 		}
@@ -31,16 +53,12 @@ describe('Component - input -', () => {
 		@Component({
 			selector: 'test',
 			template: `
-				<basic [value]="value" ></basic>
+				<basic [inputOne]="value" [inputTwo]="value" [inputThree]="value" ></basic>
 			`
 		})
 		class TestComponent {
 
-			value = '';
-
-			ngOnInit() {
-				this.value = newValue;
-			}
+			value = 'Test';
 		}
 
 		beforeEach(() => {
@@ -57,10 +75,34 @@ describe('Component - input -', () => {
 			fixture.detectChanges();
 		});
 
+
+		/**
+		 * Inputs are invoked in the order of declaration in component.
+		 */
+		const expectedOrder = [
+			'Setter inputOne',
+			'Setter inputTwo',
+			'Setter inputThree',
+			'OnChanges',
+			'OnChanges inputOne',
+			'OnChanges inputTwo',
+			'OnChanges inputThree'
+		];
+
+		it ('setting inital value via input should trigger changes', () => {
+
+			// then
+			expect(valueChanges).toEqual(expectedOrder);
+		});
+
 		it ('input changes should be triggered in specific order', () => {
 
 			// then
-			expect(valueChanges).toEqual([`Input - ${newValue}`, `OnChanges - ${newValue}`]);
+			compInstance.value = 'new value';
+			valueChanges = [];
+			fixture.detectChanges();
+
+			expect(valueChanges).toEqual(expectedOrder);
 		});
 
 	});
