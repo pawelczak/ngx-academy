@@ -28,6 +28,17 @@ describe('HttpClient -', () => {
 			return this.httpClient.get<Array<Car>>(url, { params });
 		}
 
+		postCar(url = 'cars', params?: any) {
+			return this.httpClient.post<Car>(url, { params });
+		}
+
+		putCar(url = 'cars', params?: any) {
+			return this.httpClient.put<Car>(url, { params });
+		}
+
+		deleteCar(url = 'cars', params?: any) {
+			return this.httpClient.delete<Car>(url, { params });
+		}
 	}
 
 	let carsService: CarsService,
@@ -169,6 +180,57 @@ describe('HttpClient -', () => {
 
 			const request = httpMock.expectOne(url);
 			request.flush(cars);
+		});
+
+		describe('post', () => {
+
+			it ('should mock post request', (done) => {
+
+				// when & then
+				carsService.postCar().subscribe((returnedCar) => {
+					expect(returnedCar).toEqual(cars[0]);
+					expect(returnedCar instanceof Car).toBeTruthy();
+					expect(returnedCar.getType()).toBe(cars[0].getType());
+					done();
+				});
+
+				httpMock.expectOne('cars')
+					.flush(cars[0]);
+			});
+		});
+
+		describe('put', () => {
+
+			it ('should mock put request', (done) => {
+
+				// when & then
+				carsService.putCar().subscribe((returnedCar) => {
+					expect(returnedCar).toEqual(cars[0]);
+					expect(returnedCar instanceof Car).toBeTruthy();
+					expect(returnedCar.getType()).toBe(cars[0].getType());
+					done();
+				});
+
+				httpMock.expectOne('cars')
+					.flush(cars[0]);
+			});
+		});
+
+		describe('delete', () => {
+
+			it ('should mock delete request', (done) => {
+
+				// when & then
+				carsService.deleteCar().subscribe((returnedCar) => {
+					expect(returnedCar).toEqual(cars[0]);
+					expect(returnedCar instanceof Car).toBeTruthy();
+					expect(returnedCar.getType()).toBe(cars[0].getType());
+					done();
+				});
+
+				httpMock.expectOne('cars')
+					.flush(cars[0]);
+			});
 		});
 
 	});
