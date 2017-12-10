@@ -36,7 +36,6 @@ describe('NgFor -', () => {
 							</p>`;
 
 			TestBed.overrideTemplate(NgForTestComponent, templ);
-			TestBed.compileComponents();
 			const fixture = TestBed.createComponent(NgForTestComponent),
 				componentInst = fixture.componentInstance,
 				nativeEl = fixture.debugElement.nativeElement;
@@ -65,7 +64,6 @@ describe('NgFor -', () => {
 							</ng-template>`;
 
 			TestBed.overrideTemplate(NgForTestComponent, templ);
-			TestBed.compileComponents();
 			const fixture = TestBed.createComponent(NgForTestComponent),
 				componentInst = fixture.componentInstance,
 				nativeEl = fixture.debugElement.nativeElement;
