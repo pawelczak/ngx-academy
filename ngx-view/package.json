@@ -21,7 +21,7 @@
         "build": "yarn build:dev",
         "build:dev": "yarn webpack:build -- --config config/webpack.dev.js",
         "build:prod": "yarn webpack:build -- --config config/webpack.prod.js",
-        "watch": "yarn build -- --watch",
+        "watch": "yarn webpack:build -- --config config/webpack.dev.js --watch",
         "server": "yarn server:dev",
         "server:dev": "webpack-dev-server --config config/webpack.dev.js --inline --progress --port 3000  --content-base src",
         "server:prod": "webpack-dev-server --config config/webpack.prod.js --inline --progress --port 3000  --content-base src",

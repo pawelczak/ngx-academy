@@ -59,7 +59,7 @@ describe('NgFor -', () => {
 		it ('should render basic list', () => {
 
 			// given
-			const templ = `<ng-template ngFor [ngForOf]="heroes" let-hero>
+			const templ = `<ng-template ngFor [ngForOf]="heroes" let-hero >
 								<p>{{hero}}</p>
 							</ng-template>`;
 
