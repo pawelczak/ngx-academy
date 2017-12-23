@@ -1,5 +1,6 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { componentFactoryName } from '@angular/compiler';
 
 describe('Component - input -', () => {
 
@@ -103,6 +104,74 @@ describe('Component - input -', () => {
 			fixture.detectChanges();
 
 			expect(valueChanges).toEqual(expectedOrder);
+		});
+
+	});
+
+	describe ('naming -', () => {
+
+		const compValue = 'Value';
+
+		@Component({
+			selector: 'alias',
+			template: ``
+		})
+		class AliasComponent {
+
+			@Input('inputOne')
+			set inputValueOne(val: string) {
+				this.value = val;
+			}
+
+			@Input('inputTwo')
+			set inputValueTwo(val: string) {
+				this.value = val;
+			}
+
+			value: string;
+		}
+
+		@Component({
+			selector: 'test',
+			template: `
+			
+			<alias #compOneRef [inputOne]="'Value'" ></alias>
+			
+			<alias #compTwoRef [inputTwo]="'Value'" ></alias>
+			`
+		})
+		class TestComponent {
+
+			@ViewChild('compOneRef')
+			compOneRef: AliasComponent;
+
+			@ViewChild('compTwoRef')
+			compTwoRef: AliasComponent;
+		}
+
+		beforeEach(() => {
+			TestBed
+				.configureTestingModule({
+					declarations: [
+						AliasComponent,
+						TestComponent
+					]
+				});
+
+		});
+
+		it ('should be possible to alias inputs', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(compInstance.compOneRef.value).toEqual(compValue);
+			expect(compInstance.compTwoRef.value).toEqual(compValue);
 		});
 
 	});
