@@ -135,9 +135,9 @@ describe('Component - input -', () => {
 			selector: 'test',
 			template: `
 			
-			<alias #compOneRef [inputOne]="'Value'" ></alias>
-			
-			<alias #compTwoRef [inputTwo]="'Value'" ></alias>
+				<alias #compOneRef [inputOne]="'Value'" ></alias>
+				
+				<alias #compTwoRef [inputTwo]="'Value'" ></alias>
 			`
 		})
 		class TestComponent {
