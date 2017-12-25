@@ -6,6 +6,7 @@ import { TestBed } from '@angular/core/testing';
 import { BlankComponent } from './helpers/blank.component';
 import { isViewContainerRef } from './helpers/matchers';
 
+
 describe('ViewChildren -', () => {
 
 	describe('template references -', () => {
@@ -90,7 +91,7 @@ describe('ViewChildren -', () => {
 			expect(fixture.componentInstance.blankComponentsAsElemRef.first instanceof ElementRef).toBe(true, 'componentRef as ElementRef'); // TRUE
 
 			expect(fixture.componentInstance.blankComponentsAsTempRef.length).toEqual(3);
-			expect(fixture.componentInstance.blankComponentsAsTempRef.first instanceof TemplateRef).toBe(false, 'componentRef as TemplateRef'); // TRUE
+			expect(fixture.componentInstance.blankComponentsAsTempRef.first instanceof TemplateRef).toBe(false, 'componentRef as TemplateRef'); // FALSE
 
 			expect(fixture.componentInstance.blankComponentsAsVcr.length).toEqual(3);
 			expect(isViewContainerRef(fixture.componentInstance.blankComponentsAsVcr.first)).toBe(true, 'componentRef as ViewContainerRef'); // TRUE
