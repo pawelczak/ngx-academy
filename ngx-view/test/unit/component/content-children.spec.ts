@@ -26,7 +26,10 @@ describe('ContentChildren -', () => {
 		simpleComponent: QueryList<SimpleComponent>;
 	}
 
-	describe('basic -', () => {
+	/**
+	 * @ContentChildren variables are initialized after the lifecycle hook 'AfterContentInit' is invoked.
+	 */
+	describe('ngAfterContentInit -', () => {
 
 		@Component({
 			selector: 'test',
@@ -201,6 +204,12 @@ describe('ContentChildren -', () => {
 			 */
 			@ContentChildren(SimpleComponent, {read: ViewContainerRef})
 			compAsVcrs: QueryList<ViewContainerRef>;
+
+			/**
+			 * component references by template variable
+			 */
+			@ContentChildren('compOne')
+			compByTemplVarRefs: QueryList<SimpleComponent>;
 		}
 
 		@Component({
@@ -209,10 +218,10 @@ describe('ContentChildren -', () => {
 
 				<content-children>
 
-					<simple [value]="'#1'" >
+					<simple #compOne [value]="'#1'" >
 					</simple>
 
-					<simple [value]="'#2'" >
+					<simple #compTwo [value]="'#2'" >
 					</simple>
 
 				</content-children>
@@ -234,7 +243,7 @@ describe('ContentChildren -', () => {
 			});
 		});
 
-		it ('should get content from first level - no descendants', () => {
+		it ('should get component as different objects', () => {
 
 			// given
 			const fixture = TestBed.createComponent(TestComponent),
@@ -261,12 +270,30 @@ describe('ContentChildren -', () => {
 			expect(isViewContainerRef(compAsVcrs[0])).toBe(true, 'componentRef as ViewContainerRef'); // TRUE
 		});
 
+		/**
+		 * ContentChildren allows to get reference to a component by template variable
+		 */
+		it ('should be possible to get reference by template variable', () => {
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			let compByTemplVarRefs = compInstance.compRef.compByTemplVarRefs.toArray();
+			expect(compByTemplVarRefs.length).toEqual(1);
+			expect(compByTemplVarRefs[0].value).toEqual('#1');
+			expect(compByTemplVarRefs[0] instanceof SimpleComponent).toBe(true, 'componentRef as componentRef'); // TRUE
+		});
+
 	});
 
 	/**
 	 * ContentChild allows to get different types when referencing a template
 	 */
-	describe ('read component -', () => {
+	describe ('read ng-template -', () => {
 
 		@Component({
 			selector: 'content-children',
@@ -297,6 +324,12 @@ describe('ContentChildren -', () => {
 			 */
 			@ContentChildren(TemplateRef, {read: ViewContainerRef})
 			templAsVcrs: QueryList<ViewContainerRef>;
+
+			/**
+			 * component references by template variable
+			 */
+			@ContentChildren('templOne')
+			templByTemplVarRefs: QueryList<SimpleComponent>;
 		}
 
 		@Component({
@@ -305,10 +338,10 @@ describe('ContentChildren -', () => {
 
 				<content-children>
 
-					<ng-template >
+					<ng-template #templOne >
 					</ng-template>
 
-					<ng-template>
+					<ng-template #templTwo >
 					</ng-template>
 
 				</content-children>
@@ -330,7 +363,7 @@ describe('ContentChildren -', () => {
 			});
 		});
 
-		it ('should get content from first level - no descendants', () => {
+		it ('should get template references as different objects', () => {
 
 			// given
 			const fixture = TestBed.createComponent(TestComponent),
@@ -356,6 +389,24 @@ describe('ContentChildren -', () => {
 			expect(templAsVcrs.length).toEqual(2);
 			expect(isViewContainerRef(templAsVcrs[0])).toBe(true, 'componentRef as ViewContainerRef'); // TRUE
 		});
+
+		/**
+		 * ContentChildren allows to get reference to a template by template variable
+		 */
+		it ('should be possible to get reference to a template by template variable', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			let templByTemplVarRefs = compInstance.compRef.templByTemplVarRefs.toArray();
+			expect(templByTemplVarRefs.length).toEqual(1);
+			expect(templByTemplVarRefs[0] instanceof TemplateRef).toBe(true, 'TemplateRef as TemplateRef'); // TRUE
+		})
 
 	});
 
