@@ -1,4 +1,4 @@
-import { Component, ContentChild, TemplateRef, ViewChild } from '@angular/core';
+import { Component, ContentChild, Input, TemplateRef, ViewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 
@@ -8,7 +8,10 @@ describe('ContentChild -', () => {
 		selector: 'simple',
 		template: ``
 	})
-	class SimpleComponent {}
+	class SimpleComponent {
+		@Input()
+		value: string;
+	}
 
 	@Component({
 		selector: 'content-child',
@@ -191,5 +194,69 @@ describe('ContentChild -', () => {
 		});
 
 	});
+
+	describe('content changes -', () => {
+
+
+		@Component({
+			selector: 'test',
+			template: `
+
+				<content-child>
+
+					<simple *ngIf="flag"
+							[value]="'#1'" >
+					</simple>
+
+					<simple *ngIf="!flag"
+							[value]="'#2'" >
+					</simple>
+
+				</content-child>
+
+			`
+		})
+		class TestComponent {
+			@ViewChild(ContentChildComponent)
+			compRef: ContentChildComponent;
+
+			flag: boolean = true;
+		}
+
+		beforeEach(() => {
+			TestBed.configureTestingModule({
+				declarations: [
+					SimpleComponent,
+					ContentChildComponent,
+					TestComponent
+				]
+			});
+		});
+
+		it ('should change content values', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			let simpleCompRefs: Array<SimpleComponent> = [];
+
+			// when & then
+			fixture.detectChanges();
+
+			expect(compInstance.compRef.simpleComponent).toBeDefined();
+			expect(compInstance.compRef.simpleComponent instanceof SimpleComponent).toBeTruthy();
+			expect(compInstance.compRef.simpleComponent.value).toBe('#1');
+
+			// when & then
+			compInstance.flag = false;
+			fixture.detectChanges();
+
+			expect(compInstance.compRef.simpleComponent).toBeDefined();
+			expect(compInstance.compRef.simpleComponent instanceof SimpleComponent).toBeTruthy();
+			expect(compInstance.compRef.simpleComponent.value).toBe('#2');
+		});
+
+	})
 
 });
