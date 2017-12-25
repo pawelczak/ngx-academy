@@ -170,13 +170,13 @@ describe('ContentChildren -', () => {
 	/**
 	 * ContentChild allows to get different types when referencing a component
 	 */
-	describe ('read -', () => {
+	describe ('read component -', () => {
 
 		@Component({
-			selector: 'content-children-descendants',
+			selector: 'content-children',
 			template: ``
 		})
-		class ContentChildrenDescendantsComponent {
+		class ContentChildrenComponent {
 
 			/**
 			 * component references
@@ -207,7 +207,7 @@ describe('ContentChildren -', () => {
 			selector: 'test',
 			template: `
 
-				<content-children-descendants>
+				<content-children>
 
 					<simple [value]="'#1'" >
 					</simple>
@@ -215,20 +215,20 @@ describe('ContentChildren -', () => {
 					<simple [value]="'#2'" >
 					</simple>
 
-				</content-children-descendants>
+				</content-children>
 
 			`
 		})
 		class TestComponent {
-			@ViewChild(ContentChildrenDescendantsComponent)
-			compRef: ContentChildrenDescendantsComponent;
+			@ViewChild(ContentChildrenComponent)
+			compRef: ContentChildrenComponent;
 		}
 
 		beforeEach(() => {
 			TestBed.configureTestingModule({
 				declarations: [
 					SimpleComponent,
-					ContentChildrenDescendantsComponent,
+					ContentChildrenComponent,
 					TestComponent
 				]
 			});
@@ -261,10 +261,107 @@ describe('ContentChildren -', () => {
 			expect(isViewContainerRef(compAsVcrs[0])).toBe(true, 'componentRef as ViewContainerRef'); // TRUE
 		});
 
+	});
 
+	/**
+	 * ContentChild allows to get different types when referencing a template
+	 */
+	describe ('read component -', () => {
+
+		@Component({
+			selector: 'content-children',
+			template: ``
+		})
+		class ContentChildrenComponent {
+
+			/**
+			 * ng-template references
+			 */
+			@ContentChildren(TemplateRef)
+			templRefs: QueryList<TemplateRef<any>>;
+
+			/**
+			 * ng-template references as ElementRefs
+			 */
+			@ContentChildren(TemplateRef, {read: ElementRef})
+			templAsElementRefs: QueryList<ElementRef>;
+
+			/**
+			 * ng-template references as ElementRefs
+			 */
+			@ContentChildren(TemplateRef, {read: SimpleComponent})
+			templAsCompRefs: QueryList<SimpleComponent>;
+
+			/**
+			 * ng-template references as ViewContainerRef
+			 */
+			@ContentChildren(TemplateRef, {read: ViewContainerRef})
+			templAsVcrs: QueryList<ViewContainerRef>;
+		}
+
+		@Component({
+			selector: 'test',
+			template: `
+
+				<content-children>
+
+					<ng-template >
+					</ng-template>
+
+					<ng-template>
+					</ng-template>
+
+				</content-children>
+
+			`
+		})
+		class TestComponent {
+			@ViewChild(ContentChildrenComponent)
+			compRef: ContentChildrenComponent;
+		}
+
+		beforeEach(() => {
+			TestBed.configureTestingModule({
+				declarations: [
+					SimpleComponent,
+					ContentChildrenComponent,
+					TestComponent
+				]
+			});
+		});
+
+		it ('should get content from first level - no descendants', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			let templRefs = compInstance.compRef.templRefs.toArray();
+			expect(templRefs.length).toEqual(2);
+			expect(templRefs[0] instanceof TemplateRef).toBe(true, 'TemplateRef as TemplateRef'); // TRUE
+
+			let templAsElementRefs = compInstance.compRef.templAsElementRefs.toArray();
+			expect(templAsElementRefs.length).toEqual(2);
+			expect(templAsElementRefs[0] instanceof ElementRef).toBe(true, 'componentRef as ElementRef'); // TRUE
+
+			let templAsCompRefs = compInstance.compRef.templAsCompRefs.toArray();
+			expect(templAsCompRefs.length).toEqual(0);
+			expect(templAsCompRefs[0] instanceof SimpleComponent).toBe(false, 'componentRef as SimpleComponent'); // FALSE
+
+			let templAsVcrs = compInstance.compRef.templAsVcrs.toArray();
+			expect(templAsVcrs.length).toEqual(2);
+			expect(isViewContainerRef(templAsVcrs[0])).toBe(true, 'componentRef as ViewContainerRef'); // TRUE
+		});
 
 	});
 
+	/**
+	 * Content children allows to read descendants
+	 */
 	describe ('descendants -', () => {
 
 		@Component({
