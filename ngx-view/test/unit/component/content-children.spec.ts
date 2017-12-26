@@ -104,7 +104,8 @@ describe('ContentChildren -', () => {
 	describe ('directive -', () => {
 
 		@Directive({
-			selector: '[propDir]'
+			selector: '[propDir]',
+			exportAs: 'propDir'
 		})
 		class PropDirective {
 			@Input('propDir')
@@ -118,10 +119,34 @@ describe('ContentChildren -', () => {
 		class ContentChildrenForDirectiveComponent {
 
 			/**
-			 * component references
+			 * directive references
 			 */
 			@ContentChildren(PropDirective)
-			propDirectives: QueryList<PropDirective>;
+			dirRefs: QueryList<PropDirective>;
+
+			/**
+			 * component references as ElementRefs
+			 */
+			@ContentChildren(SimpleComponent, {read: ElementRef})
+			dirAsElementRefs: QueryList<ElementRef>;
+
+			/**
+			 * component references as ElementRefs
+			 */
+			@ContentChildren(SimpleComponent, {read: TemplateRef})
+			dirAsTempRefs: QueryList<TemplateRef<any>>;
+
+			/**
+			 * component references as ViewContainerRef
+			 */
+			@ContentChildren(SimpleComponent, {read: ViewContainerRef})
+			dirAsVcrs: QueryList<ViewContainerRef>;
+
+			/**
+			 * component references by template variable
+			 */
+			@ContentChildren('dirOne')
+			dirByTemplVarRefs: QueryList<SimpleComponent>;
 		}
 
 		@Component({
@@ -129,9 +154,9 @@ describe('ContentChildren -', () => {
 			template: `
 
 				<content-children-for-directive>
-					<p [propDir]="'#1'" ></p>
-					<p [propDir]="'#2'" ></p>
-					<p [propDir]="'#3'" ></p>
+					<p #dirOne="propDir" [propDir]="'#1'" ></p>
+					<p #dirTwo="propDir" [propDir]="'#2'" ></p>
+					<p #dirThree="propDir" [propDir]="'#3'" ></p>
 				</content-children-for-directive>
 
 			`
@@ -151,7 +176,7 @@ describe('ContentChildren -', () => {
 			});
 		});
 
-		it ('should be get reference to a directive', () => {
+		xit ('should be get reference to a directive', () => {
 
 			// given
 			const fixture = TestBed.createComponent(TestComponent),
@@ -161,11 +186,43 @@ describe('ContentChildren -', () => {
 			fixture.detectChanges();
 
 			// then
-			let propDirectivesRefs = compInstance.compRef.propDirectives.toArray();
+			let propDirectivesRefs = compInstance.compRef.dirRefs.toArray();
+
 			expect(propDirectivesRefs.length).toEqual(3);
 			expect(propDirectivesRefs[0].value).toEqual('#1');
 			expect(propDirectivesRefs[1].value).toEqual('#2');
 			expect(propDirectivesRefs[2].value).toEqual('#3');
+			expect(propDirectivesRefs[0] instanceof PropDirective).toBe(true, 'directiveRef as directiveRef'); // TRUE
+
+			let dirAsElementRefs = compInstance.compRef.dirAsElementRefs.toArray();
+			expect(dirAsElementRefs.length).toEqual(2);
+			expect(dirAsElementRefs[0] instanceof ElementRef).toBe(true, 'directiveRef as ElementRef'); // TRUE
+
+			let dirAsTempRefs = compInstance.compRef.dirAsTempRefs.toArray();
+			expect(dirAsTempRefs.length).toEqual(2);
+			expect(dirAsTempRefs[0] instanceof TemplateRef).toBe(false, 'directiveRef as TemplateRef'); // FALSE
+
+			let dirAsVcrs = compInstance.compRef.dirAsVcrs.toArray();
+			expect(dirAsVcrs.length).toEqual(2);
+			expect(isViewContainerRef(dirAsVcrs[0])).toBe(true, 'directiveRef as ViewContainerRef'); // TRUE
+		});
+
+		/**
+		 * ContentChildren allows to get reference to a directive by template variable
+		 */
+		it ('should be possible to get reference by template variable', () => {
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			let dirByTemplVarRefs = compInstance.compRef.dirByTemplVarRefs.toArray();
+			expect(dirByTemplVarRefs.length).toEqual(1);
+			expect(dirByTemplVarRefs[0].value).toEqual('#1');
+			expect(dirByTemplVarRefs[0] instanceof PropDirective).toBe(true, 'directiveRef as directiveRef'); // TRUE
 		});
 
 	});
