@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Host } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 
@@ -35,5 +35,5 @@ describe('Component - reference -', () => {
 			// when & then
 			expect(() => TestBed.createComponent(TestComponent)).toThrowError();
 		});
-	})
+	});
 });

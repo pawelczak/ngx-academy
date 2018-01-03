@@ -45,7 +45,67 @@ describe('ContentChild -', () => {
 
 	}
 
-	describe('component references -', () => {
+	/**
+	 * @ContentChildren variables are initialized after the lifecycle hook 'AfterContentInit' is invoked.
+	 */
+	describe('ngAfterContentInit -', () => {
+
+		@Component({
+			selector: 'test',
+			template: `
+
+				<content-child>
+					<simple [value]="'#1'">#1</simple>
+				</content-child>
+
+			`
+		})
+		class TestComponent {
+			@ViewChild(ContentChildComponent)
+			compRef: ContentChildComponent;
+		}
+
+		beforeEach(() => {
+			TestBed.configureTestingModule({
+				declarations: [
+					SimpleComponent,
+					ContentChildComponent,
+					TestComponent
+				]
+			});
+		});
+
+		/**
+		 * Before the AfterContentInit lifecycle hook occurs
+		 * @ContentChildren variables are undefined
+		 */
+		it('should accessible after AfterContentInit lifecycle', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent);
+
+			/**
+			 * Before AfterContentInit, ContentChild should refer to empty Object of wanted Class
+			 * In this case it should be SimpleComponent({}), object without any properties
+			 * SimpleComponent#value should be undefined
+			 */
+			expect(fixture.componentInstance.compRef.simpleComponent).toBeDefined();
+			expect(fixture.componentInstance.compRef.simpleComponent instanceof SimpleComponent).toBeTruthy();
+			expect(fixture.componentInstance.compRef.simpleComponent.value).toBeUndefined();
+
+			/**
+			 * After AfterContentInit, refered object should be initialized
+			 * SimpleComponent#value should be defined
+			 */
+			fixture.detectChanges();
+			expect(fixture.componentInstance.compRef.simpleComponent).toBeDefined();
+			expect(fixture.componentInstance.compRef.simpleComponent instanceof SimpleComponent).toBeTruthy();
+			expect(fixture.componentInstance.compRef.simpleComponent.value).toBe('#1');
+		});
+
+	});
+
+	xdescribe('component references -', () => {
 
 		@Component({
 			selector: 'root',
@@ -88,7 +148,7 @@ describe('ContentChild -', () => {
 
 	});
 
-	describe('ng-template references -', () => {
+	xdescribe('ng-template references -', () => {
 
 		@Component({
 			selector: 'root',
@@ -146,7 +206,7 @@ describe('ContentChild -', () => {
 
 	});
 
-	describe('template variable references -', () => {
+	xdescribe('template variable references -', () => {
 
 		@Component({
 			selector: 'root',
@@ -196,7 +256,6 @@ describe('ContentChild -', () => {
 	});
 
 	describe('content changes -', () => {
-
 
 		@Component({
 			selector: 'test',

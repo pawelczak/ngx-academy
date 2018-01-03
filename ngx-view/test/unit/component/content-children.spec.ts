@@ -2,6 +2,7 @@ import { Component, ContentChildren, Directive, ElementRef, Input, QueryList, Te
 import { TestBed } from '@angular/core/testing';
 import { isViewContainerRef } from './helpers/matchers';
 
+
 describe('ContentChildren -', () => {
 
 	@Component({
@@ -94,135 +95,6 @@ describe('ContentChildren -', () => {
 			expect(simpleCompRefs[0].value).toEqual('#1');
 			expect(simpleCompRefs[1].value).toEqual('#2');
 			expect(simpleCompRefs[2].value).toEqual('#3');
-		});
-
-	});
-
-	/**
-	 * ContentChildren allows to get reference to multiple instances of directives
-	 */
-	describe ('directive -', () => {
-
-		@Directive({
-			selector: '[propDir]',
-			exportAs: 'propDir'
-		})
-		class PropDirective {
-			@Input('propDir')
-			value: string;
-		}
-
-		@Component({
-			selector: 'content-children-for-directive',
-			template: ``
-		})
-		class ContentChildrenForDirectiveComponent {
-
-			/**
-			 * directive references
-			 */
-			@ContentChildren(PropDirective)
-			dirRefs: QueryList<PropDirective>;
-
-			/**
-			 * component references as ElementRefs
-			 */
-			@ContentChildren(SimpleComponent, {read: ElementRef})
-			dirAsElementRefs: QueryList<ElementRef>;
-
-			/**
-			 * component references as ElementRefs
-			 */
-			@ContentChildren(SimpleComponent, {read: TemplateRef})
-			dirAsTempRefs: QueryList<TemplateRef<any>>;
-
-			/**
-			 * component references as ViewContainerRef
-			 */
-			@ContentChildren(SimpleComponent, {read: ViewContainerRef})
-			dirAsVcrs: QueryList<ViewContainerRef>;
-
-			/**
-			 * component references by template variable
-			 */
-			@ContentChildren('dirOne')
-			dirByTemplVarRefs: QueryList<SimpleComponent>;
-		}
-
-		@Component({
-			selector: 'test',
-			template: `
-
-				<content-children-for-directive>
-					<p #dirOne="propDir" [propDir]="'#1'" ></p>
-					<p #dirTwo="propDir" [propDir]="'#2'" ></p>
-					<p #dirThree="propDir" [propDir]="'#3'" ></p>
-				</content-children-for-directive>
-
-			`
-		})
-		class TestComponent {
-			@ViewChild(ContentChildrenForDirectiveComponent)
-			compRef: ContentChildrenForDirectiveComponent;
-		}
-
-		beforeEach(() => {
-			TestBed.configureTestingModule({
-				declarations: [
-					PropDirective,
-					ContentChildrenForDirectiveComponent,
-					TestComponent
-				]
-			});
-		});
-
-		xit ('should be get reference to a directive', () => {
-
-			// given
-			const fixture = TestBed.createComponent(TestComponent),
-				compInstance = fixture.componentInstance;
-
-			// when
-			fixture.detectChanges();
-
-			// then
-			let propDirectivesRefs = compInstance.compRef.dirRefs.toArray();
-
-			expect(propDirectivesRefs.length).toEqual(3);
-			expect(propDirectivesRefs[0].value).toEqual('#1');
-			expect(propDirectivesRefs[1].value).toEqual('#2');
-			expect(propDirectivesRefs[2].value).toEqual('#3');
-			expect(propDirectivesRefs[0] instanceof PropDirective).toBe(true, 'directiveRef as directiveRef'); // TRUE
-
-			let dirAsElementRefs = compInstance.compRef.dirAsElementRefs.toArray();
-			expect(dirAsElementRefs.length).toEqual(2);
-			expect(dirAsElementRefs[0] instanceof ElementRef).toBe(true, 'directiveRef as ElementRef'); // TRUE
-
-			let dirAsTempRefs = compInstance.compRef.dirAsTempRefs.toArray();
-			expect(dirAsTempRefs.length).toEqual(2);
-			expect(dirAsTempRefs[0] instanceof TemplateRef).toBe(false, 'directiveRef as TemplateRef'); // FALSE
-
-			let dirAsVcrs = compInstance.compRef.dirAsVcrs.toArray();
-			expect(dirAsVcrs.length).toEqual(2);
-			expect(isViewContainerRef(dirAsVcrs[0])).toBe(true, 'directiveRef as ViewContainerRef'); // TRUE
-		});
-
-		/**
-		 * ContentChildren allows to get reference to a directive by template variable
-		 */
-		it ('should be possible to get reference by template variable', () => {
-			// given
-			const fixture = TestBed.createComponent(TestComponent),
-				compInstance = fixture.componentInstance;
-
-			// when
-			fixture.detectChanges();
-
-			// then
-			let dirByTemplVarRefs = compInstance.compRef.dirByTemplVarRefs.toArray();
-			expect(dirByTemplVarRefs.length).toEqual(1);
-			expect(dirByTemplVarRefs[0].value).toEqual('#1');
-			expect(dirByTemplVarRefs[0] instanceof PropDirective).toBe(true, 'directiveRef as directiveRef'); // TRUE
 		});
 
 	});
@@ -343,6 +215,136 @@ describe('ContentChildren -', () => {
 			expect(compByTemplVarRefs.length).toEqual(1);
 			expect(compByTemplVarRefs[0].value).toEqual('#1');
 			expect(compByTemplVarRefs[0] instanceof SimpleComponent).toBe(true, 'componentRef as componentRef'); // TRUE
+		});
+
+	});
+
+	/**
+	 * ContentChildren allows to get reference to multiple instances of directives
+	 */
+	describe ('directive -', () => {
+
+		@Directive({
+			selector: '[propDir]',
+			exportAs: 'propDir'
+		})
+		class PropDirective {
+			@Input('propDir')
+			value: string;
+		}
+
+		@Component({
+			selector: 'content-children-for-directive',
+			template: ``
+		})
+		class ContentChildrenForDirectiveComponent {
+
+			/**
+			 * directive references
+			 */
+			@ContentChildren(PropDirective)
+			dirRefs: QueryList<PropDirective>;
+
+			/**
+			 * directive references as ElementRefs
+			 */
+			@ContentChildren(SimpleComponent, {read: ElementRef})
+			dirAsElementRefs: QueryList<ElementRef>;
+
+			/**
+			 * directive references as ElementRefs
+			 */
+			@ContentChildren(SimpleComponent, {read: TemplateRef})
+			dirAsTempRefs: QueryList<TemplateRef<any>>;
+
+			/**
+			 * directive references as ViewContainerRef
+			 */
+			@ContentChildren(SimpleComponent, {read: ViewContainerRef})
+			dirAsVcrs: QueryList<ViewContainerRef>;
+
+			/**
+			 * directive references by template variable
+			 */
+			@ContentChildren('dirOne')
+			dirByTemplVarRefs: QueryList<SimpleComponent>;
+		}
+
+		@Component({
+			selector: 'test',
+			template: `
+
+				<content-children-for-directive>
+					<p #dirOne="propDir" [propDir]="'#1'" ></p>
+					<p #dirTwo="propDir" [propDir]="'#2'" ></p>
+					<p #dirThree="propDir" [propDir]="'#3'" ></p>
+				</content-children-for-directive>
+
+			`
+		})
+		class TestComponent {
+			@ViewChild(ContentChildrenForDirectiveComponent)
+			compRef: ContentChildrenForDirectiveComponent;
+		}
+
+		beforeEach(() => {
+			TestBed.configureTestingModule({
+				declarations: [
+					PropDirective,
+					ContentChildrenForDirectiveComponent,
+					TestComponent
+				]
+			});
+		});
+
+		// TODO
+		xit ('should be get reference to a directive', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			let propDirectivesRefs = compInstance.compRef.dirRefs.toArray();
+
+			expect(propDirectivesRefs.length).toEqual(3);
+			expect(propDirectivesRefs[0].value).toEqual('#1');
+			expect(propDirectivesRefs[1].value).toEqual('#2');
+			expect(propDirectivesRefs[2].value).toEqual('#3');
+			expect(propDirectivesRefs[0] instanceof PropDirective).toBe(true, 'directiveRef as directiveRef'); // TRUE
+
+			let dirAsElementRefs = compInstance.compRef.dirAsElementRefs.toArray();
+			expect(dirAsElementRefs.length).toEqual(2);
+			expect(dirAsElementRefs[0] instanceof ElementRef).toBe(true, 'directiveRef as ElementRef'); // TRUE
+
+			let dirAsTempRefs = compInstance.compRef.dirAsTempRefs.toArray();
+			expect(dirAsTempRefs.length).toEqual(2);
+			expect(dirAsTempRefs[0] instanceof TemplateRef).toBe(false, 'directiveRef as TemplateRef'); // FALSE
+
+			let dirAsVcrs = compInstance.compRef.dirAsVcrs.toArray();
+			expect(dirAsVcrs.length).toEqual(2);
+			expect(isViewContainerRef(dirAsVcrs[0])).toBe(true, 'directiveRef as ViewContainerRef'); // TRUE
+		});
+
+		/**
+		 * ContentChildren allows to get reference to a directive by template variable
+		 */
+		it ('should be possible to get reference by template variable', () => {
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			let dirByTemplVarRefs = compInstance.compRef.dirByTemplVarRefs.toArray();
+			expect(dirByTemplVarRefs.length).toEqual(1);
+			expect(dirByTemplVarRefs[0].value).toEqual('#1');
+			expect(dirByTemplVarRefs[0] instanceof PropDirective).toBe(true, 'directiveRef as directiveRef'); // TRUE
 		});
 
 	});
