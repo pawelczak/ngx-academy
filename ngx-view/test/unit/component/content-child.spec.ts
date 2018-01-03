@@ -1,6 +1,7 @@
-import { Component, ContentChild, Input, TemplateRef, ViewChild } from '@angular/core';
+import { Component, ContentChild, ElementRef, Input, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
+import { isViewContainerRef } from './helpers/matchers';
 
 describe('ContentChild -', () => {
 
@@ -46,7 +47,7 @@ describe('ContentChild -', () => {
 	}
 
 	/**
-	 * @ContentChildren variables are initialized after the lifecycle hook 'AfterContentInit' is invoked.
+	 * @ContentChild variables are initialized after the lifecycle hook 'AfterContentInit' is invoked.
 	 */
 	describe('ngAfterContentInit -', () => {
 
@@ -104,6 +105,126 @@ describe('ContentChild -', () => {
 		});
 
 	});
+
+
+	/**
+	 * @ContentChild allows to reference a component
+	 * References can be of different types
+	 */
+	describe ('read component -', () => {
+
+		@Component({
+			selector: 'content-child',
+			template: ``
+		})
+		class ContentChildComponent {
+
+			/**
+			 * component reference
+			 */
+			@ContentChild(SimpleComponent)
+			compRef: SimpleComponent;
+
+			/**
+			 * component reference as ElementRefs
+			 */
+			@ContentChild(SimpleComponent, {read: ElementRef})
+			compAsElementRef: ElementRef;
+
+			/**
+			 * component reference as ElementRefs
+			 */
+			@ContentChild(SimpleComponent, {read: TemplateRef})
+			compAsTempRef: TemplateRef<any>;
+
+			/**
+			 * component reference as ViewContainerRef
+			 */
+			@ContentChild(SimpleComponent, {read: ViewContainerRef})
+			compAsVcr: ViewContainerRef;
+
+			/**
+			 * component reference by template variable
+			 */
+			@ContentChild('compOne')
+			compByTemplVarRef: SimpleComponent;
+		}
+
+		@Component({
+			selector: 'test',
+			template: `
+
+				<content-child>
+
+					<simple #compOne [value]="'#1'" >
+					</simple>
+
+					<simple #compTwo [value]="'#2'" >
+					</simple>
+
+				</content-child>
+
+			`
+		})
+		class TestComponent {
+			@ViewChild(ContentChildComponent)
+			contentChildRef: ContentChildComponent;
+		}
+
+		beforeEach(() => {
+			TestBed.configureTestingModule({
+				declarations: [
+					SimpleComponent,
+					ContentChildComponent,
+					TestComponent
+				]
+			});
+		});
+
+		it ('should get component as different objects', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			let compRef = compInstance.contentChildRef.compRef;
+			expect(compRef.value).toBe('#1');
+			expect(compRef instanceof SimpleComponent).toBe(true, 'componentRef as componentRef'); // TRUE
+
+			let compAsElemRef = compInstance.contentChildRef.compAsElementRef;
+			expect(compAsElemRef instanceof ElementRef).toBe(true, 'componentRef as ElementRef'); // TRUE
+
+			let compAsTempRef = compInstance.contentChildRef.compAsTempRef;
+			expect(compAsTempRef instanceof TemplateRef).toBe(false, 'componentRef as TemplateRef'); // FALSE
+
+			let compAsVcr = compInstance.contentChildRef.compAsVcr;
+			expect(isViewContainerRef(compAsVcr)).toBe(true, 'componentRef as ViewContainerRef'); // TRUE
+		});
+
+		/**
+		 * @ContentChild allows to get reference to a component by template variable
+		 */
+		it ('should be possible to get reference by template variable', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			let compByTemplVarRef = compInstance.contentChildRef.compByTemplVarRef;
+			expect(compByTemplVarRef.value).toEqual('#1');
+			expect(compByTemplVarRef instanceof SimpleComponent).toBe(true, 'componentRef as componentRef'); // TRUE
+		});
+
+	});
+
 
 	xdescribe('component references -', () => {
 

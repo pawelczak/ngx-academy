@@ -1,5 +1,6 @@
 import { Component, ContentChildren, Directive, ElementRef, Input, QueryList, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+
 import { isViewContainerRef } from './helpers/matchers';
 
 
@@ -100,7 +101,7 @@ describe('ContentChildren -', () => {
 	});
 
 	/**
-	 * ContentChild allows to get different types when referencing a component
+	 * @ContentChildren allows to get different types when referencing a component
 	 */
 	describe ('read component -', () => {
 
@@ -200,7 +201,7 @@ describe('ContentChildren -', () => {
 		});
 
 		/**
-		 * ContentChildren allows to get reference to a component by template variable
+		 * @ContentChildren allows to get reference to a component by template variable
 		 */
 		it ('should be possible to get reference by template variable', () => {
 			// given
@@ -220,7 +221,7 @@ describe('ContentChildren -', () => {
 	});
 
 	/**
-	 * ContentChildren allows to get reference to multiple instances of directives
+	 * @ContentChildren allows to get reference to multiple instances of directives
 	 */
 	describe ('directive -', () => {
 
@@ -330,7 +331,7 @@ describe('ContentChildren -', () => {
 		});
 
 		/**
-		 * ContentChildren allows to get reference to a directive by template variable
+		 * @ContentChildren allows to get reference to a directive by template variable
 		 */
 		it ('should be possible to get reference by template variable', () => {
 			// given
@@ -350,7 +351,7 @@ describe('ContentChildren -', () => {
 	});
 
 	/**
-	 * ContentChild allows to get different types when referencing a template
+	 * @ContentChildren allows to get different types when referencing a template
 	 */
 	describe ('read ng-template -', () => {
 
@@ -470,7 +471,7 @@ describe('ContentChildren -', () => {
 	});
 
 	/**
-	 * Content children allows to read descendants
+	 * @ContentChildren allows to read descendants
 	 */
 	describe ('descendants -', () => {
 
