@@ -464,7 +464,7 @@ describe('ContentChildren -', () => {
 		});
 
 		/**
-		 * ContentChildren allows to get reference to a template by template variable
+		 * @ContentChildren allows to get reference to a template by template variable
 		 */
 		it ('should be possible to get reference to a template by template variable', () => {
 

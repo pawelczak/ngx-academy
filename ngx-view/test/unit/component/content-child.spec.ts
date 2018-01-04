@@ -241,7 +241,7 @@ describe('ContentChild -', () => {
 		}
 
 		@Component({
-			selector: 'content-children-for-directive',
+			selector: 'content-child-for-directive',
 			template: ``
 		})
 		class ContentChildForDirectiveComponent {
@@ -281,11 +281,11 @@ describe('ContentChild -', () => {
 			selector: 'test',
 			template: `
 
-				<content-children-for-directive>
+				<content-child-for-directive>
 					<p #dirOne="propDir" [propDir]="'#1'" ></p>
 					<p #dirTwo="propDir" [propDir]="'#2'" ></p>
 					<p #dirThree="propDir" [propDir]="'#3'" ></p>
-				</content-children-for-directive>
+				</content-child-for-directive>
 
 			`
 		})
@@ -366,105 +366,123 @@ describe('ContentChild -', () => {
 
 	});
 
-
-	xdescribe('component references -', () => {
+	/**
+	 * @ContentChild allows to get different types when referencing a template
+	 */
+	describe ('read ng-template -', () => {
 
 		@Component({
-			selector: 'root',
+			selector: 'content-child',
+			template: ``
+		})
+		class ContentChildComponent {
+
+			/**
+			 * ng-template reference
+			 */
+			@ContentChild(TemplateRef)
+			templRef: TemplateRef<any>;
+
+			/**
+			 * ng-template reference as ElementRefs
+			 */
+			@ContentChild(TemplateRef, {read: ElementRef})
+			templAsElementRef: ElementRef;
+
+			/**
+			 * ng-template reference as ElementRefs
+			 */
+			@ContentChild(TemplateRef, {read: SimpleComponent})
+			templAsCompRef: SimpleComponent;
+
+			/**
+			 * ng-template reference as ViewContainerRef
+			 */
+			@ContentChild(TemplateRef, {read: ViewContainerRef})
+			templAsVcr: ViewContainerRef;
+
+			/**
+			 * component reference by template variable
+			 */
+			@ContentChild('templOne')
+			templByTemplVarRef: SimpleComponent;
+		}
+
+		@Component({
+			selector: 'test',
 			template: `
+
 				<content-child>
-					<simple></simple>
+
+					<ng-template #templOne >
+					</ng-template>
+
+					<ng-template #templTwo >
+					</ng-template>
+
 				</content-child>
+
 			`
 		})
-		class RootComponent {
+		class TestComponent {
 			@ViewChild(ContentChildComponent)
-			contentChildRef: ContentChildComponent;
+			compRef: ContentChildComponent;
 		}
 
 		beforeEach(() => {
-			TestBed
-				.configureTestingModule({
-					imports: [],
-					declarations: [
-						RootComponent,
-						ContentChildComponent,
-						SimpleComponent
-					]
-				});
+			TestBed.configureTestingModule({
+				declarations: [
+					SimpleComponent,
+					ContentChildComponent,
+					TestComponent
+				]
+			});
 		});
 
-		it ('should be possible to get reference to component', () => {
+		it ('should get template references as different objects', () => {
 
 			// given
-			const fixture = TestBed.createComponent(RootComponent),
+			const fixture = TestBed.createComponent(TestComponent),
 				compInstance = fixture.componentInstance;
 
 			// when
 			fixture.detectChanges();
 
 			// then
-			expect(compInstance.contentChildRef.simpleComponent).toBeDefined();
-			expect(compInstance.contentChildRef.simpleComponent instanceof SimpleComponent).toBeTruthy();
+			let templRef = compInstance.compRef.templRef;
+			expect(templRef).toBeDefined();
+			expect(templRef instanceof TemplateRef).toBe(true, 'TemplateRef as TemplateRef'); // TRUE
+
+			let templAsElementRef = compInstance.compRef.templAsElementRef;
+			expect(templAsElementRef).toBeDefined();
+			expect(templAsElementRef instanceof ElementRef).toBe(true, 'componentRef as ElementRef'); // TRUE
+
+			let templAsCompRef = compInstance.compRef.templAsCompRef;
+			expect(templAsCompRef).toBeUndefined();
+			expect(templAsCompRef instanceof SimpleComponent).toBe(false, 'componentRef as SimpleComponent'); // FALSE
+
+			let templAsVcr = compInstance.compRef.templAsVcr;
+			expect(templAsVcr).toBeDefined();
+			expect(isViewContainerRef(templAsVcr)).toBe(true, 'componentRef as ViewContainerRef'); // TRUE
 		});
 
-	});
+		/**
+		 * @ContentChild allows to get reference to a template by template variable
+		 */
+		it ('should be possible to get reference to a template by template variable', () => {
 
-	xdescribe('ng-template references -', () => {
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
 
-		@Component({
-			selector: 'root',
-			template: `
-				<content-child>
-					<ng-template #templateOne ></ng-template>
-					<ng-template #templateTwo ></ng-template>
-				</content-child>
-			`
+			// when
+			fixture.detectChanges();
+
+			// then
+			let templByTemplVarRef = compInstance.compRef.templByTemplVarRef;
+			expect(templByTemplVarRef).toBeDefined();
+			expect(templByTemplVarRef instanceof TemplateRef).toBe(true, 'TemplateRef as TemplateRef'); // TRUE
 		})
-		class RootComponent {
-			@ViewChild(ContentChildComponent)
-			contentChildRef: ContentChildComponent;
-		}
-
-		beforeEach(() => {
-			TestBed
-				.configureTestingModule({
-					imports: [],
-					declarations: [
-						RootComponent,
-						ContentChildComponent,
-						SimpleComponent
-					]
-				});
-		});
-
-		it ('should be possible to get reference to component via ng-template', () => {
-
-			// given
-			const fixture = TestBed.createComponent(RootComponent),
-				compInstance = fixture.componentInstance;
-
-			// when
-			fixture.detectChanges();
-
-			// then
-			expect(compInstance.contentChildRef.templateRef).toBeDefined();
-			expect(compInstance.contentChildRef.templateRef instanceof TemplateRef).toBeTruthy();
-		});
-
-
-		it ('ng-template should get reference to first declared ng-template', () => {
-
-			// given
-			const fixture = TestBed.createComponent(RootComponent),
-				compInstance = fixture.componentInstance;
-
-			// when
-			fixture.detectChanges();
-
-			// then
-			expect(compInstance.contentChildRef.templateRef).toEqual(compInstance.contentChildRef.templateOneVarRef);
-		});
 
 	});
 
