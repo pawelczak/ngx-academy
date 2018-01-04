@@ -9,6 +9,10 @@ import { ViewContainerRef } from '@angular/core';
  */
 export function isViewContainerRef(vcr: ViewContainerRef): boolean {
 
+	if (!vcr) {
+		return false;
+	}
+
 	if (vcr.element &&
 		vcr.injector &&
 		vcr.parentInjector &&
