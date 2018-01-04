@@ -298,8 +298,7 @@ describe('ContentChildren -', () => {
 			});
 		});
 
-		// TODO
-		xit ('should be get reference to a directive', () => {
+		it ('should get reference to a directive', () => {
 
 			// given
 			const fixture = TestBed.createComponent(TestComponent),
@@ -316,18 +315,32 @@ describe('ContentChildren -', () => {
 			expect(propDirectivesRefs[1].value).toEqual('#2');
 			expect(propDirectivesRefs[2].value).toEqual('#3');
 			expect(propDirectivesRefs[0] instanceof PropDirective).toBe(true, 'directiveRef as directiveRef'); // TRUE
+		});
 
+		/**
+		 * When you want to get reference to a directive by @ContentChildren, you cannot use read option. It doesn't work.
+		 */
+		it ('shouldn\'t be possible to use read parameter with directive', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
 			let dirAsElementRefs = compInstance.compRef.dirAsElementRefs.toArray();
-			expect(dirAsElementRefs.length).toEqual(2);
-			expect(dirAsElementRefs[0] instanceof ElementRef).toBe(true, 'directiveRef as ElementRef'); // TRUE
+			expect(dirAsElementRefs.length).toEqual(0);
+			expect(dirAsElementRefs[0] instanceof ElementRef).toBe(false, 'directiveRef as ElementRef'); // FALSE
 
 			let dirAsTempRefs = compInstance.compRef.dirAsTempRefs.toArray();
-			expect(dirAsTempRefs.length).toEqual(2);
+			expect(dirAsTempRefs.length).toEqual(0);
 			expect(dirAsTempRefs[0] instanceof TemplateRef).toBe(false, 'directiveRef as TemplateRef'); // FALSE
 
 			let dirAsVcrs = compInstance.compRef.dirAsVcrs.toArray();
-			expect(dirAsVcrs.length).toEqual(2);
-			expect(isViewContainerRef(dirAsVcrs[0])).toBe(true, 'directiveRef as ViewContainerRef'); // TRUE
+			expect(dirAsVcrs.length).toEqual(0);
+			expect(isViewContainerRef(dirAsVcrs[0])).toBe(false, 'directiveRef as ViewContainerRef'); // FALSE
 		});
 
 		/**
