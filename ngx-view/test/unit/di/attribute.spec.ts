@@ -2,7 +2,13 @@ import { Attribute, Component, ViewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 /**
- * @Attribute allows to get value from a component or directive
+ * @Attribute allows to get a static value from a component or directive
+ * You cannot dynamically change static attribute value on a component
+ *
+ * <simple-comp
+ * 		id='#simple' <- cannot be changed by angular
+ * 		>
+ * </simple-comp>
  */
 describe('@Attribute -', () => {
 
@@ -71,5 +77,9 @@ describe('@Attribute -', () => {
 		});
 
 	});
+
+	/**
+	 * @Attribute + [attr] directive
+	 */
 
 });
