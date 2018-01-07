@@ -15,16 +15,14 @@ describe('AsyncPipe -', () => {
 			selector: 'test',
 			template: `
 			
-				<ul 
-					*ngFor="let item of items$ | async"
-					id="async-pipe" >
-					<li>{{item}}</li>
+				<!-- Async pipe use -->
+				<ul id="async-pipe" >
+					<li *ngFor="let item of items$ | async" >{{item}}</li>
 				</ul>
 
-				<ul
-					*ngFor="let item of items"
-					id="not-async-pipe" >
-					<li>{{item}}</li>
+				<!-- subscribe method use -->
+				<ul id="not-async-pipe" >
+					<li *ngFor="let item of items" >{{item}}</li>
 				</ul>
 			
 			`
@@ -35,11 +33,11 @@ describe('AsyncPipe -', () => {
 
 			items$: Observable<Array<string>> = this.sub$.asObservable();
 
-			items: any;
+			items: Array<string>;
 
 			constructor(changeDetectorRef: ChangeDetectorRef) {
-				this.items$.subscribe((s) => {
-					this.items = s;
+				this.items$.subscribe((items: Array<string>) => {
+					this.items = items;
 					changeDetectorRef.detectChanges();
 				});
 			}
@@ -92,9 +90,9 @@ describe('AsyncPipe -', () => {
 		/**
 		 * Async pipe uses markForCheck method to run change detection mechanism.
 		 * So unless someone else triggers tick of change detection, it will
-		 * not rerender the view.
+		 * not re-render the view.
 		 */
-		it ('should not rerender the view after change of items', () => {
+		it ('should not update("re-render") the view after change of items', () => {
 
 			// given
 			const fixture = TestBed.createComponent(TestComponent);
@@ -129,7 +127,6 @@ describe('AsyncPipe -', () => {
 			expect(notAsyncElements[0].textContent).toEqual(givenItems[0]);
 			expect(notAsyncElements[1].textContent).toEqual(givenItems[1]);
 			expect(notAsyncElements[2].textContent).toEqual(givenItems[2]);
-
 		});
 
 	});
