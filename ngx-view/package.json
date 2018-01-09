@@ -37,7 +37,8 @@
 		"protractor": "protractor",
 		"pree2e": "yarn webdriver:update -- --standalone",
 		"e2e": "yarn protractor",
-		"precommit": "yarn test"
+		"precommit": "yarn test",
+		"analyze-stats": "yarn webpack:build -- --config config/webpack.dev.js --profile --json > dist/stats.json && webpack-bundle-analyzer dist/stats.json"
 	},
 	"dependencies": {
 		"@angular/animations": "5.1.3",
@@ -110,6 +111,7 @@
 		"typescript": "2.4.2",
 		"url-loader": "^0.5.7",
 		"webpack": "2.5.1",
+		"webpack-bundle-analyzer": "^2.9.2",
 		"webpack-dev-server": "2.4.5",
 		"webpack-merge": "4.1.0"
 	}

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/throw';
+import { _throw } from 'rxjs/observable/throw';
 
 export class User {
 	login: string;
@@ -27,7 +27,7 @@ export class GithubApiService {
 
 	search<T>(what: string, params: HttpParams): Observable<SearchResults<T>> {
 		if (this.WHAT.indexOf(what) === -1) {
-			return Observable.throw(`Searching for ${what} is not supported. The available types are: ${this.WHAT.join(', ')}.`);
+			return _throw(`Searching for ${what} is not supported. The available types are: ${this.WHAT.join(', ')}.`);
 		}
 		return this.http.get<SearchResults<T>>(`${this.API_URL}/search/${what}`, { params });
 	}

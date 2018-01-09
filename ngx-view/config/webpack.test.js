@@ -3,6 +3,7 @@ const helpers = require('./helpers'),
 	webpack = require('webpack');
 
 module.exports = {
+
 	devtool: 'inline-source-map',
 
 	resolve: {
@@ -44,7 +45,7 @@ module.exports = {
 
 	plugins: [
 		new webpack.ContextReplacementPlugin(
-			/angular(\\|\/)core(\\|\/)@angular/,
+			/angular(\\|\/)core(\\|\/)/,
 			helpers.root('./src'),
 			{}
 		)

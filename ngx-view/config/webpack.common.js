@@ -37,8 +37,13 @@ module.exports = {
 		rules: [
 			{
 				test: /\.ts$/,
-				loaders: [
-					'awesome-typescript-loader',
+				use: [
+					{
+						loader: 'awesome-typescript-loader',
+						options: {
+							silent: process.argv.indexOf("--json") !== -1
+						}
+					},
 					'angular2-template-loader'
 				],
 				exclude: /node_modules/
@@ -101,7 +106,7 @@ module.exports = {
 			chunksSortMode: 'dependency'
 		}),
 		new webpack.ContextReplacementPlugin(
-			/angular(\\|\/)core(\\|\/)@angular/,
+			/angular(\\|\/)core(\\|\/)/,
 			helpers.root('./src'),
 			{}
 		),
