@@ -22,30 +22,54 @@ describe('Pipe -', () => {
 		`
 	})
 	class TestComponent {
-		value = 8;
+		value = 0;
 	}
 
-	beforeEach(() => {
-		TestBed.configureTestingModule({
-			declarations: [
-				TestPipe,
-				TestComponent
-			]
+	describe('template -', () => {
+
+		beforeEach(() => {
+			TestBed.configureTestingModule({
+				declarations: [
+					TestPipe,
+					TestComponent
+				]
+			});
 		});
-	});
 
-	it ('should be possible to use pipes in template', () => {
+		it ('should be possible to use pipes in template', () => {
 
-		// given
-		const fixture = TestBed.createComponent(TestComponent);
+			// given
+			const fixture = TestBed.createComponent(TestComponent);
 
-		// when
-		fixture.detectChanges();
+			// when
+			fixture.detectChanges();
 
-		// then
-		const el = fixture.nativeElement.querySelector('p');
+			// then
+			const el = fixture.nativeElement.querySelector('p');
 
-		expect(el.textContent.trim()).toBe('9');
+			expect(el.textContent.trim()).toBe('1');
+		});
+
+		it ('should be possible to use pipes with multiple arguments', () => {
+
+			// given
+			const template = `
+					<p>
+						{{value | add:1:2:3:4 }}
+					</p>
+			`;
+			TestBed.overrideTemplate(TestComponent, template);
+			const fixture = TestBed.createComponent(TestComponent);
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			const el = fixture.nativeElement.querySelector('p');
+
+			expect(el.textContent.trim()).toBe('10');
+		});
+
 	});
 
 });
