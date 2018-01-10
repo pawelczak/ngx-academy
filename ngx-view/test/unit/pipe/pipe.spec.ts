@@ -25,7 +25,7 @@ describe('Pipe -', () => {
 		value = 0;
 	}
 
-	describe('template -', () => {
+	describe('template use-', () => {
 
 		beforeEach(() => {
 			TestBed.configureTestingModule({
@@ -71,5 +71,21 @@ describe('Pipe -', () => {
 		});
 
 	});
+
+	describe('object use -', () => {
+
+		it ('should be possible to use pipe as an object', () => {
+
+			// given
+			const pipe = new TestPipe();
+
+			// when
+			const sum = pipe.transform(0, 1, 2, 3, 4);
+
+			// then
+			expect(sum).toEqual(10);
+		});
+
+	})
 
 });
