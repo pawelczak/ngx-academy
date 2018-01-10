@@ -38,7 +38,7 @@
 		"pree2e": "yarn webdriver:update -- --standalone",
 		"e2e": "yarn protractor",
 		"precommit": "yarn test",
-		"analyze-stats": "yarn webpack:build -- --config config/webpack.dev.js --profile --json > dist/stats.json && webpack-bundle-analyzer dist/stats.json"
+		"analyze-bundles": "yarn webpack:build -- --config config/webpack.dev.js --profile --json > dist/stats.json && webpack-bundle-analyzer dist/stats.json"
 	},
 	"dependencies": {
 		"@angular/animations": "5.1.3",
