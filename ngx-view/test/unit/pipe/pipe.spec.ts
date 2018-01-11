@@ -16,6 +16,10 @@ describe('Pipe -', () => {
 		}
 
 		transform(value: any, ...args: any[]): any {
+			if (!args || args.length < 1) {
+				return value;
+			}
+
 			return value + args.reduce((prev, cur) => {return prev + cur;});
 		}
 	}
@@ -75,6 +79,26 @@ describe('Pipe -', () => {
 			const el = fixture.nativeElement.querySelector('p');
 
 			expect(el.textContent.trim()).toBe('10');
+		});
+
+		it ('should be possible to use pipes with no arguments', () => {
+
+			// given
+			const template = `
+					<p>
+						{{value | add }}
+					</p>
+			`;
+			TestBed.overrideTemplate(TestComponent, template);
+			const fixture = TestBed.createComponent(TestComponent);
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			const el = fixture.nativeElement.querySelector('p');
+
+			expect(el.textContent.trim()).toBe('0');
 		});
 
 	});
