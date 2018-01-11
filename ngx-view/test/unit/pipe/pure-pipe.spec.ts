@@ -128,7 +128,7 @@ describe('Pure pipes -', () => {
 		/**
 		 * Fixture#detectChanges runs change detection twice, than compares templates
 		 * and throws errors if they don't match.
-		 * That is way number of impure logs is 10, although Fixture#detectChanges was invoked
+		 * That is why number of impure logs is 10, although Fixture#detectChanges was invoked
 		 * only 5 times.
 		 */
 		expect(logger.impureNumberOfLogs()).toEqual(10);

@@ -7,7 +7,14 @@ describe('Pipe -', () => {
 	@Pipe({
 		name: 'add'
 	})
-	class TestPipe implements PipeTransform {
+	class CounterPipe implements PipeTransform {
+
+		static instanceNumber: number = 0;
+
+		constructor() {
+			CounterPipe.instanceNumber++;
+		}
+
 		transform(value: any, ...args: any[]): any {
 			return value + args.reduce((prev, cur) => {return prev + cur;});
 		}
@@ -30,7 +37,7 @@ describe('Pipe -', () => {
 		beforeEach(() => {
 			TestBed.configureTestingModule({
 				declarations: [
-					TestPipe,
+					CounterPipe,
 					TestComponent
 				]
 			});
@@ -77,13 +84,77 @@ describe('Pipe -', () => {
 		it ('should be possible to use pipe as an object', () => {
 
 			// given
-			const pipe = new TestPipe();
+			const pipe = new CounterPipe();
 
 			// when
 			const sum = pipe.transform(0, 1, 2, 3, 4);
 
 			// then
 			expect(sum).toEqual(10);
+		});
+
+	});
+
+	describe('multiple instances -', () => {
+
+		@Component({
+			selector: 'child',
+			template: `
+				{{ 8 | add:1 }}
+			`
+		})
+		class ChildComponent {}
+
+		beforeEach(() => {
+			TestBed.configureTestingModule({
+				declarations: [
+					CounterPipe,
+					TestComponent,
+					ChildComponent
+				]
+			});
+		});
+
+		it ('should create one instance of pipe for each use in component template', () => {
+
+			// given
+			CounterPipe.instanceNumber = 0; // reset number of instances
+
+			const templ = `
+				{{value | add:1}}
+				{{value | add:2}}
+				{{value | add:3}}
+			`;
+			TestBed.overrideTemplate(TestComponent, templ);
+			const fixture = TestBed.createComponent(TestComponent);
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(CounterPipe.instanceNumber).toEqual(1);
+		});
+
+		it ('should create two instances of pipes, one for each component', () => {
+
+			// given
+			CounterPipe.instanceNumber = 0; // reset number of instances
+
+			const templ = `
+				{{value | add:1}}
+				{{value | add:2}}
+				{{value | add:3}}
+				<child></child>
+				<child></child>
+			`;
+			TestBed.overrideTemplate(TestComponent, templ);
+			const fixture = TestBed.createComponent(TestComponent);
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(CounterPipe.instanceNumber).toEqual(3);
 		});
 
 	})
