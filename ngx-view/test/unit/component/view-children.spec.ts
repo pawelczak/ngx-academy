@@ -1,5 +1,5 @@
 import {
-	Component, ElementRef, QueryList, TemplateRef, ViewChildren, ViewContainerRef
+	Component, ElementRef, Input, QueryList, TemplateRef, ViewChildren, ViewContainerRef
 } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
@@ -8,6 +8,91 @@ import { isViewContainerRef } from './helpers/matchers';
 
 
 describe('ViewChildren -', () => {
+
+	@Component({
+		selector: 'simple',
+		template: ``
+	})
+	class SimpleComponent {
+		@Input()
+		value: string;
+	}
+
+	/**
+	 * @ViewChildren variables are initialized after the lifecycle hook 'AfterViewInit' is invoked.
+	 */
+	describe('ngAfterViewInit -', () => {
+
+		@Component({
+			selector: 'test',
+			template: `
+
+				<simple [value]="'#1'" >#1</simple>
+				<simple [value]="'#2'" >#2</simple>
+				<simple [value]="'#3'" >#3</simple>
+
+			`
+		})
+		class TestComponent {
+			@ViewChildren(SimpleComponent)
+			compRefs: QueryList<SimpleComponent>;
+		}
+
+		beforeEach(() => {
+			TestBed.configureTestingModule({
+				declarations: [
+					SimpleComponent,
+					TestComponent
+				]
+			});
+		});
+
+
+		/**
+		 * Before the AfterViewInit lifecycle hook occurs
+		 * @ViewChildren variables are undefined
+		 */
+		it ('should accessible after AfterViewInit lifecycle', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent);
+
+			/**
+			 * Before AfterViewInit
+			 */
+			expect(fixture.componentInstance.compRefs).toBeUndefined();
+
+
+			/**
+			 * Run all lifecycle hooks
+			 */
+			fixture.detectChanges();
+
+			/**
+			 * After AfterViewInit
+			 */
+			expect(fixture.componentInstance.compRefs).toBeDefined();
+		});
+
+		it ('should be possible to get component instance(with inputs) from QueryList', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			const simpleCompRefs = compInstance.compRefs.toArray();
+			expect(simpleCompRefs.length).toEqual(3);
+			expect(simpleCompRefs[0].value).toEqual('#1');
+			expect(simpleCompRefs[1].value).toEqual('#2');
+			expect(simpleCompRefs[2].value).toEqual('#3');
+		});
+
+	});
+
 
 	describe('template references -', () => {
 

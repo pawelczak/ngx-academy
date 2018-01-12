@@ -47,7 +47,7 @@ describe('ContentChildren -', () => {
 		})
 		class TestComponent {
 			@ViewChild(ContentChildrenComponent)
-			compRef: ContentChildrenComponent;
+			compRefs: ContentChildrenComponent;
 		}
 
 		beforeEach(() => {
@@ -72,16 +72,20 @@ describe('ContentChildren -', () => {
 			/**
 			 * Before AfterContentInit
 			 */
-			expect(fixture.componentInstance.compRef.simpleComponent).toBeUndefined();
+			expect(fixture.componentInstance.compRefs.simpleComponent).toBeUndefined();
+
+			/**
+			 * Run all lifecycle hooks
+			 */
+			fixture.detectChanges();
 
 			/**
 			 * After AfterContentInit
 			 */
-			fixture.detectChanges();
-			expect(fixture.componentInstance.compRef.simpleComponent).toBeDefined();
+			expect(fixture.componentInstance.compRefs.simpleComponent).toBeDefined();
 		});
 
-		it ('should be possible to get component instance from QueryList', () => {
+		it ('should be possible to get component instance(with inputs) from QueryList', () => {
 
 			// given
 			const fixture = TestBed.createComponent(TestComponent),
@@ -91,7 +95,7 @@ describe('ContentChildren -', () => {
 			fixture.detectChanges();
 
 			// then
-			const simpleCompRefs = compInstance.compRef.simpleComponent.toArray();
+			const simpleCompRefs = compInstance.compRefs.simpleComponent.toArray();
 			expect(simpleCompRefs.length).toEqual(3);
 			expect(simpleCompRefs[0].value).toEqual('#1');
 			expect(simpleCompRefs[1].value).toEqual('#2');
