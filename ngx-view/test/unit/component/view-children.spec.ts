@@ -1,9 +1,8 @@
 import {
 	Component, Directive, ElementRef, Input, QueryList, TemplateRef, ViewChildren, ViewContainerRef
 } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 
-import { BlankComponent } from './helpers/blank.component';
 import { isViewContainerRef } from './helpers/matchers';
 
 
@@ -510,6 +509,72 @@ describe('ViewChildren -', () => {
 			expect(templByTemplVarRefs.length).toEqual(1);
 			expect(templByTemplVarRefs[0] instanceof ElementRef).toBe(true, 'ElementRef as ElementRef'); // TRUE
 		});
+
+	});
+
+	describe ('QueryList changes -', () => {
+
+		@Component({
+			selector: 'test',
+			template: `
+
+				<simple *ngIf="flag"
+						[value]="'#1'" >#1</simple>
+
+				<simple *ngIf="!flag"
+						[value]="'#2'" >#2</simple>
+			`
+		})
+		class TestComponent {
+
+			/**
+			 * component references
+			 */
+			@ViewChildren(SimpleComponent)
+			simpleComponents: QueryList<SimpleComponent>;
+
+			flag: boolean = false;
+		}
+
+		beforeEach(() => {
+			TestBed.configureTestingModule({
+				declarations: [
+					SimpleComponent,
+					TestComponent
+				]
+			});
+		});
+
+		/**
+		 * There is some issue here.
+		 * It seems, that changes from @ViewChildren are all detect changes cycles,
+		 * when angular is stable. It is hard to test it.
+		 */
+		it ('should be possible to observe changes made to view', fakeAsync(() => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			let simpleCompRefs: Array<SimpleComponent> = [];
+
+			// when
+			fixture.detectChanges();
+			compInstance.simpleComponents.changes.subscribe((s) => {
+				simpleCompRefs = compInstance.simpleComponents.toArray();
+			});
+
+			fixture
+				.whenStable()
+				.then(() => {
+					// then
+					expect(simpleCompRefs.length).toEqual(1);
+					expect(simpleCompRefs[0].value).toEqual('#1');
+				});
+
+			compInstance.flag = true;
+			fixture.detectChanges();
+		}));
 
 	});
 

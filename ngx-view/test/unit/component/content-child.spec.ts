@@ -489,6 +489,19 @@ describe('ContentChild -', () => {
 	describe('content changes -', () => {
 
 		@Component({
+			selector: 'content-child',
+			template: ``
+		})
+		class ContentChildComponent {
+
+			/**
+			 * component references
+			 */
+			@ContentChild(SimpleComponent)
+			simpleComponent: SimpleComponent;
+		}
+
+		@Component({
 			selector: 'test',
 			template: `
 
