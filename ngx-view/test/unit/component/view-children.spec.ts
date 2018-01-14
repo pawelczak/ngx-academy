@@ -435,105 +435,80 @@ describe('ViewChildren -', () => {
 
 	});
 
-
-	describe('template references -', () => {
+	/**
+	 * @ViewChildren allows to get a reference by tag element
+	 */
+	describe ('HTML tag -', () => {
 
 		@Component({
-			selector: 'view-children-component',
+			selector: 'test',
 			template: `
 
-				<p class="paragraph" >Lorem</p>
-				<p class="paragraph" >ipsum</p>
-				<p class="paragraph" >dolor</p>
+				<p>#1</p>
+				<p>#2</p>
+				<p>#3</p>
 				
-				<blank></blank>
-				<blank></blank>
-				<blank></blank>
-				
-				<ng-template></ng-template>
-				<ng-template></ng-template>
-				<ng-template></ng-template>
-				
+				<p #templVar >#4</p>
+
 			`
 		})
-		class ViewChildrenComponent {
+		class TestComponent {
 
-			@ViewChildren(BlankComponent)
-			blankComponents: QueryList<BlankComponent>;
-
-			@ViewChildren(BlankComponent, { read: ElementRef })
-			blankComponentsAsElemRef: QueryList<ElementRef>;
-
-			@ViewChildren(BlankComponent, { read: TemplateRef })
-			blankComponentsAsTempRef: QueryList<TemplateRef<any>>;
-
-			@ViewChildren(BlankComponent, { read: ViewContainerRef })
-			blankComponentsAsVcr: QueryList<ViewContainerRef>;
-
-			@ViewChildren(TemplateRef)
-			tempRefs: QueryList<TemplateRef<any>>;
-
+			/**
+			 * HTML tag references
+			 */
 			@ViewChildren('p')
-			pElements: QueryList<ElementRef>;
+			tagRefs: QueryList<any>;
 
+			/**
+			 * HTML tag references by template variable
+			 */
+			@ViewChildren('templVar')
+			tagBytemplVarRefs: QueryList<ElementRef>;
 		}
 
 		beforeEach(() => {
-			TestBed
-				.configureTestingModule({
-					imports: [],
-					declarations: [
-						ViewChildrenComponent,
-						BlankComponent
-					]
-				});
+			TestBed.configureTestingModule({
+				declarations: [
+					SimpleComponent,
+					TestComponent
+				]
+			});
 		});
 
-		it ('should be possible to get reference to ng-template', () => {
+		/**
+		 * @ViewChildren doesn't allow to get reference by HTML tag
+		 */
+		it ('should not be possible to get reference by HTML tag', () => {
 
 			// given
-			const fixture = TestBed.createComponent(ViewChildrenComponent);
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			let templRefs = compInstance.tagRefs.toArray();
+			expect(templRefs.length).toEqual(0);
+			expect(templRefs[0]).toBeUndefined();
+		});
+
+		/**
+		 * @ViewChildren allows to get reference to a HTML node by template variable
+		 */
+		it ('should be possible to get reference to a template by template variable', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
 
 			// when
 			fixture.detectChanges();
 
 			// then
-			expect(fixture.componentInstance.tempRefs.length).toEqual(3);
-			expect(fixture.componentInstance.tempRefs.first instanceof TemplateRef).toBe(true, 'TemplateRef as TemplateRef'); // TRUE
-		});
-
-		it ('should be possible to get reference to components', () => {
-
-			// given
-			const fixture = TestBed.createComponent(ViewChildrenComponent);
-
-			// when
-			fixture.detectChanges();
-
-			// then
-			expect(fixture.componentInstance.blankComponents.length).toEqual(3);
-			expect(fixture.componentInstance.blankComponents.first instanceof BlankComponent).toBe(true, 'componentRef as ComponentRef'); // TRUE
-
-			expect(fixture.componentInstance.blankComponentsAsElemRef.length).toEqual(3);
-			expect(fixture.componentInstance.blankComponentsAsElemRef.first instanceof ElementRef).toBe(true, 'componentRef as ElementRef'); // TRUE
-
-			expect(fixture.componentInstance.blankComponentsAsTempRef.length).toEqual(3);
-			expect(fixture.componentInstance.blankComponentsAsTempRef.first instanceof TemplateRef).toBe(false, 'componentRef as TemplateRef'); // FALSE
-
-			expect(fixture.componentInstance.blankComponentsAsVcr.length).toEqual(3);
-			expect(isViewContainerRef(fixture.componentInstance.blankComponentsAsVcr.first)).toBe(true, 'componentRef as ViewContainerRef'); // TRUE
-		});
-
-		it ('not possible to get multiple element references by HTML tag selector', () => {
-
-			// given
-			const fixture = TestBed.createComponent(ViewChildrenComponent);
-
-			// when
-			fixture.detectChanges();
-
-			// then
-			expect(fixture.componentInstance.pElements.length).toEqual(0);
+			let templByTemplVarRefs = compInstance.tagBytemplVarRefs.toArray();
+			expect(templByTemplVarRefs.length).toEqual(1);
+			expect(templByTemplVarRefs[0] instanceof ElementRef).toBe(true, 'ElementRef as ElementRef'); // TRUE
 		});
 
 	});
