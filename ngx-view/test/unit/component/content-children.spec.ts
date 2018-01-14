@@ -456,15 +456,15 @@ describe('ContentChildren -', () => {
 
 			let templAsElementRefs = compInstance.compRef.templAsElementRefs.toArray();
 			expect(templAsElementRefs.length).toEqual(2);
-			expect(templAsElementRefs[0] instanceof ElementRef).toBe(true, 'componentRef as ElementRef'); // TRUE
+			expect(templAsElementRefs[0] instanceof ElementRef).toBe(true, 'TemplateRef as ElementRef'); // TRUE
 
 			let templAsCompRefs = compInstance.compRef.templAsCompRefs.toArray();
 			expect(templAsCompRefs.length).toEqual(0);
-			expect(templAsCompRefs[0] instanceof SimpleComponent).toBe(false, 'componentRef as SimpleComponent'); // FALSE
+			expect(templAsCompRefs[0] instanceof SimpleComponent).toBe(false, 'TemplateRef as SimpleComponent'); // FALSE
 
 			let templAsVcrs = compInstance.compRef.templAsVcrs.toArray();
 			expect(templAsVcrs.length).toEqual(2);
-			expect(isViewContainerRef(templAsVcrs[0])).toBe(true, 'componentRef as ViewContainerRef'); // TRUE
+			expect(isViewContainerRef(templAsVcrs[0])).toBe(true, 'TemplateRef as ViewContainerRef'); // TRUE
 		});
 
 		/**

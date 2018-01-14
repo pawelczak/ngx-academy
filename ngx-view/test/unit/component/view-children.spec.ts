@@ -330,6 +330,111 @@ describe('ViewChildren -', () => {
 
 	});
 
+	/**
+	 * @ViewChildren allows to get different types when referencing a template
+	 */
+	describe ('read ng-template -', () => {
+
+		@Component({
+			selector: 'test',
+			template: `
+				
+				<ng-template #templOne >
+				</ng-template>
+
+				<ng-template #templTwo >
+				</ng-template>
+
+			`
+		})
+		class TestComponent {
+			/**
+			 * ng-template references
+			 */
+			@ViewChildren(TemplateRef)
+			templRefs: QueryList<TemplateRef<any>>;
+
+			/**
+			 * ng-template references as ElementRefs
+			 */
+			@ViewChildren(TemplateRef, {read: ElementRef})
+			templAsElementRefs: QueryList<ElementRef>;
+
+			/**
+			 * ng-template references as ComponentRefs
+			 */
+			@ViewChildren(TemplateRef, {read: SimpleComponent})
+			templAsCompRefs: QueryList<SimpleComponent>;
+
+			/**
+			 * ng-template references as ViewContainerRef
+			 */
+			@ViewChildren(TemplateRef, {read: ViewContainerRef})
+			templAsVcrs: QueryList<ViewContainerRef>;
+
+			/**
+			 * ng-template references by template variable
+			 */
+			@ViewChildren('templOne')
+			templByTemplVarRefs: QueryList<SimpleComponent>;
+		}
+
+		beforeEach(() => {
+			TestBed.configureTestingModule({
+				declarations: [
+					SimpleComponent,
+					TestComponent
+				]
+			});
+		});
+
+		it ('should get template references as different objects', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			let templRefs = compInstance.templRefs.toArray();
+			expect(templRefs.length).toEqual(2);
+			expect(templRefs[0] instanceof TemplateRef).toBe(true, 'TemplateRef as TemplateRef'); // TRUE
+
+			let templAsElementRefs = compInstance.templAsElementRefs.toArray();
+			expect(templAsElementRefs.length).toEqual(2);
+			expect(templAsElementRefs[0] instanceof ElementRef).toBe(true, 'TemplateRef as ElementRef'); // TRUE
+
+			let templAsCompRefs = compInstance.templAsCompRefs.toArray();
+			expect(templAsCompRefs.length).toEqual(0);
+			expect(templAsCompRefs[0] instanceof SimpleComponent).toBe(false, 'TemplateRef as SimpleComponent'); // FALSE
+
+			let templAsVcrs = compInstance.templAsVcrs.toArray();
+			expect(templAsVcrs.length).toEqual(2);
+			expect(isViewContainerRef(templAsVcrs[0])).toBe(true, 'TemplateRef as ViewContainerRef'); // TRUE
+		});
+
+		/**
+		 * @ViewChildren allows to get reference to a template by template variable
+		 */
+		it ('should be possible to get reference to a template by template variable', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			let templByTemplVarRefs = compInstance.templByTemplVarRefs.toArray();
+			expect(templByTemplVarRefs.length).toEqual(1);
+			expect(templByTemplVarRefs[0] instanceof TemplateRef).toBe(true, 'TemplateRef as TemplateRef'); // TRUE
+		})
+
+	});
+
 
 	describe('template references -', () => {
 

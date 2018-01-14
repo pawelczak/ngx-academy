@@ -455,15 +455,15 @@ describe('ContentChild -', () => {
 
 			let templAsElementRef = compInstance.contentChildRef.templAsElementRef;
 			expect(templAsElementRef).toBeDefined();
-			expect(templAsElementRef instanceof ElementRef).toBe(true, 'componentRef as ElementRef'); // TRUE
+			expect(templAsElementRef instanceof ElementRef).toBe(true, 'TemplateRef as ElementRef'); // TRUE
 
 			let templAsCompRef = compInstance.contentChildRef.templAsCompRef;
 			expect(templAsCompRef).toBeUndefined();
-			expect(templAsCompRef instanceof SimpleComponent).toBe(false, 'componentRef as SimpleComponent'); // FALSE
+			expect(templAsCompRef instanceof SimpleComponent).toBe(false, 'TemplateRef as SimpleComponent'); // FALSE
 
 			let templAsVcr = compInstance.contentChildRef.templAsVcr;
 			expect(templAsVcr).toBeDefined();
-			expect(isViewContainerRef(templAsVcr)).toBe(true, 'componentRef as ViewContainerRef'); // TRUE
+			expect(isViewContainerRef(templAsVcr)).toBe(true, 'TemplateRef as ViewContainerRef'); // TRUE
 		});
 
 		/**
