@@ -71,28 +71,6 @@ describe('Injector -', () => {
 			expect(childInst.value).toBe('child component');
 		});
 
-		xit ('should be possible to get parent component injector from child level', () => {
-
-			// given
-			const fixture = TestBed.createComponent(ParentComponent),
-				parentInst = fixture.componentInstance,
-				childInst = parentInst.child;
-
-			// when
-			fixture.detectChanges();
-
-			// then
-			const parentInjector = parentInst.injector,
-				childInjector = childInst.injector;
-
-			// expect((childInjector as any).parent.get(token)).toBe(parentInst.injector.get(token));
-
-			//
-			// console.log(childInjector.view.root.injector.get(token));
-			//
-			// expect(childInjector.view.parent.injector.get(token)).toBe('aa');
-		});
-
 	});
 
 });
