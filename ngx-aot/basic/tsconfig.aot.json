@@ -1,0 +1,40 @@
+{
+	"compilerOptions": {
+		"target": "es5",
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"declaration": false,
+		"removeComments": true,
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"sourceMap": true,
+		"pretty": true,
+		"allowUnreachableCode": false,
+		"allowUnusedLabels": false,
+		"noImplicitAny": false,
+		"noImplicitReturns": false,
+		"noImplicitUseStrict": false,
+		"noFallthroughCasesInSwitch": true,
+		"outDir": "./aot",
+		"skipLibCheck": true,
+		"typeRoots": [
+			"node_modules/@types"
+		],
+		"lib": [
+			"dom",
+			"es2015"
+		]
+	},
+	"files": [
+		"src/app/app.module.ts",
+		"src/main.aot.ts"
+	],
+	"exclude": [
+		"node_modules",
+		"dist"
+	],
+	"angularCompilerOptions": {
+		"genDir": "aot",
+		"skipMetadataEmit": true
+	}
+}
