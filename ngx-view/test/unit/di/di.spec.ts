@@ -25,18 +25,18 @@ describe('Dependency Injection -', () => {
 		})
 		class InjectComponent {
 
-			constructor(
-				public applicationRef: ApplicationRef,
-				public elementRef: ElementRef,
-				public viewContainerRef: ViewContainerRef,
-				public injector: Injector,
-				public renderer: Renderer2,
-				public rendererFactory: RendererFactory2,
-				public componentFactoryResolver: ComponentFactoryResolver,
-				public changeDetectionRef: ChangeDetectorRef,
-				public compiler: Compiler,
-				public ngModuleRef: NgModuleRef<any>,
-				public ngZone: NgZone) {}
+			constructor(public applicationRef: ApplicationRef,
+						public elementRef: ElementRef,
+						public viewContainerRef: ViewContainerRef,
+						public injector: Injector,
+						public renderer: Renderer2,
+						public rendererFactory: RendererFactory2,
+						public componentFactoryResolver: ComponentFactoryResolver,
+						public changeDetectionRef: ChangeDetectorRef,
+						public compiler: Compiler,
+						public ngModuleRef: NgModuleRef<any>,
+						public ngZone: NgZone) {
+			}
 		}
 
 		beforeEach(() => {
@@ -50,7 +50,7 @@ describe('Dependency Injection -', () => {
 		});
 
 
-		it ('should have all native services injected', () => {
+		it('should have all native services injected', () => {
 
 			// given
 			const fixture = TestBed.createComponent(InjectComponent),
@@ -80,26 +80,27 @@ describe('Dependency Injection -', () => {
 		})
 		class InjectDirective {
 
-			constructor(
-				public applicationRef: ApplicationRef,
-				public elementRef: ElementRef,
-				public viewContainerRef: ViewContainerRef,
-				public injector: Injector,
-				public renderer: Renderer2,
-				public rendererFactory: RendererFactory2,
-				public componentFactoryResolver: ComponentFactoryResolver,
-				public changeDetectionRef: ChangeDetectorRef,
-				public compiler: Compiler,
-				public ngModuleRef: NgModuleRef<any>,
-				public ngZone: NgZone) {}
+			constructor(public applicationRef: ApplicationRef,
+						public elementRef: ElementRef,
+						public viewContainerRef: ViewContainerRef,
+						public injector: Injector,
+						public renderer: Renderer2,
+						public rendererFactory: RendererFactory2,
+						public componentFactoryResolver: ComponentFactoryResolver,
+						public changeDetectionRef: ChangeDetectorRef,
+						public compiler: Compiler,
+						public ngModuleRef: NgModuleRef<any>,
+						public ngZone: NgZone) {
+			}
 
-			methodOnDirective() {}
+			methodOnDirective() {
+			}
 		}
 
 		@Component({
 			selector: 'test-di-directive',
 			template: `
-				<div di-directive #dirRef="dirRef" >
+				<div di-directive #dirRef="dirRef">
 				</div>
 			`
 		})
@@ -119,7 +120,7 @@ describe('Dependency Injection -', () => {
 				});
 		});
 
-		it ('should have all native services injected', () => {
+		it('should have all native services injected', () => {
 
 			// given
 			const fixture = TestBed.createComponent(TestInjectDirectiveComponent),
@@ -150,14 +151,14 @@ describe('Dependency Injection -', () => {
 		@Injectable()
 		class InjectService {
 
-			constructor(
-				public applicationRef: ApplicationRef,
-				public injector: Injector,
-				public rendererFactory: RendererFactory2,
-				public componentFactoryResolver: ComponentFactoryResolver,
-				public compiler: Compiler,
-				public ngModuleRef: NgModuleRef<any>,
-				public ngZone: NgZone) {}
+			constructor(public applicationRef: ApplicationRef,
+						public injector: Injector,
+						public rendererFactory: RendererFactory2,
+						public componentFactoryResolver: ComponentFactoryResolver,
+						public compiler: Compiler,
+						public ngModuleRef: NgModuleRef<any>,
+						public ngZone: NgZone) {
+			}
 		}
 
 		beforeEach(() => {
@@ -171,18 +172,18 @@ describe('Dependency Injection -', () => {
 		});
 
 
-		it ('should have all native services injected',
+		it('should have all native services injected',
 			inject([InjectService], (injectService: InjectService) => {
 
-			// when & then
-			expect(injectService.applicationRef).toBeDefined();
-			expect(injectService.injector).toBeDefined();
-			expect(injectService.rendererFactory).toBeDefined();
-			expect(injectService.componentFactoryResolver).toBeDefined();
-			expect(injectService.compiler).toBeDefined();
-			expect(injectService.ngModuleRef).toBeDefined();
-			expect(injectService.ngZone).toBeDefined();
-		}));
+				// when & then
+				expect(injectService.applicationRef).toBeDefined();
+				expect(injectService.injector).toBeDefined();
+				expect(injectService.rendererFactory).toBeDefined();
+				expect(injectService.componentFactoryResolver).toBeDefined();
+				expect(injectService.compiler).toBeDefined();
+				expect(injectService.ngModuleRef).toBeDefined();
+				expect(injectService.ngZone).toBeDefined();
+			}));
 
 	});
 

@@ -112,6 +112,24 @@ describe('injection decorators -', () => {
 			constructor(@Optional() @SkipSelf() public service: Service) {}
 		}
 
+		it ('should not use service from component context if module doesn\'t have it in context', () => {
+
+			// given
+			TestBed
+				.resetTestingModule()
+				.configureTestingModule({
+					imports: [],
+					declarations: [
+						SkipComponent
+					]
+				});
+			const fixture = TestBed.createComponent(SkipComponent),
+				compInstance = fixture.componentInstance;
+
+			// when & then
+			expect(compInstance.service).toBeNull();
+		});
+
 		it ('should start to search provider from parent context', () => {
 
 			// given
@@ -136,24 +154,6 @@ describe('injection decorators -', () => {
 			expect(compInstance.service.value).toBe('Module context');
 		});
 
-		it ('should not use service from component context if module doesn\'t have it in context', () => {
-
-			// given
-			TestBed
-				.resetTestingModule()
-				.configureTestingModule({
-					imports: [],
-					declarations: [
-						SkipComponent
-					]
-				});
-			const fixture = TestBed.createComponent(SkipComponent),
-				compInstance = fixture.componentInstance;
-
-			// when & then
-			expect(compInstance.service).toBeNull();
-		});
-
 		/**
 		 * M - module context
 		 * |
@@ -161,7 +161,7 @@ describe('injection decorators -', () => {
 		 * |
 		 * C - component context
 		 *
-		 * In this case first parent of component is parentComponent.
+		 * In this case the first parent of component is parentComponent.
 		 */
 		it ('should start from first parent component',() => {
 
@@ -213,19 +213,20 @@ describe('injection decorators -', () => {
 	 */
 	describe('@Self() -', () => {
 
+		@Component({
+			selector: 'self',
+			template: ``,
+			providers: []
+		})
+		class SelfComponent {
+			constructor(@Optional() @Self() public selfService: Service,
+						@Optional() public notSelfService: Service) {
+			}
+		}
+
 		it ('should not take provider from module context', () => {
 
-			@Component({
-				selector: 'self',
-				template: ``,
-				providers: []
-			})
-			class SelfComponent {
-				constructor(@Optional() @Self() public selfService: Service,
-							@Optional() public notSelfService: Service) {
-				}
-			}
-
+			// given
 			TestBed
 				.configureTestingModule({
 					imports: [],
@@ -240,7 +241,7 @@ describe('injection decorators -', () => {
 					}]
 				});
 
-			// given
+
 			const fixture = TestBed.createComponent(SelfComponent),
 				compInstance = fixture.componentInstance;
 
@@ -253,22 +254,27 @@ describe('injection decorators -', () => {
 	});
 
 	/**
-	 * @Host makes component to use providers only from component or parent component.
+	 * @Host - Specifies that an injector should retrieve a dependency from any injector
+	 * until reaching the host element of the current component.
+	 *
+	 * M - module context
+	 * |
+	 * P - parent context
+	 * |
+	 * C - component context
 	 */
-	describe('@Host() -', () => {
+	xdescribe('@Host() -', () => {
+
+		@Injectable()
+		class OtherService {}
 
 		@Component({
 			selector: 'host',
-			template: ``,
-			providers: [{
-				provide: Service,
-				useValue: {
-					value: 'Component context'
-				}
-			}]
+			template: ``
 		})
 		class HostComponent {
-			constructor(@Optional() @Host() public service: Service) {}
+			constructor(@Optional() @Host() public service: Service,
+		 				@Optional() @Host() public otherService: OtherService) {}
 		}
 
 		@Component({
@@ -281,12 +287,12 @@ describe('injection decorators -', () => {
 				}
 			}]
 		})
-		class ParentHostComponent {
+		class ParentComponent {
 			@ViewChild(HostComponent)
-			hostComp: HostComponent;
+			hostRef: HostComponent;
 		}
 
-		it ('should not use provider declared in component', () => {
+		it ('should use provider declared in the context of created component', () => {
 
 			// given
 			TestBed
@@ -298,11 +304,16 @@ describe('injection decorators -', () => {
 					providers: []
 				});
 
+
 			const fixture = TestBed.createComponent(HostComponent),
 				compInstance = fixture.componentInstance;
 
-			// when & then
-			expect(compInstance.service.value).toBe('Component context');
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(compInstance.service).toBeNull();
+			expect(compInstance.otherService).toBeNull();
 		});
 
 		it ('should use provider declared in parent component', () => {
@@ -313,43 +324,31 @@ describe('injection decorators -', () => {
 					imports: [],
 					declarations: [
 						HostComponent,
-						ParentHostComponent
+						ParentComponent
 					],
 					providers: []
-				});
+				})
+				.compileComponents();
 
-			const fixture = TestBed.createComponent(ParentHostComponent),
+			const fixture = TestBed.createComponent(ParentComponent),
 				compInstance = fixture.componentInstance;
 
-			// when & then
-			expect(compInstance.hostComp.service.value).toBe('Component context');
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(compInstance.hostRef.service.value).toBe('Parent context');
+			expect(compInstance.hostRef.otherService).toBeNull();
 		});
 
 		it ('should not use provider declared in module', () => {
-
-			@Component({
-				selector: 'host',
-				template: ``
-			})
-			class EmptyHostComponent {
-				constructor(@Optional() @Host() public service: Service) {}
-			}
-
-			@Component({
-				selector: '',
-				template: `<host></host>`
-			})
-			class ParentEmptyHostComponent {
-				@ViewChild(EmptyHostComponent)
-				hostComp: HostComponent;
-			}
 
 			TestBed
 				.configureTestingModule({
 					imports: [],
 					declarations: [
-						EmptyHostComponent,
-						ParentEmptyHostComponent
+						HostComponent,
+						ParentComponent
 					],
 					providers: [{
 						provide: Service,
@@ -360,14 +359,15 @@ describe('injection decorators -', () => {
 				});
 
 			// given
-			const fixture = TestBed.createComponent(ParentEmptyHostComponent),
+			const fixture = TestBed.createComponent(ParentComponent),
 				compInstance = fixture.componentInstance;
 
 			// when
 			fixture.detectChanges();
 
 			// then
-			expect(compInstance.hostComp.service).toBeNull();
+			expect(compInstance.hostRef.service.value).toBe('Parent context');
+			expect(compInstance.hostRef.otherService).toBeNull();
 		});
 	});
 
