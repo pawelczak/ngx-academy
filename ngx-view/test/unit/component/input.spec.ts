@@ -1,6 +1,5 @@
-import { Component, Input, OnChanges, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { componentFactoryName } from '@angular/compiler';
 
 describe('Component - input -', () => {
 
@@ -123,8 +122,8 @@ describe('Component - input -', () => {
 				this.value = val;
 			}
 
-			@Input('inputTwo')
-			set inputValueTwo(val: string) {
+			@Input('inputTwo,inputThree')
+			set inputValueMulti(val: string) {
 				this.value = val;
 			}
 
@@ -134,19 +133,12 @@ describe('Component - input -', () => {
 		@Component({
 			selector: 'test',
 			template: `
-			
-				<alias #compOneRef [inputOne]="'Value'" ></alias>
-				
-				<alias #compTwoRef [inputTwo]="'Value'" ></alias>
+				<alias #compRef [inputOne]="'Value'" ></alias>
 			`
 		})
 		class TestComponent {
-
-			@ViewChild('compOneRef')
-			compOneRef: AliasComponent;
-
-			@ViewChild('compTwoRef')
-			compTwoRef: AliasComponent;
+			@ViewChild('compRef')
+			compRef: AliasComponent;
 		}
 
 		beforeEach(() => {
@@ -157,12 +149,14 @@ describe('Component - input -', () => {
 						TestComponent
 					]
 				});
-
 		});
 
 		it ('should be possible to alias inputs', () => {
 
 			// given
+			const testTempl = `<alias #compRef [inputOne]="'Value'" ></alias>`;
+			TestBed.overrideTemplate(TestComponent, testTempl);
+
 			const fixture = TestBed.createComponent(TestComponent),
 				compInstance = fixture.componentInstance;
 
@@ -170,8 +164,30 @@ describe('Component - input -', () => {
 			fixture.detectChanges();
 
 			// then
-			expect(compInstance.compOneRef.value).toEqual(compValue);
-			expect(compInstance.compTwoRef.value).toEqual(compValue);
+			expect(compInstance.compRef.value).toEqual(compValue);
+		});
+
+		it ('shouldn\'t be possible to use input original name, when it is aliased', () => {
+
+			// given
+			const testTempl = `<alias #compRef [inputValueOne]="'Value'" ></alias>`;
+			TestBed.overrideTemplate(TestComponent, testTempl);
+
+			// when & then
+			expect(() => TestBed.createComponent(TestComponent)).toThrowError();
+		});
+
+		/**
+		 * @Input('inputTwo,inputThree') <- will throw error
+		 */
+		it ('not possible to specify multiple aliases', () => {
+
+			// given
+			const testTempl = `<alias #compRef [inputTwo]="'Value'" ></alias>`;
+			TestBed.overrideTemplate(TestComponent, testTempl);
+
+			// when & then
+			expect(() => TestBed.createComponent(TestComponent)).toThrowError();
 		});
 
 	});
