@@ -2,7 +2,7 @@ import { Component, Inject, Injectable, InjectionToken, Optional, Self, SkipSelf
 import { TestBed } from '@angular/core/testing';
 
 
-describe('injection decorators -', () => {
+describe('Injection decorators -', () => {
 
 	@Injectable()
 	class Service {
@@ -247,7 +247,7 @@ describe('injection decorators -', () => {
 
 			// when & then
 			expect(compInstance.selfService).toBeNull();
-			expect(compInstance.notSelfService).not.toBeNull();
+			expect(compInstance.notSelfService).toBeDefined();
 			expect(compInstance.notSelfService.value).toBe('Module context');
 		});
 
@@ -256,6 +256,10 @@ describe('injection decorators -', () => {
 	/**
 	 * @Host - Specifies that an injector should retrieve a dependency from any injector
 	 * until reaching the host element of the current component.
+	 * The @Host decorator stops the upward search at the host component.
+	 * The host component is typically the component requesting the dependency,
+	 * but when this component is projected into a parent component,
+	 * that parent component becomes the host.
 	 *
 	 * M - module context
 	 * |
@@ -263,14 +267,22 @@ describe('injection decorators -', () => {
 	 * |
 	 * C - component context
 	 */
-	xdescribe('@Host() -', () => {
+	describe('@Host() -', () => {
 
 		@Injectable()
-		class OtherService {}
+		class OtherService {
+			value: string;
+		}
 
 		@Component({
 			selector: 'host',
-			template: ``
+			template: ``,
+			providers: [{
+				provide: Service,
+				useValue: {
+					value: 'Component context'
+				}
+			}]
 		})
 		class HostComponent {
 			constructor(@Optional() @Host() public service: Service,
@@ -278,10 +290,16 @@ describe('injection decorators -', () => {
 		}
 
 		@Component({
-			selector: '',
+			selector: 'parent-host',
 			template: `<host></host>`,
 			providers: [{
 				provide: Service,
+				useValue: {
+					value: 'Parent context'
+				}
+			},
+			{
+				provide: OtherService,
 				useValue: {
 					value: 'Parent context'
 				}
@@ -289,47 +307,27 @@ describe('injection decorators -', () => {
 		})
 		class ParentComponent {
 			@ViewChild(HostComponent)
-			hostRef: HostComponent;
+			hostCompRef: HostComponent;
 		}
 
+		/**
+		 * In this scenario ParentComponent uses HostComponent. It may seem,
+		 * that in this case 'host component' is ParentComponent, but actually it's not.
+		 * HostComponent is the 'host component', so services marked with @Host()
+		 * will be taken just from context of HostComponent.
+		 */
 		it ('should use provider declared in the context of created component', () => {
 
-			// given
-			TestBed
-				.configureTestingModule({
-					imports: [],
-					declarations: [
-						HostComponent
-					],
-					providers: []
-				});
-
-
-			const fixture = TestBed.createComponent(HostComponent),
-				compInstance = fixture.componentInstance;
-
-			// when
-			fixture.detectChanges();
-
-			// then
-			expect(compInstance.service).toBeNull();
-			expect(compInstance.otherService).toBeNull();
-		});
-
-		it ('should use provider declared in parent component', () => {
-
-			// given
 			TestBed
 				.configureTestingModule({
 					imports: [],
 					declarations: [
 						HostComponent,
 						ParentComponent
-					],
-					providers: []
-				})
-				.compileComponents();
+					]
+				});
 
+			// given
 			const fixture = TestBed.createComponent(ParentComponent),
 				compInstance = fixture.componentInstance;
 
@@ -337,10 +335,67 @@ describe('injection decorators -', () => {
 			fixture.detectChanges();
 
 			// then
-			expect(compInstance.hostRef.service.value).toBe('Parent context');
-			expect(compInstance.hostRef.otherService).toBeNull();
+			expect(compInstance.hostCompRef.service.value).toBe('Component context');
+			expect(compInstance.hostCompRef.otherService).toBeNull();
 		});
 
+		/**
+		 * When component is projected, @Host() annotation says that component
+		 * should use parents injector of component that wraps current component.
+		 *
+		 * <parent-host>
+		 *     <host></host>
+		 * </parent-host>
+		 *
+		 * HostComponent is projected, because it is declaren in the content of another component,
+		 * so objects marked with @Host() will be injected from ParentComponent.
+		 *
+		 * If requested object doesn't live in the ParentComponents context, it will not be taken
+		 * from higher level components.
+		 *
+		 */
+		it ('should use provider declared in parent component', () => {
+
+			// given
+			@Component({
+				selector: 'test',
+				template: `
+					<parent-host>
+						<host></host>
+					</parent-host>
+				`
+			})
+			class TestComponent {
+				@ViewChild(HostComponent)
+				hostCompRef: HostComponent;
+			}
+
+			TestBed
+				.configureTestingModule({
+					imports: [],
+					declarations: [
+						HostComponent,
+						ParentComponent,
+						TestComponent
+					],
+					providers: []
+				});
+
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(compInstance.hostCompRef.service.value).toBe('Component context', 'Service');
+			expect(compInstance.hostCompRef.otherService.value).toBe('Parent context', 'OtherService');
+		});
+
+		/**
+		 * @Host() stops looking for a provided object on 'host component'.
+		 * That means it will not take
+		 */
 		it ('should not use provider declared in module', () => {
 
 			TestBed
@@ -355,6 +410,12 @@ describe('injection decorators -', () => {
 						useValue: {
 							value: 'Module context'
 						}
+					},
+					{
+						provide: OtherService,
+						useValue: {
+							value: 'Module context'
+						}
 					}]
 				});
 
@@ -366,8 +427,8 @@ describe('injection decorators -', () => {
 			fixture.detectChanges();
 
 			// then
-			expect(compInstance.hostRef.service.value).toBe('Parent context');
-			expect(compInstance.hostRef.otherService).toBeNull();
+			expect(compInstance.hostCompRef.service.value).toBe('Component context');
+			expect(compInstance.hostCompRef.otherService).toBeNull();
 		});
 	});
 
