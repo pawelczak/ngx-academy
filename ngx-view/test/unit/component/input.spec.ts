@@ -1,8 +1,8 @@
-import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, Directive, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-describe('Component - input -', () => {
 
+describe('Component - input -', () => {
 
 	describe('order of changes -', () => {
 
@@ -188,6 +188,67 @@ describe('Component - input -', () => {
 
 			// when & then
 			expect(() => TestBed.createComponent(TestComponent)).toThrowError();
+		});
+
+	});
+
+	describe('same input name -', () => {
+
+		@Component({
+			selector: 'input-comp',
+			template: ``
+		})
+		class InputComponent {
+			@Input()
+			value: string;
+		}
+
+		@Directive({
+			selector: '[input-dir]'
+		})
+		class InputDirective {
+			@Input()
+			value: string;
+		}
+
+		@Component({
+			selector: 'test',
+			template: `
+				<input-comp input-dir [value]="'Hello'" ></input-comp>
+			`
+		})
+		class TestComponent {
+			@ViewChild(InputComponent)
+			compRef: InputComponent;
+
+			@ViewChild(InputDirective)
+			dirRef: InputDirective;
+		}
+
+		beforeEach(() => {
+			TestBed.configureTestingModule({
+				imports: [],
+				declarations: [
+					InputComponent,
+					InputDirective,
+					TestComponent
+				]
+			});
+		});
+
+		it ('should be possible to use same input name for component and directive', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				comp = fixture.componentInstance.compRef,
+				dir = fixture.componentInstance.dirRef;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(comp.value).toBe('Hello');
+			expect(dir.value).toBe('Hello');
 		});
 
 	});
