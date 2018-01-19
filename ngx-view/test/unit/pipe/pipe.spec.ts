@@ -5,16 +5,10 @@ import { TestBed } from '@angular/core/testing';
 describe('Pipe -', () => {
 
 	@Pipe({
-		name: 'add'
+		name: 'add',
+		pure: true
 	})
 	class CounterPipe implements PipeTransform {
-
-		static instanceNumber: number = 0;
-
-		constructor() {
-			CounterPipe.instanceNumber++;
-		}
-
 		transform(value: any, ...args: any[]): any {
 			if (!args || args.length < 1) {
 				return value;
@@ -121,66 +115,168 @@ describe('Pipe -', () => {
 
 	describe('multiple instances -', () => {
 
-		@Component({
-			selector: 'child',
-			template: `
-				{{ 8 | add:1 }}
-			`
-		})
-		class ChildComponent {}
+		class Counter {
+			static instanceNumber: number = 0;
 
-		beforeEach(() => {
-			TestBed.configureTestingModule({
-				declarations: [
-					CounterPipe,
-					TestComponent,
-					ChildComponent
-				]
+			constructor() {
+				Counter.instanceNumber++;
+			}
+		}
+
+		describe('pure pipe -', () => {
+
+			@Pipe({
+				name: 'pure',
+				pure: true
+			})
+			class PurePipe extends Counter implements PipeTransform {
+				constructor() {
+					super();
+				}
+				transform(value: any, ...args: any[]): any {
+					return 'pure';
+				}
+			}
+
+			@Component({
+				selector: 'child',
+				template: `
+					{{ 'hello' | pure }}
+				`
+			})
+			class ChildComponent {}
+
+			beforeEach(() => {
+				TestBed.configureTestingModule({
+					declarations: [
+						PurePipe,
+						TestComponent,
+						ChildComponent
+					]
+				});
 			});
+
+			it ('should create one instance of pipe per component', () => {
+
+				// given
+				Counter.instanceNumber = 0; // reset number of instances
+
+				const templ = `
+					{{ 'one' | pure }}
+					{{ 'two' | pure }}
+					{{ 'three' | pure }}
+				`;
+				TestBed.overrideTemplate(TestComponent, templ);
+				const fixture = TestBed.createComponent(TestComponent);
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				expect(Counter.instanceNumber).toEqual(1);
+			});
+
+			it ('should create one instances of pipe, one for each component and its children', () => {
+
+				// given
+				Counter.instanceNumber = 0; // reset number of instances
+
+				const templ = `
+					{{ 'one' | pure }}
+					{{ 'two' | pure }}
+					{{ 'three' | pure }}
+					<child></child>
+					<child></child>
+				`;
+				TestBed.overrideTemplate(TestComponent, templ);
+				const fixture = TestBed.createComponent(TestComponent);
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				expect(Counter.instanceNumber).toEqual(3);
+			});
+
 		});
 
-		it ('should create one instance of pipe for each use in component template', () => {
+		describe('impure pipe -', () => {
 
-			// given
-			CounterPipe.instanceNumber = 0; // reset number of instances
+			@Pipe({
+				name: 'impure',
+				pure: false
+			})
+			class PurePipe extends Counter implements PipeTransform {
+				constructor() {
+					super();
+				}
+				transform(value: any, ...args: any[]): any {
+					return 'impure';
+				}
+			}
 
-			const templ = `
-				{{value | add:1}}
-				{{value | add:2}}
-				{{value | add:3}}
-			`;
-			TestBed.overrideTemplate(TestComponent, templ);
-			const fixture = TestBed.createComponent(TestComponent);
+			@Component({
+				selector: 'child',
+				template: `
+					{{ 'hello' | impure }}
+				`
+			})
+			class ChildComponent {}
 
-			// when
-			fixture.detectChanges();
+			beforeEach(() => {
+				TestBed.configureTestingModule({
+					declarations: [
+						PurePipe,
+						TestComponent,
+						ChildComponent
+					]
+				});
+			});
 
-			// then
-			expect(CounterPipe.instanceNumber).toEqual(1);
+			it ('should create one instance of pipe for each use component', () => {
+
+				// given
+				Counter.instanceNumber = 0; // reset number of instances
+
+				const templ = `
+					{{ 'one' | impure }}
+					{{ 'two' | impure }}
+					{{ 'three' | impure }}
+				`;
+				TestBed.overrideTemplate(TestComponent, templ);
+				const fixture = TestBed.createComponent(TestComponent);
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				expect(Counter.instanceNumber).toEqual(3);
+			});
+
+			it ('should create instances of pipe for each use in a component and its children', () => {
+
+				// given
+				Counter.instanceNumber = 0; // reset number of instances
+
+				const templ = `
+					{{ 'one' | impure }}
+					{{ 'two' | impure }}
+					{{ 'three' | impure }}
+					<child></child>
+					<child></child>
+				`;
+				TestBed.overrideTemplate(TestComponent, templ);
+				const fixture = TestBed.createComponent(TestComponent);
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				expect(Counter.instanceNumber).toEqual(5);
+			});
+
 		});
 
-		it ('should create two instances of pipes, one for each component', () => {
-
-			// given
-			CounterPipe.instanceNumber = 0; // reset number of instances
-
-			const templ = `
-				{{value | add:1}}
-				{{value | add:2}}
-				{{value | add:3}}
-				<child></child>
-				<child></child>
-			`;
-			TestBed.overrideTemplate(TestComponent, templ);
-			const fixture = TestBed.createComponent(TestComponent);
-
-			// when
-			fixture.detectChanges();
-
-			// then
-			expect(CounterPipe.instanceNumber).toEqual(3);
-		});
-
-	})
+	});
 
 });
