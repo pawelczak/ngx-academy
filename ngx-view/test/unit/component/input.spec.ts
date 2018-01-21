@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 
 describe('Component - input -', () => {
 
-	fdescribe('order of changes -', () => {
+	describe('order of changes -', () => {
 
 		const newValue = 'new value';
 		let fixture: any,
@@ -252,12 +252,8 @@ describe('Component - input -', () => {
 			@Input('value')
 			set inputValue(value: string) {
 				this.value = value;
-				valueChanges.push(`Directive setter${this.id}`);
-				console.log(this.id)
+				valueChanges.push(`Directive setter`);
 			}
-
-			@Input('input-dir')
-			id: string = '';
 
 			value: string;
 		}
@@ -265,7 +261,7 @@ describe('Component - input -', () => {
 		@Component({
 			selector: 'test',
 			template: `
-				<input-comp [input-dir]="'sad'" [value]="'Hello'" ></input-comp>
+				<input-comp input-dir [value]="'Hello'" ></input-comp>
 			`
 		})
 		class TestComponent {
@@ -309,29 +305,6 @@ describe('Component - input -', () => {
 				expectedChanges = [
 					'Component setter',
 					'Directive setter'
-				];
-
-			valueChanges = [];
-
-			// when
-			fixture.detectChanges();
-
-			// then
-			expect(valueChanges).toEqual(expectedChanges);
-		});
-
-		xit ('should invoke directive input in order of declaration in template', () => {
-
-			// given
-			const templ = `<input-comp [input-dir]="' - #1'" input-dir=" - #2" [value]="'Hello'" input-dir=" - #3" ></input-comp>`;
-			TestBed.overrideTemplate(TestComponent, templ);
-
-			const fixture = TestBed.createComponent(TestComponent),
-				expectedChanges = [
-					'Component setter',
-					'Directive setter - #1',
-					'Directive setter - #2',
-					'Directive setter - #3'
 				];
 
 			valueChanges = [];
