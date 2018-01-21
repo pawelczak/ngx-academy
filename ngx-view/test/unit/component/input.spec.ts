@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 
 describe('Component - input -', () => {
 
-	describe('order of changes -', () => {
+	fdescribe('order of changes -', () => {
 
 		const newValue = 'new value';
 		let fixture: any,
@@ -70,9 +70,6 @@ describe('Component - input -', () => {
 						TestComponent
 					]
 				});
-			fixture = TestBed.createComponent(TestComponent);
-			compInstance = fixture.componentInstance;
-			fixture.detectChanges();
 		});
 
 
@@ -89,7 +86,16 @@ describe('Component - input -', () => {
 			'OnChanges inputThree'
 		];
 
-		it ('setting inital value via input should trigger changes', () => {
+		/**
+		 * Inputs are invoked in the order of declarations in the component
+		 */
+		it ('setting initial value via input should trigger changes', () => {
+
+			// when
+			valueChanges = [];
+			fixture = TestBed.createComponent(TestComponent);
+			compInstance = fixture.componentInstance;
+			fixture.detectChanges();
 
 			// then
 			expect(valueChanges).toEqual(expectedOrder);
@@ -97,13 +103,42 @@ describe('Component - input -', () => {
 
 		it ('input changes should be triggered in specific order', () => {
 
-			// then
+			valueChanges = [];
+			fixture = TestBed.createComponent(TestComponent);
+			compInstance = fixture.componentInstance;
+			fixture.detectChanges();
+
+			// when
 			compInstance.value = 'new value';
 			valueChanges = [];
 			fixture.detectChanges();
 
+			// then
 			expect(valueChanges).toEqual(expectedOrder);
 		});
+
+		/**
+		 * Changing the order of input declarations in component,
+		 * doesn't affect the order of which they are invoked.
+		 */
+		it ('should not change order of input invocations', () => {
+
+			// given
+			const templ = `
+				<basic [inputTwo]="value" [inputThree]="value" [inputOne]="value" ></basic>
+			`;
+			valueChanges = [];
+			TestBed.overrideTemplate(TestComponent, templ);
+			fixture = TestBed.createComponent(TestComponent);
+			compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(valueChanges).toEqual(expectedOrder);
+		});
+
 
 	});
 
@@ -194,12 +229,19 @@ describe('Component - input -', () => {
 
 	describe('same input name -', () => {
 
+		let valueChanges: Array<string> = [];
+
 		@Component({
 			selector: 'input-comp',
 			template: ``
 		})
 		class InputComponent {
-			@Input()
+			@Input('value')
+			set inputValue(value: string) {
+				this.value = value;
+				valueChanges.push('Component setter');
+			}
+
 			value: string;
 		}
 
@@ -207,14 +249,23 @@ describe('Component - input -', () => {
 			selector: '[input-dir]'
 		})
 		class InputDirective {
-			@Input()
+			@Input('value')
+			set inputValue(value: string) {
+				this.value = value;
+				valueChanges.push(`Directive setter${this.id}`);
+				console.log(this.id)
+			}
+
+			@Input('input-dir')
+			id: string = '';
+
 			value: string;
 		}
 
 		@Component({
 			selector: 'test',
 			template: `
-				<input-comp input-dir [value]="'Hello'" ></input-comp>
+				<input-comp [input-dir]="'sad'" [value]="'Hello'" ></input-comp>
 			`
 		})
 		class TestComponent {
@@ -249,6 +300,47 @@ describe('Component - input -', () => {
 			// then
 			expect(comp.value).toBe('Hello');
 			expect(dir.value).toBe('Hello');
+		});
+
+		it ('should invoke setters in specific order', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				expectedChanges = [
+					'Component setter',
+					'Directive setter'
+				];
+
+			valueChanges = [];
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(valueChanges).toEqual(expectedChanges);
+		});
+
+		xit ('should invoke directive input in order of declaration in template', () => {
+
+			// given
+			const templ = `<input-comp [input-dir]="' - #1'" input-dir=" - #2" [value]="'Hello'" input-dir=" - #3" ></input-comp>`;
+			TestBed.overrideTemplate(TestComponent, templ);
+
+			const fixture = TestBed.createComponent(TestComponent),
+				expectedChanges = [
+					'Component setter',
+					'Directive setter - #1',
+					'Directive setter - #2',
+					'Directive setter - #3'
+				];
+
+			valueChanges = [];
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(valueChanges).toEqual(expectedChanges);
 		});
 
 	});
