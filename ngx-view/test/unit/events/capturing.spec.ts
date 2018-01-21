@@ -53,13 +53,14 @@ describe('Events -', () => {
 		}
 
 		beforeEach(() => {
-			TestBed.configureTestingModule({
-				imports: [],
-				declarations: [
-					ButtonComponent,
-					TestComponent
-				]
-			});
+			TestBed
+				.configureTestingModule({
+					imports: [],
+					declarations: [
+						ButtonComponent,
+						TestComponent
+					]
+				});
 		});
 
 		it ('should be not be posible to click on disabled button', () => {
