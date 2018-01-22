@@ -8,7 +8,7 @@ import { SecondLevelComponent } from './components/second-level.component';
 import { ThirdLevelComponent } from './components/third-level.component';
 
 
-describe('Life cycle hooks - ', () => {
+describe('Lifecycle hooks - ', () => {
 
 	class MockLogger {
 
