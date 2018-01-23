@@ -5,7 +5,7 @@ import { TestBed } from '@angular/core/testing';
 
 describe('Dynamic component creation -', () => {
 
-	describe('appRef -', () => {
+	describe('component factory -', () => {
 
 		@Component({
 			selector: 'simple',
@@ -15,6 +15,8 @@ describe('Dynamic component creation -', () => {
 
 		@Injectable()
 		class DynamicComponentService {
+
+			private compRef: ComponentRef<any>;
 
 			constructor(private applicationRef: ApplicationRef,
 						private componentFactoryResolver: ComponentFactoryResolver,
@@ -34,6 +36,13 @@ describe('Dynamic component creation -', () => {
 				this.document.body.appendChild(componentRef.location.nativeElement);
 
 				return componentRef;
+			}
+
+			destroy(): void {
+				if (this.compRef) {
+					this.compRef.destroy();
+					this.compRef = null;
+				}
 			}
 		}
 
@@ -62,6 +71,10 @@ describe('Dynamic component creation -', () => {
 				});
 
 			dynamicComponentService = TestBed.get(DynamicComponentService);
+		});
+
+		afterEach(() => {
+			dynamicComponentService.destroy();
 		});
 
 		it ('should create component and attach it to the body', () => {
