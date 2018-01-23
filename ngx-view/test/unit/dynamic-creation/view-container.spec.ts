@@ -46,7 +46,6 @@ describe('Dynamic component - ViewContainerRef -', () => {
 		})
 		class SimpleModule {}
 
-
 		beforeEach(() => {
 			TestBed
 				.configureTestingModule({
