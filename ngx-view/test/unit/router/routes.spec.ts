@@ -1,15 +1,15 @@
 import { Component } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, Routes } from '@angular/router';
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 
 
-xdescribe('Router - routes', () => {
+describe('Router - routes', () => {
 
 	let location: Location;
 	let router: Router;
-	let fixture;
+	let fixture: ComponentFixture<any>;
 
 	@Component({
 		template: `List`
@@ -54,24 +54,46 @@ xdescribe('Router - routes', () => {
 		router.initialNavigation();
 	});
 
-	it ('navigate to "" redirects you to /list', fakeAsync(() => {
+	/**
+	 * Testing with 'done' method
+	 */
+	it ('navigate to "" redirects you to /list', (done) => {
 
 		// when
-		router.navigate(['']);
-		tick(100);
+		router
+			.navigate([''])
+			.then(() => {
 
-		// then
-		expect(location.path()).toBe('/list');
-	}));
+				// then
+				expect(location.path()).toBe('/list');
+				done();
+			});
+	});
 
-	it ('navigate to "search" takes you to /details', fakeAsync(() => {
+	/**
+	 * fakeAsync doesn't work
+	 */
+	xit ('navigate to "search" takes you to /details', fakeAsync(() => {
 
 		// when
 		router.navigate(['/details']);
-		tick(50);
+
+		fixture.detectChanges();
+		tick(5000);
 
 		// then
 		expect(location.path()).toBe('/details');
+	}));
+
+	/**
+	 * (async) method works
+	 */
+	it ('can navigate to details with method (async)', async(() => {
+		router
+			.navigate(['/details'])
+			.then(() => {
+				expect(location.path()).toBe('/details');
+			});
 	}));
 
 });
