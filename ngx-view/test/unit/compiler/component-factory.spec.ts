@@ -26,7 +26,7 @@ describe('Compiler - component factory -', () => {
 
 			const factory = this.createComponentFactorySync(this.compiler, meta, clazz);
 
-			this.container.createComponent(factory)
+			this.container.createComponent(factory);
 		}
 
 		private createComponentFactorySync(compiler: Compiler, metadata: Component, componentClass: any): ComponentFactory<any> {
@@ -63,9 +63,9 @@ describe('Compiler - component factory -', () => {
 		const runtimeComponentMeta = {
 			selector: 'runtime-component',
 			template: `
-			
+
 				<div id="runtime-component" >Hello World</div>
-			
+
 			`
 		};
 
