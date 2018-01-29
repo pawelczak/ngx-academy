@@ -48,4 +48,54 @@ describe('NgTemplateOutlet -', () => {
 
 	});
 
+	/**
+	 * NgTemplateOutput can provide context for created template
+	 */
+	describe('ng-template with context -', () => {
+
+		const heroName = 'Wolverine';
+
+		@Component({
+			template: `
+				<ng-template #tmpl let-hero="hero">
+					<p class="hero-name" >{{hero}}</p>
+				</ng-template>
+					
+				<ng-container *ngTemplateOutlet="tmpl; context: templateContext" ></ng-container>
+			`
+		})
+		class TestComponent {
+			templateContext = {
+				hero: heroName
+			}
+		}
+
+		beforeEach(() => {
+			TestBed
+				.configureTestingModule({
+					imports: [
+						CommonModule
+					],
+					declarations: [
+						TestComponent
+					]
+				});
+		});
+
+		it ('should create view from ng-template with context', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent);
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			const text = fixture.debugElement.nativeElement.textContent.trim();
+
+			expect(text).toEqual(heroName);
+		});
+
+	});
+
 });
