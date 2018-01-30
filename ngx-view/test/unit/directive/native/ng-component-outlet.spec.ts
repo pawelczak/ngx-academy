@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { CommonModule, NgTemplateOutlet } from '@angular/common';
+import { Component, Injectable, Injector, Optional, StaticProvider, ViewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
@@ -15,7 +15,8 @@ describe('NgComponentOutlet -', () => {
 				${givenSimpleTemplate}
 			`
 	})
-	class SimpleComponent {}
+	class SimpleComponent {
+	}
 
 	@Component({
 		selector: 'other',
@@ -89,6 +90,77 @@ describe('NgComponentOutlet -', () => {
 
 			expect(otherComp).toBeDefined();
 			expect(otherComp.textContent.trim()).toEqual(givenOtherTemplate);
+		});
+
+	});
+
+
+	/**
+	 * Pass custom injector
+	 */
+	describe('ngComponentOutletInjector -', () => {
+
+		const givenValue = 'Jack Hughman';
+
+		@Injectable()
+		class Service {
+			value = givenValue;
+		}
+
+		@Component({
+			selector: 'basic',
+			template: `{{service.value}}`
+		})
+		class BasicComponent {
+			constructor(public service: Service) {}
+		}
+
+		@Component({
+			template: `				
+				<div *ngComponentOutlet="component; injector: injectorExpression" #compRef ></div>
+			`,
+			entryComponents: [
+				BasicComponent
+			]
+		})
+		class TestComponent {
+
+			component = BasicComponent;
+
+			injectorExpression: Injector;
+
+			constructor(private injector: Injector) {
+				const customProviders = [{ provide: Service, useClass: Service, deps: []} as StaticProvider];
+				this.injectorExpression = Injector.create(customProviders, this.injector);
+			}
+		}
+
+		beforeEach(() => {
+			TestBed
+				.configureTestingModule({
+					imports: [
+						CommonModule
+					],
+					declarations: [
+						BasicComponent,
+						TestComponent
+					]
+				});
+		});
+
+		it ('should be possible to pass injector to component outlet', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent);
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			const compRef = fixture.debugElement.query(By.css('basic')).nativeElement;
+
+			expect(compRef).toBeDefined();
+			expect(compRef.textContent.trim()).toEqual(givenValue);
 		});
 
 	});
