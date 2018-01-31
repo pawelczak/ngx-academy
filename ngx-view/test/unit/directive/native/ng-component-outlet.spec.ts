@@ -1,5 +1,5 @@
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
-import { Component, Injectable, Injector, Optional, StaticProvider, ViewChild } from '@angular/core';
+import { Component, Injectable, Injector, Optional, StaticProvider, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
@@ -94,7 +94,6 @@ describe('NgComponentOutlet -', () => {
 
 	});
 
-
 	/**
 	 * Pass custom injector
 	 */
@@ -116,7 +115,7 @@ describe('NgComponentOutlet -', () => {
 		}
 
 		@Component({
-			template: `				
+			template: `
 				<div *ngComponentOutlet="component; injector: injectorExpression" #compRef ></div>
 			`,
 			entryComponents: [
@@ -161,6 +160,71 @@ describe('NgComponentOutlet -', () => {
 
 			expect(compRef).toBeDefined();
 			expect(compRef.textContent.trim()).toEqual(givenValue);
+		});
+
+	});
+
+	/**
+	 * NgComponentOutletContent
+	 */
+	describe('ngComponentOutletContent -', () => {
+
+		const givenTemplate = 'Bruce Wayne';
+
+		@Component({
+			selector: '',
+			template: `
+				<div *ngComponentOutlet="component; content: contentNodes" #compRef ></div>
+
+				<ng-template #tmplRef >${givenTemplate}</ng-template>
+			`,
+			entryComponents: [
+				SimpleComponent
+			]
+		})
+		class TestComponent {
+			@ViewChild('tmplRef')
+			templateRef: TemplateRef<any>;
+
+			contentNodes: Array<Array<any>>;
+
+			component = SimpleComponent;
+
+			constructor(public viewContainerRef: ViewContainerRef) {}
+		}
+
+		beforeEach(() => {
+			TestBed
+				.configureTestingModule({
+					imports: [
+						CommonModule
+					],
+					declarations: [
+						TestComponent,
+						SimpleComponent
+					]
+				});
+		});
+
+		it ('should work with content', () => {
+
+			// given
+			TestBed.overrideTemplate(SimpleComponent, '<ng-content></ng-content>');
+
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			fixture.detectChanges();
+
+			// when
+			const view = compInstance.viewContainerRef.createEmbeddedView(compInstance.templateRef);
+
+			compInstance.contentNodes = [view.rootNodes];
+
+			fixture.detectChanges();
+
+			// then
+			expect(fixture.nativeElement.textContent.trim()).toBe(givenTemplate);
 		});
 
 	});
