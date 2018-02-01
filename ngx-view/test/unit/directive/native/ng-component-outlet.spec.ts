@@ -1,7 +1,11 @@
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
-import { Component, Injectable, Injector, Optional, StaticProvider, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
+import {
+	Compiler, Component, Injectable, Injector, NgModule, NgModuleFactory, Optional, StaticProvider, TemplateRef, Type, ViewChild,
+	ViewContainerRef
+} from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { Test } from 'tslint/lib/lint';
 
 
 describe('NgComponentOutlet -', () => {
@@ -227,6 +231,88 @@ describe('NgComponentOutlet -', () => {
 			expect(fixture.nativeElement.textContent.trim()).toBe(givenTemplate);
 		});
 
+	});
+
+	/**
+	 * ngComponentOutletNgModuleFactory
+	 */
+	describe('ngComponentOutletNgModuleFactory -', () => {
+
+		let compiler: Compiler;
+		const title = 'Geralt of Rivia';
+
+		@Injectable()
+		class Service {
+			value = title;
+		}
+
+
+		@Component({
+			template: ``
+		})
+		class EmbeddedComponent {
+			constructor(@Optional() public service: Service) {}
+		}
+
+		@Component({
+			template: `
+				<div *ngComponentOutlet="component; ngModuleFactory: moduleFactory" #compRef ></div>
+			`
+		})
+		class TestComponent {
+
+			component: Type<any>;
+
+			moduleFactory: NgModuleFactory<any>;
+
+		}
+
+		@NgModule({
+			imports: [],
+			declarations: [SimpleComponent],
+			entryComponents: [SimpleComponent]
+		})
+		class DynamicModule {}
+
+		beforeEach(() => {
+			TestBed
+				.configureTestingModule({
+					imports: [
+						CommonModule
+					],
+					declarations: [
+						TestComponent
+					]
+				});
+
+			compiler = TestBed.get(Compiler);
+		});
+
+		// it ('should throw error, when creating component from different module', () => {
+		//
+		// 	// given
+		// 	const fixture = TestBed.createComponent(TestComponent),
+		// 		compInstance = fixture.componentInstance;
+		//
+		// 	compInstance.component = SimpleComponent;
+		//
+		// });
+
+		it ('should be possible to pass ModuleFactory with component', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			const modulerFactory = compiler.compileModuleSync(DynamicModule);
+			compInstance.component = SimpleComponent;
+			compInstance.moduleFactory = modulerFactory;
+			fixture.detectChanges();
+
+			// then
+			expect(fixture.nativeElement.textContent.trim()).toBe(givenSimpleTemplate);
+		});
 	});
 
 });
