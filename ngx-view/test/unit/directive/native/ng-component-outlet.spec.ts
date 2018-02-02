@@ -1,11 +1,10 @@
-import { CommonModule, NgTemplateOutlet } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import {
 	Compiler, Component, Injectable, Injector, NgModule, NgModuleFactory, Optional, StaticProvider, TemplateRef, Type, ViewChild,
 	ViewContainerRef
 } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { Test } from 'tslint/lib/lint';
 
 
 describe('NgComponentOutlet -', () => {
@@ -238,14 +237,14 @@ describe('NgComponentOutlet -', () => {
 	 */
 	describe('ngComponentOutletNgModuleFactory -', () => {
 
-		const title = 'Geralt of Rivia',
-			givenTemplate = 'Embedded Tempalte';
+		const serviceValue = 'Geralt of Rivia',
+			givenTemplate = 'Embedded Template';
 
 		let compiler: Compiler;
 
 		@Injectable()
 		class Service {
-			value = title;
+			value = serviceValue;
 		}
 
 		@Component({
@@ -257,11 +256,10 @@ describe('NgComponentOutlet -', () => {
 
 		@Component({
 			template: `
-				<div *ngComponentOutlet="component; ngModuleFactory: moduleFactory" #compRef ></div>
+				<div *ngComponentOutlet="component; ngModuleFactory: moduleFactory" ></div>
 			`
 		})
 		class TestComponent {
-
 			component: Type<any>;
 			moduleFactory: NgModuleFactory<any>;
 		}
@@ -274,53 +272,126 @@ describe('NgComponentOutlet -', () => {
 		class DynamicModule {}
 
 
-		beforeEach(() => {
-			TestBed
-				.configureTestingModule({
-					imports: [
-						CommonModule
-					],
-					declarations: [
-						TestComponent
-					]
-				});
+		describe('ngModuleFactory declarations -', () => {
 
-			compiler = TestBed.get(Compiler);
-		});
+			beforeEach(() => {
+				TestBed
+					.configureTestingModule({
+						imports: [
+							CommonModule
+						],
+						declarations: [
+							TestComponent
+						]
+					});
 
-		it ('should be possible to pass ModuleFactory with component', () => {
+				compiler = TestBed.get(Compiler);
+			});
 
-			// given
-			const fixture = TestBed.createComponent(TestComponent),
-				compInstance = fixture.componentInstance;
+			it ('should be possible to pass ModuleFactory with component', () => {
 
-			// when
-			const modulerFactory = compiler.compileModuleSync(DynamicModule);
-			compInstance.component = EmbeddedComponent;
-			compInstance.moduleFactory = modulerFactory;
-			fixture.detectChanges();
+				// given
+				const fixture = TestBed.createComponent(TestComponent),
+					compInstance = fixture.componentInstance;
 
-			// then
-			expect(fixture.nativeElement.textContent.trim()).toBe(givenTemplate);
+				// when
+				const modulerFactory = compiler.compileModuleSync(DynamicModule);
+				compInstance.component = EmbeddedComponent;
+				compInstance.moduleFactory = modulerFactory;
+				fixture.detectChanges();
+
+				// then
+				expect(fixture.nativeElement.textContent.trim()).toBe(givenTemplate);
+			});
+
+			/**
+			 * Trying to create component that isn't part of passed ModuleFactory
+			 */
+			it ('should throw error, when creating component from different module', () => {
+
+				// given
+				const fixture = TestBed.createComponent(TestComponent),
+					compInstance = fixture.componentInstance;
+
+				// when
+				const modulerFactory = compiler.compileModuleSync(DynamicModule);
+				compInstance.moduleFactory = modulerFactory;
+
+				compInstance.component = SimpleComponent; // SimpleComponent is not part of DynamicModule
+
+				// then
+				expect(() => fixture.detectChanges()).toThrowError();
+			});
+
 		});
 
 		/**
-		 * Trying to create component that isn't part of passed ModuleFactory
+		 * NgModule can also have injector
 		 */
-		it ('should throw error, when creating component from different module', () => {
+		describe('injector -', () => {
 
-			// given
-			const fixture = TestBed.createComponent(TestComponent),
-				compInstance = fixture.componentInstance;
+			beforeEach(() => {
+				TestBed
+					.configureTestingModule({
+						imports: [
+							CommonModule
+						],
+						declarations: [
+							TestComponent
+						]
+					});
+				TestBed.overrideTemplate(EmbeddedComponent, `{{service?.value}}`);
+			});
 
-			// when
-			const modulerFactory = compiler.compileModuleSync(DynamicModule);
-			compInstance.moduleFactory = modulerFactory;
+			/**
+			 * NgModuleFactory doesn't have Service provided,
+			 * so template inside EmbeddedComponent is empty.
+			 */
+			it ('should not have required service', () => {
 
-			compInstance.component = SimpleComponent; // SimpleComponent is not part of DynamicModule
+				// given
+				compiler = TestBed.get(Compiler);
 
-			// then
-			expect(() => fixture.detectChanges()).toThrowError();
+				const fixture = TestBed.createComponent(TestComponent),
+					compInstance = fixture.componentInstance;
+
+				// when
+				const modulerFactory = compiler.compileModuleSync(DynamicModule);
+				compInstance.component = EmbeddedComponent;
+				compInstance.moduleFactory = modulerFactory;
+
+				fixture.detectChanges();
+
+				// then
+				expect(fixture.nativeElement.textContent.trim()).toBe('');
+			});
+
+			/**
+			 * NgModuleFactory has Service provided,
+			 * so template inside EmbeddedComponent isn't empty.
+			 */
+			it ('should create component with service from ngModuleFactory', () => {
+
+				// given
+				const givenProviders = [{provide: Service, useClass: Service}];
+
+				TestBed.overrideModule(DynamicModule, {set: {providers: givenProviders}});
+				compiler = TestBed.get(Compiler);
+
+				const fixture = TestBed.createComponent(TestComponent),
+					compInstance = fixture.componentInstance;
+
+				// when
+				const modulerFactory = compiler.compileModuleSync(DynamicModule);
+				compInstance.component = EmbeddedComponent;
+				compInstance.moduleFactory = modulerFactory;
+
+				fixture.detectChanges();
+
+				// then
+				expect(fixture.nativeElement.textContent.trim()).toBe(serviceValue);
+			});
+
 		});
 
 	});
