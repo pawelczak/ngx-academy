@@ -238,17 +238,18 @@ describe('NgComponentOutlet -', () => {
 	 */
 	describe('ngComponentOutletNgModuleFactory -', () => {
 
+		const title = 'Geralt of Rivia',
+			givenTemplate = 'Embedded Tempalte';
+
 		let compiler: Compiler;
-		const title = 'Geralt of Rivia';
 
 		@Injectable()
 		class Service {
 			value = title;
 		}
 
-
 		@Component({
-			template: ``
+			template: givenTemplate
 		})
 		class EmbeddedComponent {
 			constructor(@Optional() public service: Service) {}
@@ -262,17 +263,16 @@ describe('NgComponentOutlet -', () => {
 		class TestComponent {
 
 			component: Type<any>;
-
 			moduleFactory: NgModuleFactory<any>;
-
 		}
 
 		@NgModule({
 			imports: [],
-			declarations: [SimpleComponent],
-			entryComponents: [SimpleComponent]
+			declarations: [EmbeddedComponent],
+			entryComponents: [EmbeddedComponent]
 		})
 		class DynamicModule {}
+
 
 		beforeEach(() => {
 			TestBed
@@ -288,16 +288,6 @@ describe('NgComponentOutlet -', () => {
 			compiler = TestBed.get(Compiler);
 		});
 
-		// it ('should throw error, when creating component from different module', () => {
-		//
-		// 	// given
-		// 	const fixture = TestBed.createComponent(TestComponent),
-		// 		compInstance = fixture.componentInstance;
-		//
-		// 	compInstance.component = SimpleComponent;
-		//
-		// });
-
 		it ('should be possible to pass ModuleFactory with component', () => {
 
 			// given
@@ -306,13 +296,33 @@ describe('NgComponentOutlet -', () => {
 
 			// when
 			const modulerFactory = compiler.compileModuleSync(DynamicModule);
-			compInstance.component = SimpleComponent;
+			compInstance.component = EmbeddedComponent;
 			compInstance.moduleFactory = modulerFactory;
 			fixture.detectChanges();
 
 			// then
-			expect(fixture.nativeElement.textContent.trim()).toBe(givenSimpleTemplate);
+			expect(fixture.nativeElement.textContent.trim()).toBe(givenTemplate);
 		});
+
+		/**
+		 * Trying to create component that isn't part of passed ModuleFactory
+		 */
+		it ('should throw error, when creating component from different module', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			const modulerFactory = compiler.compileModuleSync(DynamicModule);
+			compInstance.moduleFactory = modulerFactory;
+
+			compInstance.component = SimpleComponent; // SimpleComponent is not part of DynamicModule
+
+			// then
+			expect(() => fixture.detectChanges()).toThrowError();
+		});
+
 	});
 
 });
