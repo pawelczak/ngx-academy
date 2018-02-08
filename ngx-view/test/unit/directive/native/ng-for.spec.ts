@@ -1,81 +1,191 @@
-import { Component } from '@angular/core';
+import { Component, Injectable } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { CommonModule } from '@angular/common';
 
 
 describe('NgFor -', () => {
 
-	@Component({
-		selector: 'ngfor-test',
-		template: ``
-	})
-	class NgForTestComponent {
+	describe('useage -', () => {
 
-		heroes = ['spiderman', 'wolverine', 'xavier'];
-	}
+		@Component({
+			selector: 'ngfor-test',
+			template: ``
+		})
+		class NgForTestComponent {
 
-	beforeEach(() => {
-		TestBed
-			.configureTestingModule({
-				imports: [
-					CommonModule
-				],
-				declarations: [
-					NgForTestComponent
-				]
-			})
-	});
+			heroes = ['spiderman', 'wolverine', 'xavier'];
+		}
 
-	describe('structural use -', () => {
+		beforeEach(() => {
+			TestBed
+				.configureTestingModule({
+					imports: [
+						CommonModule
+					],
+					declarations: [
+						NgForTestComponent
+					]
+				})
+		});
 
-		it ('should render basic list', () => {
+		describe('structural -', () => {
 
-			// given
-			const templ = `<p *ngFor="let hero of heroes">
-								{{hero}}
-							</p>`;
+			it ('should render basic list', () => {
 
-			TestBed.overrideTemplate(NgForTestComponent, templ);
-			const fixture = TestBed.createComponent(NgForTestComponent),
-				componentInst = fixture.componentInstance,
-				nativeEl = fixture.debugElement.nativeElement;
+				// given
+				const templ = `<p *ngFor="let hero of heroes">
+									{{hero}}
+								</p>`;
 
-			// when
-			fixture.detectChanges();
+				TestBed.overrideTemplate(NgForTestComponent, templ);
+				const fixture = TestBed.createComponent(NgForTestComponent),
+					componentInst = fixture.componentInstance,
+					nativeEl = fixture.debugElement.nativeElement;
 
-			// then
-			const tags = nativeEl.querySelectorAll('p');
-			expect(tags.length).toBe(componentInst.heroes.length);
-			tags.forEach((tag: any, index: number) => {
-				expect(tag.textContent.trim()).toEqual(componentInst.heroes[index]);
+				// when
+				fixture.detectChanges();
+
+				// then
+				const tags = nativeEl.querySelectorAll('p');
+				expect(tags.length).toBe(componentInst.heroes.length);
+				tags.forEach((tag: any, index: number) => {
+					expect(tag.textContent.trim()).toEqual(componentInst.heroes[index]);
+				});
+
+			});
+
+		});
+
+		describe('template -', () => {
+
+			it ('should render basic list', () => {
+
+				// given
+				const templ = `<ng-template ngFor [ngForOf]="heroes" let-hero >
+									<p>{{hero}}</p>
+								</ng-template>`;
+
+				TestBed.overrideTemplate(NgForTestComponent, templ);
+				const fixture = TestBed.createComponent(NgForTestComponent),
+					componentInst = fixture.componentInstance,
+					nativeEl = fixture.debugElement.nativeElement;
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				const tags = nativeEl.querySelectorAll('p');
+				expect(tags.length).toBe(componentInst.heroes.length);
+				tags.forEach((tag: any, index: number) => {
+					expect(tag.textContent.trim()).toEqual(componentInst.heroes[index]);
+				});
+
 			});
 
 		});
 
 	});
 
-	describe('template use -', () => {
+	describe('trackBy -', () => {
 
-		it ('should render basic list', () => {
+		let logger: Logger;
 
-			// given
-			const templ = `<ng-template ngFor [ngForOf]="heroes" let-hero >
-								<p>{{hero}}</p>
-							</ng-template>`;
+		@Injectable()
+		class Logger {
+			logs: Array<string> = [];
+			log(text: string): void {
+				this.logs.push(text);
+			}
+			reset(): void {
+				this.logs = [];
+			}
+		}
 
-			TestBed.overrideTemplate(NgForTestComponent, templ);
-			const fixture = TestBed.createComponent(NgForTestComponent),
-				componentInst = fixture.componentInstance,
-				nativeEl = fixture.debugElement.nativeElement;
+		@Component({
+			selector: 'simple',
+			template: ``
+		})
+		class SimpleComponent {
+			constructor(private logger: Logger) {}
 
-			// when
-			fixture.detectChanges();
+			ngAfterViewInit() {
+				this.logger.log('Simple component render');
+			}
+		}
 
-			// then
-			const tags = nativeEl.querySelectorAll('p');
-			expect(tags.length).toBe(componentInst.heroes.length);
-			tags.forEach((tag: any, index: number) => {
-				expect(tag.textContent.trim()).toEqual(componentInst.heroes[index]);
+		describe('string -', () => {
+
+			@Component({
+				selector: 'test',
+				template: `
+					<simple *ngFor="let hero of heroes"></simple>
+				`
+			})
+			class TestComponent {
+
+				heroOne = 'spiderman';
+				heroTwo = 'wolverine';
+				heroThree = 'xavier';
+
+				heroes = [this.heroOne, this.heroTwo, this.heroThree];
+			}
+
+			beforeEach(() => {
+				TestBed
+					.configureTestingModule({
+						imports: [
+							CommonModule
+						],
+						declarations: [
+							SimpleComponent,
+							TestComponent
+						],
+						providers: [
+							Logger
+						]
+					});
+
+				logger = TestBed.get(Logger);
+			});
+
+			/**
+			 * N
+			 */
+			it('should not re-render elements which reference hasn\'t changed', () => {
+
+				// given
+				const fixture = TestBed.createComponent(TestComponent),
+					compInstance = fixture.componentInstance;
+
+				fixture.detectChanges();
+
+				expect(logger.logs.length).toBe(compInstance.heroes.length);
+
+				// Creating new array with same the same objects
+				fixture.componentInstance.heroes = [...fixture.componentInstance.heroes];
+				fixture.detectChanges();
+
+				// no additional renders
+				expect(logger.logs.length).toBe(compInstance.heroes.length);
+			});
+
+			it('should render only new items added to array', () => {
+
+				// given
+				const fixture = TestBed.createComponent(TestComponent),
+					compInstance = fixture.componentInstance,
+					newHero = 'Voldemorth';
+
+				fixture.detectChanges();
+
+				expect(logger.logs.length).toBe(compInstance.heroes.length);
+
+				// Creating new array with same the same objects
+				fixture.componentInstance.heroes = [...fixture.componentInstance.heroes, newHero];
+				fixture.detectChanges();
+
+				// one additional render
+				expect(logger.logs.length).toBe(compInstance.heroes.length);
 			});
 
 		});
