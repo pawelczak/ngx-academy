@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, QueryList, ViewChildren } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
@@ -110,6 +110,15 @@ describe('Performance - ngFor -', () => {
 		class HeroComponent {
 			@Input()
 			hero: Hero;
+
+			pure = true;
+
+			static number = 0;
+
+			constructor() {
+				HeroComponent.number += 1;
+				// console.log('HeroComp', HeroComponent.number);
+			}
 		}
 
 		@Component({
@@ -120,6 +129,9 @@ describe('Performance - ngFor -', () => {
 			`
 		})
 		class TestComponent {
+			@ViewChildren(HeroComponent)
+			heroCompRefs: QueryList<HeroComponent>;
+
 			heroes = _.cloneDeep(givenHeroes);
 		}
 
@@ -156,6 +168,71 @@ describe('Performance - ngFor -', () => {
 			expect(elements[0].nativeElement.textContent.trim()).toBe(givenHeroes[0].name); // should not change
 			expect(elements[1].nativeElement.textContent.trim()).toBe(givenHeroes[1].name);
 			expect(elements[2].nativeElement.textContent.trim()).toBe(givenHeroes[2].name);
+		});
+
+		it('should render when object changes reference', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance,
+				newHero = new Hero(4, 'Batman');
+
+			// when
+			fixture.detectChanges();
+
+			compInstance.heroCompRefs.toArray().forEach((heroComp) => {
+				heroComp.pure = false;
+			});
+
+			compInstance.heroes = [newHero, givenHeroes[1], givenHeroes[2]];
+
+			fixture.detectChanges();
+
+			// then
+			const elements = fixture.debugElement.queryAll(By.css('hero'));
+
+			expect(elements[0].nativeElement.textContent.trim()).toBe(newHero.name);
+			expect(elements[1].nativeElement.textContent.trim()).toBe(givenHeroes[1].name);
+			expect(elements[2].nativeElement.textContent.trim()).toBe(givenHeroes[2].name);
+
+			compInstance.heroCompRefs.toArray().forEach((heroComp, index) => {
+				expect(heroComp.pure).toBe(true);
+			});
+		});
+
+		it('should re-render when reference changed', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance,
+				newHeroes = [
+					new Hero(1, 'wolverine'),
+					new Hero(2, 'magneto'),
+					new Hero(3, 'deadpool')
+				];
+
+			// when
+			fixture.detectChanges();
+
+			compInstance.heroCompRefs.toArray().forEach((heroComp) => {
+				heroComp.pure = false;
+			});
+
+			compInstance.heroes = newHeroes;
+
+			fixture.detectChanges();
+
+			// then
+			const elements = fixture.debugElement.queryAll(By.css('hero'));
+
+			expect(elements[0].nativeElement.textContent.trim()).toBe(newHeroes[0].name);
+			expect(elements[1].nativeElement.textContent.trim()).toBe(newHeroes[1].name);
+			expect(elements[2].nativeElement.textContent.trim()).toBe(newHeroes[2].name);
+
+			compInstance.heroCompRefs.toArray().forEach((heroComp) => {
+				expect(heroComp.pure).toBe(true);
+			});
+
 		});
 
 	});
