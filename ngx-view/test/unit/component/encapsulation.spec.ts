@@ -1,5 +1,4 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { By } from '@angular/platform-browser';
 import { TestBed } from '@angular/core/testing';
 
 
@@ -8,19 +7,29 @@ describe('Component - encapsulation -', () => {
 	describe('None -', () => {
 
 		@Component({
+			selector: 'enc-none',
 			template: `
 				<div>Enc</div>
 			`,
+			styles: [``],
 			encapsulation: ViewEncapsulation.None
 		})
-		class EncapsulationComponent {}
+		class NoneEncapsulationComponent {}
+
+		@Component({
+			template: `
+				<enc-none></enc-none>
+			`
+		})
+		class TestComponent {}
 
 		beforeEach(() => {
 			TestBed
 				.configureTestingModule({
 					imports: [],
 					declarations: [
-						EncapsulationComponent
+						NoneEncapsulationComponent,
+						TestComponent
 					]
 				});
 		});
@@ -28,12 +37,17 @@ describe('Component - encapsulation -', () => {
 		it ('should not generate fake encapsulation', () => {
 
 			// given
-			const fixture = TestBed.createComponent(EncapsulationComponent);
+			const fixture = TestBed.createComponent(TestComponent),
+				el = fixture.nativeElement.querySelector('enc-none');
 
 			// when
 			fixture.detectChanges();
 
 			// then
+			const div = el.querySelector('div');
+
+			expect(el.getAttribute('_nghost-c0')).toBeNull('Component tag');
+			expect(div.getAttribute('_ngcontent-c0')).toBeNull('Node div inside component');
 		});
 
 	});
@@ -66,7 +80,6 @@ describe('Component - encapsulation -', () => {
 		})
 		class TestComponent {}
 
-
 		beforeEach(() => {
 			TestBed
 				.configureTestingModule({
@@ -90,8 +103,8 @@ describe('Component - encapsulation -', () => {
 			// then
 			const div = el.querySelector('div');
 
-			expect(el.getAttribute('_nghost-c0')).toBe('', 'Component tag');
-			expect(div.getAttribute('_ngcontent-c0')).toBe('', 'Node div inside component');
+			expect(el.getAttribute('_nghost-c1')).toBe('', 'Component tag');
+			expect(div.getAttribute('_ngcontent-c1')).toBe('', 'Node div inside component');
 		});
 
 	});
@@ -134,8 +147,6 @@ describe('Component - encapsulation -', () => {
 
 			// when
 			fixture.detectChanges();
-
-			console.log(fixture.nativeElement);
 
 			// then
 			const div = el.querySelector('div');
