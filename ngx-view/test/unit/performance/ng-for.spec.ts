@@ -271,7 +271,7 @@ describe('Performance - ngFor -', () => {
 			 * has same id as old ones. That makes angular not to recreate the components,
 			 * but it changes input value of components, so new names will be rerendered properly.
 			 */
-			it('should not re-render when reference changed', () => {
+			it('should not recreates component but it should rerender', () => {
 
 				// given
 				TestBed.overrideTemplate(PureNgForTestComponent, trackByTemplate);
@@ -305,6 +305,43 @@ describe('Performance - ngFor -', () => {
 				compInstance.heroCompRefs.toArray().forEach((heroComp) => {
 					expect(heroComp.pure).toBe(false);
 				});
+
+			});
+
+			it('should create and render new object', () => {
+
+				// given
+				TestBed.overrideTemplate(PureNgForTestComponent, trackByTemplate);
+
+				const fixture = TestBed.createComponent(PureNgForTestComponent),
+					compInstance = fixture.componentInstance,
+					newHero = new Hero(4, 'Wonder woman');
+
+				// when
+				fixture.detectChanges();
+
+				compInstance.heroCompRefs.toArray().forEach((heroComp) => {
+					heroComp.pure = false;
+				});
+
+				compInstance.heroes = [...compInstance.heroes];
+				compInstance.heroes.push(newHero);
+
+				fixture.detectChanges();
+
+				// then
+				const elements = fixture.debugElement.queryAll(By.css('hero'));
+
+				expect(elements[0].nativeElement.textContent.trim()).toBe(givenHeroes[0].name);
+				expect(elements[1].nativeElement.textContent.trim()).toBe(givenHeroes[1].name);
+				expect(elements[2].nativeElement.textContent.trim()).toBe(givenHeroes[2].name);
+				expect(elements[3].nativeElement.textContent.trim()).toBe(newHero.name);
+
+				const heroRefs = compInstance.heroCompRefs.toArray();
+				expect(heroRefs[0].pure).toBe(false, 'Component [0] hasn\'t been recreated');
+				expect(heroRefs[1].pure).toBe(false, 'Component [1] hasn\'t been recreated');
+				expect(heroRefs[2].pure).toBe(false, 'Component [2] hasn\'t been recreated');
+				expect(heroRefs[3].pure).toBe(true, 'Component [3] has been recreated');
 
 			});
 
