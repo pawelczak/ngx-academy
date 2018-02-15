@@ -15,4 +15,3 @@ import '@angular/router';
 // import 'jquery';
 import 'lodash';
 
-import '../node_modules/bootstrap/dist/css/bootstrap.min.css';

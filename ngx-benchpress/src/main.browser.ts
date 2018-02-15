@@ -14,5 +14,4 @@ platformBrowserDynamic()
 	.bootstrapModule(AppModule)
 	.then(() => {
 		window.timeToBootstrap = Date.now() - performance.timing.navigationStart;
-		// console.log('timeToBootstrap', window.timeToBootstrap);
 	});
