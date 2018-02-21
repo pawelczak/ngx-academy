@@ -2,17 +2,15 @@ import {
 	ApplicationRef, ChangeDetectorRef, Compiler, Component, ComponentFactoryResolver, Directive, ElementRef, Host, Inject, Injectable, InjectionToken, Injector,
 	NgModuleRef,
 	NgZone,
-	Optional,
 	Renderer2,
 	RendererFactory2,
-	Self,
-	SkipSelf,
 	ViewChild,
 	ViewContainerRef
 } from '@angular/core';
 import { inject, TestBed } from '@angular/core/testing';
 
-describe('Dependency Injection -', () => {
+
+describe('Dependency Injection - native services -', () => {
 
 	describe('Component -', () => {
 
@@ -170,7 +168,6 @@ describe('Dependency Injection -', () => {
 					]
 				});
 		});
-
 
 		it('should have all native services injected',
 			inject([InjectService], (injectService: InjectService) => {

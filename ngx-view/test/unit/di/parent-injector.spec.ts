@@ -1,11 +1,8 @@
 import { Component, forwardRef, Host, Injectable, InjectionToken, Injector, SkipSelf, ViewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-
 /**
- *
  * Testing methods for getting parent injector.
- *
  */
 describe('Parent injector -' , () => {
 

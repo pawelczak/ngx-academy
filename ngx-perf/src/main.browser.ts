@@ -8,6 +8,8 @@ declare var process: any;
 enableProdMode();
 
 platformBrowserDynamic()
-	.bootstrapModule(AppModule)
+	.bootstrapModule(AppModule, {
+		ngZone: 'noop'
+	})
 	.then(() => {
 	});

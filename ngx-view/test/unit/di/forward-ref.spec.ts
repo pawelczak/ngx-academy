@@ -1,12 +1,13 @@
 import { Component, Directive, forwardRef, Injector, Self, StaticProvider, ViewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
+
 describe('ForwardRef -', () => {
 
 	/**
 	 * Declare class providers before class has been declared
 	 */
-	it ('basic example', () => {
+	it('basic example', () => {
 
 		// given
 		const providers = [
@@ -16,7 +17,8 @@ describe('ForwardRef -', () => {
 			} as StaticProvider
 		];
 
-		class Car {}
+		class Car {
+		}
 
 		// when
 		const injector = Injector.create(providers);
@@ -32,10 +34,11 @@ describe('ForwardRef -', () => {
 	 * Than other directive can inject reference to the first one using di.
 	 * This works because directives created on same node share injector (View)
 	 */
-	it ('should be possible to inject directive as its own dependency', () => {
+	it('should be possible to inject directive as its own dependency', () => {
 
 		// given
-		class ForwardedDirectiveRef {}
+		class ForwardedDirectiveRef {
+		}
 
 		const providers = [{
 			provide: ForwardedDirectiveRef,
@@ -56,12 +59,13 @@ describe('ForwardRef -', () => {
 			exportAs: 'catchRef'
 		})
 		class CatchDirective {
-			constructor(@Self() public forwardedDirectiveRef: ForwardedDirectiveRef) {}
+			constructor(@Self() public forwardedDirectiveRef: ForwardedDirectiveRef) {
+			}
 		}
 
 		@Component({
 			selector: 'test',
-			template: `<span forwarded #dirRef="dirRef" catch #catchRef="catchRef" ></span>`
+			template: `<span forwarded #dirRef="dirRef" catch #catchRef="catchRef"></span>`
 		})
 		class TestComponent {
 			@ViewChild(ForwardedDirective)

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Injector, NgZone, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Injector, NgZone, ChangeDetectorRef, ApplicationRef } from '@angular/core';
 
 @Component({
 	selector: 'app',
@@ -14,9 +14,11 @@ export class AppComponent {
 	activeMeasure: any = false;
 	startTime: any;
 
-	constructor(private changeDetectorRef: ChangeDetectorRef) {}
+	constructor(private appRef: ApplicationRef,
+				private changeDetectorRef: ChangeDetectorRef) {}
 
-	populate() {
+	populate(event: Event) {
+		event.preventDefault();
 		let data = [];
 		for (let i = 0; i < 1000; i++) {
 			data.push(i);
@@ -24,11 +26,13 @@ export class AppComponent {
 
 		this.start();
 		this.data = data;
+		this.appRef.tick();
 		// this.changeDetectorRef.detectChanges();
 
 	}
 
-	clear() {
+	clear(event: Event) {
+		event.preventDefault();
 		this.start();
 		this.data = [];
 	}
