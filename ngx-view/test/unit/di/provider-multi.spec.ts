@@ -37,9 +37,59 @@ describe('Dependency injection - providers - multi -', () => {
 
 	});
 
-	describe ('modules imports -', () => {
+	const token = new InjectionToken('multi_modules');
 
-		const token = new InjectionToken('multi_modules');
+	/**
+	 * Multi providers declared in @NgModule
+	 */
+	describe('ngModule -', () => {
+
+		@Component({
+			template: ``
+		})
+		class MultiComponent {
+			constructor(@Inject(token) public multiValue: any) {}
+		}
+
+		@NgModule({
+			providers: [{
+				provide: token,
+				useValue: 'module',
+				multi: true
+			}],
+			declarations: [
+				MultiComponent
+			]
+		})
+		class TestModule {}
+
+		beforeEach(() => {
+			TestBed.configureTestingModule({
+				imports: [
+					TestModule
+				]
+			});
+		});
+
+		/**
+		 * Component has values provided in @NgModule
+		 */
+		it('should provide values declared in module', () => {
+
+			// given
+			const fixture = TestBed.createComponent(MultiComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(compInstance.multiValue).toEqual(['module']);
+		});
+
+	});
+
+	describe ('modules imports -', () => {
 
 		@NgModule({
 			imports: [
