@@ -44,6 +44,8 @@ describe('Dependency injection - providers - multi -', () => {
 	 */
 	describe('ngModule -', () => {
 
+		const givenValueOne = 'Bruce';
+
 		@Component({
 			template: ``
 		})
@@ -54,7 +56,7 @@ describe('Dependency injection - providers - multi -', () => {
 		@NgModule({
 			providers: [{
 				provide: token,
-				useValue: 'module',
+				useValue: givenValueOne,
 				multi: true
 			}],
 			declarations: [
@@ -63,28 +65,75 @@ describe('Dependency injection - providers - multi -', () => {
 		})
 		class TestModule {}
 
-		beforeEach(() => {
-			TestBed.configureTestingModule({
-				imports: [
-					TestModule
-				]
+		describe('single module -', () => {
+
+			beforeEach(() => {
+				TestBed.configureTestingModule({
+					imports: [
+						TestModule
+					]
+				});
 			});
+
+			/**
+			 * Component has values provided in @NgModule
+			 */
+			it('should provide values declared in module', () => {
+
+				// given
+				const fixture = TestBed.createComponent(MultiComponent),
+					compInstance = fixture.componentInstance,
+					expectedValue = [givenValueOne];
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				expect(compInstance.multiValue).toEqual(expectedValue);
+			});
+
 		});
 
 		/**
-		 * Component has values provided in @NgModule
+		 * Providers in two different ngModules
+		 * Modules imported at the same level of hierarchy
 		 */
-		it('should provide values declared in module', () => {
+		describe('multiple modules -', () => {
 
-			// given
-			const fixture = TestBed.createComponent(MultiComponent),
-				compInstance = fixture.componentInstance;
+			const givenValueTwo = 'Wayne';
 
-			// when
-			fixture.detectChanges();
+			@NgModule({
+				providers: [{
+					provide: token,
+					useValue: givenValueTwo,
+					multi: true
+				}]
+			})
+			class SecondTestModule {}
 
-			// then
-			expect(compInstance.multiValue).toEqual(['module']);
+			beforeEach(() => {
+				TestBed.configureTestingModule({
+					imports: [
+						TestModule,
+						SecondTestModule
+					]
+				});
+			});
+
+			it('should provide values declared in module', () => {
+
+				// given
+				const fixture = TestBed.createComponent(MultiComponent),
+					compInstance = fixture.componentInstance,
+					expectedValue = [givenValueOne, givenValueTwo];
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				expect(compInstance.multiValue).toEqual(expectedValue);
+			});
+
 		});
 
 	});
