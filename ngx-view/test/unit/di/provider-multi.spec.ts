@@ -138,6 +138,102 @@ describe('Dependency injection - providers - multi -', () => {
 
 	});
 
+	/**
+	 * Multi providers declared at the @Component level
+	 */
+	describe('Components -', () => {
+
+		const givenValueOne = 'Han';
+
+		@Component({
+			selector: 'multi',
+			template: ``,
+			providers: [{
+				provide: token,
+				useValue: givenValueOne,
+				multi: true
+			}]
+		})
+		class MultiComponent {
+			constructor(@Inject(token) public multiValue: any) {
+			}
+		}
+
+		describe('single component -', () => {
+
+			beforeEach(() => {
+				TestBed.configureTestingModule({
+					declarations: [
+						MultiComponent
+					]
+				});
+			});
+
+			/**
+			 * Component has values provided in @Component
+			 */
+			it('should provide values declared in component', () => {
+
+				// given
+				const fixture = TestBed.createComponent(MultiComponent),
+					compInstance = fixture.componentInstance,
+					expectedValue = [givenValueOne];
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				expect(compInstance.multiValue).toEqual(expectedValue);
+			});
+
+		});
+
+		/**
+		 * Providing values for the same token, at different level of hierarchy
+		 * doesn't merge providers, it overrides them.
+		 * Multi level providers doesn't allow to merge provider.
+		 */
+		describe('multi level components -', () => {
+
+			const givenValueTwo = 'Solo';
+
+			@Component({
+				template: `<multi></multi>`,
+				providers: [{
+					provide: token,
+					useValue: givenValueTwo,
+					multi: true
+				}]
+			})
+			class ParentComponent {
+			}
+
+			beforeEach(() => {
+				TestBed.configureTestingModule({
+					declarations: [
+						MultiComponent
+					]
+				});
+			});
+
+			it('should provide values declared in component', () => {
+
+				// given
+				const fixture = TestBed.createComponent(MultiComponent),
+					compInstance = fixture.componentInstance,
+					expectedValue = [givenValueOne];
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				expect(compInstance.multiValue).toEqual(expectedValue);
+				expect(compInstance.multiValue).not.toEqual([givenValueOne, givenValueTwo]);
+			});
+
+		});
+	});
+
 	describe ('modules imports -', () => {
 
 		@NgModule({
