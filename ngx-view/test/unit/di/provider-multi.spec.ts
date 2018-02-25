@@ -216,7 +216,7 @@ describe('Dependency injection - providers - multi -', () => {
 				});
 			});
 
-			it('should provide values declared in component', () => {
+			it('should provide values declared only in the component', () => {
 
 				// given
 				const fixture = TestBed.createComponent(MultiComponent),
@@ -230,157 +230,52 @@ describe('Dependency injection - providers - multi -', () => {
 				expect(compInstance.multiValue).toEqual(expectedValue);
 				expect(compInstance.multiValue).not.toEqual([givenValueOne, givenValueTwo]);
 			});
-
 		});
-	});
 
-	describe ('modules imports -', () => {
+		/**
+		 * Component providers overwrite NgModule providers.
+		 * Providing multi value in the module will be overwritten
+		 * by the values provided in the component.
+		 */
+		describe('components & modules -', () => {
 
-		@NgModule({
-			imports: [
-				forwardRef(() => ChildModule)
-			],
-			providers: [{
-				provide: token,
-				useValue: 'root module',
-				multi: true
-			}]
-		})
-		class RootModule {}
+			const givenValueTwo = 'Solo';
 
-		@NgModule({
-			declarations: [
-				forwardRef(() => ParentComponent),
-				forwardRef(() => ChildComponent),
-				forwardRef(() => EmptyComponent)
-			],
-			providers: [{
-				provide: token,
-				useValue: 'child module',
-				multi: true
-			}]
-		})
-		class ChildModule {}
-
-		@Component({
-			selector: 'parent',
-			template: `<child></child>`,
-			providers: [{
-				provide: token,
-				useValue: 'parent component',
-				multi: true
-			}]
-		})
-		class ParentComponent {
-			@ViewChild(forwardRef(() => ChildComponent))
-			child: ChildComponent;
-
-			constructor(public injector: Injector,
-						@Inject(token) public multiValue: any) {}
-		}
-
-		@Component({
-			selector: 'child',
-			template: ``,
-			providers: [{
-				provide: token,
-				useValue: 'child component',
-				multi: true
-			}]
-		})
-		class ChildComponent {
-			constructor(public injector: Injector,
-						@Inject(token) public multiValue: any) {}
-		}
-
-		@Component({
-			selector: 'empty',
-			template: ``
-		})
-		class EmptyComponent {
-			constructor(public injector: Injector,
-						@Inject(token) public multiValue: any) {}
-		}
-
-		beforeEach(() => {
-			TestBed.configureTestingModule({
-				imports: [
-					RootModule
+			@NgModule({
+				providers: [{
+					provide: token,
+					useValue: givenValueTwo,
+					multi: true
+				}],
+				declarations: [
+					MultiComponent
 				]
+			})
+			class TestModule {}
+
+			beforeEach(() => {
+				TestBed.configureTestingModule({
+					imports: [
+						TestModule
+					]
+				});
 			});
-		});
 
-		describe ('component context -', () => {
-
-			it ('should provide values only from component context', () => {
+			it('should provide values declared only in the component', () => {
 
 				// given
-				const fixture = TestBed.createComponent(ParentComponent),
+				const fixture = TestBed.createComponent(MultiComponent),
 					compInstance = fixture.componentInstance,
-					expectedParentCompValues = ['parent component'],
-					expectedChildCompValues = ['child component'];
+					expectedValue = [givenValueOne];
 
 				// when
 				fixture.detectChanges();
 
 				// then
-				expect(compInstance.multiValue).toEqual(expectedParentCompValues);
-				expect(compInstance.injector.get(token)).toEqual(expectedParentCompValues);
-
-				expect(compInstance.child.multiValue).toEqual(expectedChildCompValues);
-				expect(compInstance.child.injector.get(token)).toEqual(expectedChildCompValues);
-				// expect(compInstance.child.parentInjector.get(token)).toEqual(expectedParentCompValues);
+				expect(compInstance.multiValue).toEqual(expectedValue);
+				expect(compInstance.multiValue).not.toEqual([givenValueOne, givenValueTwo]);
 			});
-
 		});
-
-		describe ('modules context -', () => {
-
-			it ('should provide values from modules', () => {
-
-				// given
-				const fixture = TestBed.createComponent(EmptyComponent),
-					compInstance = fixture.componentInstance;
-
-				// when
-				fixture.detectChanges();
-
-				// then
-				expect(compInstance.multiValue).toEqual(['child module', 'root module']);
-			});
-
-			it ('should provide values only from one context - module', () => {
-
-				// given
-				const injector = getTestBed(),
-					expectedValues = ['child module', 'root module'];
-
-				// when & then
-				expect(injector.get(token)).toEqual(expectedValues);
-			});
-
-		});
-
-
-		xit ('modules and components have separate sets of providers', () => {
-
-			// given
-			const fixture = TestBed.createComponent(ParentComponent),
-				compInstance = fixture.componentInstance,
-				expectedParentCompValues = ['parent component'],
-				expectedChildCompValues = ['child component'];
-
-			// when
-			fixture.detectChanges();
-
-			// then
-			// expect(compInstance.injector.get(token)).toEqual(expectedParentCompValues);
-			// expect(compInstance.child.injector.get(token)).toEqual(expectedChildCompValues);
-
-			// expect(compInstance.child.injector.get(Injector)).toEqual(['child module', 'root module']);
-
-		});
-
 	});
 
 });
