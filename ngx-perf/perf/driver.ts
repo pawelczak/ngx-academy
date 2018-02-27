@@ -25,7 +25,7 @@ function buildDriver() {
 	options = options.addArguments("--disable-sync");
 	options = options.addArguments("--disable-extensions");
 	options = options.addArguments("--disable-default-apps");
-	options = options.addArguments("--window-size=1200,800")
+	options = options.addArguments("--window-size=1200,800");
 	if (args.chromeBinary) options = options.setChromeBinaryPath(args.chromeBinary);
 	options = options.setLoggingPrefs(logPref);
 

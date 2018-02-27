@@ -1,5 +1,5 @@
-import { Component, forwardRef, Inject, InjectionToken, Injector, NgModule, ViewChild } from '@angular/core';
-import { getTestBed, TestBed } from '@angular/core/testing';
+import { Component, Inject, InjectionToken, Injector, NgModule } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 
 
 describe('Dependency injection - providers - multi -', () => {
@@ -9,7 +9,7 @@ describe('Dependency injection - providers - multi -', () => {
 	 */
 	describe('Injector -', () => {
 
-		it ('should create array of services', () => {
+		it('should create array of services', () => {
 
 			//given
 			const token = new InjectionToken('token');
@@ -50,7 +50,8 @@ describe('Dependency injection - providers - multi -', () => {
 			template: ``
 		})
 		class MultiComponent {
-			constructor(@Inject(token) public multiValue: any) {}
+			constructor(@Inject(token) public multiValue: any) {
+			}
 		}
 
 		@NgModule({
@@ -63,7 +64,8 @@ describe('Dependency injection - providers - multi -', () => {
 				MultiComponent
 			]
 		})
-		class TestModule {}
+		class TestModule {
+		}
 
 		describe('single module -', () => {
 
@@ -109,7 +111,8 @@ describe('Dependency injection - providers - multi -', () => {
 					multi: true
 				}]
 			})
-			class SecondTestModule {}
+			class SecondTestModule {
+			}
 
 			beforeEach(() => {
 				TestBed.configureTestingModule({
@@ -198,7 +201,8 @@ describe('Dependency injection - providers - multi -', () => {
 			const givenValueTwo = 'Solo';
 
 			@Component({
-				template: `<multi></multi>`,
+				template: `
+					<multi></multi>`,
 				providers: [{
 					provide: token,
 					useValue: givenValueTwo,
@@ -251,7 +255,8 @@ describe('Dependency injection - providers - multi -', () => {
 					MultiComponent
 				]
 			})
-			class TestModule {}
+			class TestModule {
+			}
 
 			beforeEach(() => {
 				TestBed.configureTestingModule({
@@ -274,6 +279,70 @@ describe('Dependency injection - providers - multi -', () => {
 				// then
 				expect(compInstance.multiValue).toEqual(expectedValue);
 				expect(compInstance.multiValue).not.toEqual([givenValueOne, givenValueTwo]);
+			});
+		});
+	});
+
+
+	/**
+	 * Using multi allows to inject not only by @Inject,
+	 * but also by provided class type.
+	 */
+	describe('inject method -', () => {
+
+		class Service {}
+
+		@Component({
+			template: ``,
+			providers: [{
+				provide: Service,
+				useClass: Service,
+				multi: true
+			}, {
+				provide: Service,
+				useClass: Service,
+				multi: true
+			}]
+		})
+		class MultiComponent {
+
+			services: Array<Service>;
+
+			/**
+			 * There is a mixup here, because it is declared to inject Service,
+			 * but what I really expected is an Array of Services.
+			 * If I write Array<Service> angular will not recognize it.
+			 */
+			constructor(public injectedServices: Service) {
+				this.services = this.injectedServices as Array<Service>;
+			}
+		}
+
+		beforeEach(() => {
+			TestBed.configureTestingModule({
+				declarations: [
+					MultiComponent
+				],
+				providers: [
+					Service
+				]
+			});
+		});
+
+		it('should provide values services', () => {
+
+			// given
+			const fixture = TestBed.createComponent(MultiComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(compInstance.services).toBeDefined();
+			expect(compInstance.services.length).toBe(2);
+			compInstance.services.forEach((service: Service) => {
+				expect(service instanceof Service).toBe(true);
 			});
 		});
 	});
