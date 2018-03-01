@@ -1,5 +1,6 @@
 import { HTTP_INTERCEPTORS, HttpHandler, HttpInterceptor, HttpParams, HttpRequest } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { StaticProvider } from '@angular/core';
 import { getTestBed, TestBed } from '@angular/core/testing';
 import { Observable } from 'rxjs/Observable';
 import { filter, map } from 'rxjs/operators';
@@ -186,60 +187,124 @@ describe('Http - interceptors -', () => {
 		const headerKey = 'Accept-Payment',
 			headerValue = 'Yes';
 
-		class HeadersInterceptor implements HttpInterceptor {
+		class AddHeadersInterceptor implements HttpInterceptor {
 
 			intercept(request: HttpRequest<any>, next: HttpHandler): Observable<any> {
-
-				let req = request.clone({
+				const req = request.clone({
 					headers: request.headers.append(headerKey, headerValue)
 				});
-
 				return next.handle(req);
 			}
 		}
 
-		beforeEach(() => {
-			TestBed
-				.configureTestingModule({
-					imports: [
-						HttpClientTestingModule
-					],
-					providers: [
-						CarsService,
-						{
-							provide: HTTP_INTERCEPTORS,
-							useClass: HeadersInterceptor,
-							multi: true
-						}
-					]
+		class RemoveHeadersInterceptor implements HttpInterceptor {
+
+			intercept(request: HttpRequest<any>, next: HttpHandler): Observable<any> {
+				const req = request.clone({
+					headers: request.headers.delete(headerKey)
 				});
+				return next.handle(req);
+			}
+		}
 
-			const injector = getTestBed();
-			carsService = injector.get(CarsService);
-			httpMock = injector.get(HttpTestingController);
+		/**
+		 * Interceptor adds custom header to http headers.
+		 */
+		describe('add headers -', () => {
+
+			const interceptors: Array<any> = [
+				AddHeadersInterceptor
+			];
+
+			initTestContext(interceptors);
+
+			afterEach(() => {
+				httpMock.verify();
+			});
+
+			it('should add header to http headers', (done) => {
+
+				// given
+				const url = 'cars/success';
+
+				// when & then
+				carsService
+					.getCars(url)
+					.subscribe(() => {
+						done();
+					});
+
+				const request = httpMock.expectOne(url);
+				expect(request.request.headers.has(headerKey)).toBe(true);
+				expect(request.request.headers.get(headerKey)).toBe(headerValue);
+				request.flush({});
+			});
 		});
 
-		afterEach(() => {
-			httpMock.verify();
+		/**
+		 * First interceptor adds header to http headers.
+		 * Second interceptor removes header.
+		 * Interceptors are invoked in the order of declaration.
+		 */
+		describe('remove headers -', () => {
+
+			const interceptors: Array<any> = [
+				AddHeadersInterceptor,
+				RemoveHeadersInterceptor
+			];
+
+			initTestContext(interceptors);
+
+			afterEach(() => {
+				httpMock.verify();
+			});
+
+			it('should remove header from http headers', (done) => {
+
+				// given
+				const url = 'cars/success';
+
+				// when & then
+				carsService
+					.getCars(url)
+					.subscribe(() => {
+						done();
+					});
+
+				const request = httpMock.expectOne(url);
+				expect(request.request.headers.has(headerKey)).not.toBe(true);
+				request.flush({});
+			});
 		});
 
-		it('should add header to headers', (done) => {
+		function initTestContext(interceptros: Array<any>) {
 
-			// given
-			const url = 'cars/success';
+			let providers: Array<any> = [];
 
-			// when & then
-			carsService
-				.getCars(url)
-				.subscribe((next) => {
-					done();
-				});
+			interceptros.forEach((interceptor: any) => {
+				providers.push({
+					provide: HTTP_INTERCEPTORS,
+					useClass: interceptor,
+					multi: true
+				})
+			});
 
-			const request = httpMock.expectOne(url);
-			expect(request.request.headers.has(headerKey)).toBe(true);
-			expect(request.request.headers.get(headerKey)).toBe(headerValue);
-			request.flush({});
-		});
+			providers.push(CarsService);
+
+			beforeEach(() => {
+				TestBed
+					.configureTestingModule({
+						imports: [
+							HttpClientTestingModule
+						],
+						providers: providers
+					});
+
+				const injector = getTestBed();
+				carsService = injector.get(CarsService);
+				httpMock = injector.get(HttpTestingController);
+			});
+		}
 	});
 
 
