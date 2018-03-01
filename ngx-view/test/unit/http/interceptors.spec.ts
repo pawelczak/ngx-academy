@@ -1,4 +1,4 @@
-import { HTTP_INTERCEPTORS, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpHandler, HttpInterceptor, HttpParams, HttpRequest } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { getTestBed, TestBed } from '@angular/core/testing';
 import { Observable } from 'rxjs/Observable';
@@ -14,10 +14,15 @@ describe('Http - interceptors -', () => {
 
 	const cars = [new Car('combi'), new Car('suv')];
 
-
+	/**
+	 * Interceptors allows to manipulate the response of http call.
+	 */
 	describe('response -', () => {
 
-		describe('success manipulation -', () => {
+		/**
+		 * It's possible to modify successful responses.
+		 */
+		describe('success -', () => {
 
 			class CarsCounterInterceptor implements HttpInterceptor {
 
@@ -89,8 +94,10 @@ describe('Http - interceptors -', () => {
 
 		});
 
-
-		describe('error manipulation -', () => {
+		/**
+		 * It's also possible to modify responses with errors.
+		 */
+		describe('error -', () => {
 
 			class OnlyErrorsInterceptor implements HttpInterceptor {
 
@@ -167,6 +174,71 @@ describe('Http - interceptors -', () => {
 				);
 			});
 
+		});
+	});
+
+	/**
+	 * Interceptors allows to modify request, e.g. headers.
+	 *
+	 */
+	describe('request -', () => {
+
+		const headerKey = 'Accept-Payment',
+			headerValue = 'Yes';
+
+		class HeadersInterceptor implements HttpInterceptor {
+
+			intercept(request: HttpRequest<any>, next: HttpHandler): Observable<any> {
+
+				let req = request.clone({
+					headers: request.headers.append(headerKey, headerValue)
+				});
+
+				return next.handle(req);
+			}
+		}
+
+		beforeEach(() => {
+			TestBed
+				.configureTestingModule({
+					imports: [
+						HttpClientTestingModule
+					],
+					providers: [
+						CarsService,
+						{
+							provide: HTTP_INTERCEPTORS,
+							useClass: HeadersInterceptor,
+							multi: true
+						}
+					]
+				});
+
+			const injector = getTestBed();
+			carsService = injector.get(CarsService);
+			httpMock = injector.get(HttpTestingController);
+		});
+
+		afterEach(() => {
+			httpMock.verify();
+		});
+
+		it('should add header to headers', (done) => {
+
+			// given
+			const url = 'cars/success';
+
+			// when & then
+			carsService
+				.getCars(url)
+				.subscribe((next) => {
+					done();
+				});
+
+			const request = httpMock.expectOne(url);
+			expect(request.request.headers.has(headerKey)).toBe(true);
+			expect(request.request.headers.get(headerKey)).toBe(headerValue);
+			request.flush({});
 		});
 	});
 

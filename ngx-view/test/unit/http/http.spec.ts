@@ -42,7 +42,7 @@ describe('HttpClient -', () => {
 		it('mock simple http calls', (done) => {
 
 			// when & then
-			carsService.getCars().subscribe((requestedCars) => {
+			carsService.getCars().subscribe((requestedCars: Array<Car>) => {
 				expect(requestedCars).toEqual(cars);
 				expect(requestedCars[0] instanceof Car).toBeTruthy();
 				expect(requestedCars[0].getType()).toBe(cars[0].getType());
@@ -59,7 +59,7 @@ describe('HttpClient -', () => {
 			const url = 'cars?max=100';
 
 			// when & then
-			carsService.getCars(url).subscribe((requestedCars) => {
+			carsService.getCars(url).subscribe((requestedCars: Array<Car>) => {
 				expect(requestedCars).toEqual(cars);
 				done();
 			});
@@ -76,7 +76,8 @@ describe('HttpClient -', () => {
 			// given
 			const url = 'cars',
 				errorMessage = {'error': 'Error message'},
-				errorStatus = 500;
+				errorStatus = 500,
+				errorStatusText = 'Server error';
 
 			// when & then
 			carsService
@@ -86,6 +87,7 @@ describe('HttpClient -', () => {
 					},
 					(error: HttpErrorResponse) => {
 						expect(error.status).toEqual(errorStatus);
+						expect(error.statusText).toEqual(errorStatusText);
 						expect(error.error).toEqual(errorMessage);
 						done();
 					}
@@ -94,7 +96,7 @@ describe('HttpClient -', () => {
 			const request = httpMock.expectOne(url);
 			request.flush(
 				errorMessage,
-				{status: errorStatus, statusText: 'Server error'}
+				{status: errorStatus, statusText: errorStatusText}
 			);
 		});
 
@@ -113,6 +115,29 @@ describe('HttpClient -', () => {
 			const request = httpMock.expectOne(url + '?max=200');
 			expect(request.request.url).toBe(url);
 			expect(request.request.params).toEqual(params);
+
+			request.flush(cars);
+		});
+
+		it('should return Http headers', (done) => {
+
+			// given
+			const url = 'cars',
+				params = new HttpParams().set('max', '200'),
+				headerKey = 'Darth',
+				headerValue = 'Vader',
+				givenHeaders = {};
+			givenHeaders[headerKey] = headerValue;
+
+			// when & then
+			carsService.getCars(url, params, givenHeaders).subscribe((requestedCars) => {
+				expect(requestedCars).toEqual(cars);
+				done();
+			});
+
+			const request = httpMock.expectOne(url + '?max=200');
+			expect(request.request.headers.has(headerKey)).toBe(true);
+			expect(request.request.headers.get(headerKey)).toBe(headerValue);
 
 			request.flush(cars);
 		});

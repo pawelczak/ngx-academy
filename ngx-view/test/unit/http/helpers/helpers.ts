@@ -14,8 +14,8 @@ export class CarsService {
 
 	constructor(public httpClient: HttpClient) {}
 
-	getCars(url = 'cars', params?: HttpParams) {
-		return this.httpClient.get<Array<Car>>(url, { params });
+	getCars(url = 'cars', params?: HttpParams, headers?: any) {
+		return this.httpClient.get<Array<Car>>(url, { params, headers });
 	}
 
 	postCar(url = 'cars', params?: any) {
