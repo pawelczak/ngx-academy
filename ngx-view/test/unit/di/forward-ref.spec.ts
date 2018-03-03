@@ -1,5 +1,9 @@
-import { Component, Directive, forwardRef, Injector, Self, StaticProvider, ViewChild } from '@angular/core';
+import { Component, ContentChild, Directive, forwardRef, Injector, Self, StaticProvider, ViewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+
+import { ParentComponent } from './helpers/parent.component';
+import { ChildComponent } from './helpers/child.component';
+import { FixedChildComponent } from './helpers/fixed-child.component';
 
 
 describe('ForwardRef -', () => {
@@ -7,96 +11,185 @@ describe('ForwardRef -', () => {
 	/**
 	 * Declare class providers before class has been declared
 	 */
-	it('basic example', () => {
+	describe('basic -', () => {
 
-		// given
-		const providers = [
-			{
-				provide: forwardRef(() => Car),
-				deps: []
-			} as StaticProvider
-		];
+		it('basic example', () => {
 
-		class Car {
-		}
+			// given
+			const providers = [
+				{
+					provide: forwardRef(() => Car),
+					deps: []
+				} as StaticProvider
+			];
 
-		// when
-		const injector = Injector.create(providers);
+			class Car {
+			}
 
-		// then
-		expect(injector.get(Car)).toBeDefined();
+			// when
+			const injector = Injector.create({providers});
+
+			// then
+			expect(injector.get(Car)).toBeDefined();
+		});
 	});
 
-	/**
-	 * Providers for directive are created before the directive is declared.
-	 * Using forwardRef lets you declare Directive as a provider before it is used.
-	 *
-	 * Than other directive can inject reference to the first one using di.
-	 * This works because directives created on same node share injector (View)
-	 */
-	it('should be possible to inject directive as its own dependency', () => {
+	describe('circular dependencies', () => {
 
-		// given
-		class ForwardedDirectiveRef {
-		}
+		/**
+		 * Directive wants to add to dependencies itself. That creates a circular dependency.
+		 *
+		 * Providers for directive are created before the directive is declared.
+		 * Using forwardRef lets you declare Directive as a provider before it is used.
+		 *
+		 * Than other directive can inject reference to the first one using di.
+		 * This works because directives created on same node share injector (View).
+		 */
+		it('should be possible to inject directive as its own dependency', () => {
 
-		const providers = [{
-			provide: ForwardedDirectiveRef,
-			useExisting: forwardRef(() => ForwardedDirective)
-		}];
-
-		@Directive({
-			selector: '[forwarded]',
-			exportAs: 'dirRef',
-			providers: providers
-		})
-		class ForwardedDirective {
-			value = 'Forward directive';
-		}
-
-		@Directive({
-			selector: '[catch]',
-			exportAs: 'catchRef'
-		})
-		class CatchDirective {
-			constructor(@Self() public forwardedDirectiveRef: ForwardedDirectiveRef) {
+			// given
+			class ForwardedDirectiveRef {
 			}
-		}
 
-		@Component({
-			selector: 'test',
-			template: `<span forwarded #dirRef="dirRef" catch #catchRef="catchRef"></span>`
-		})
-		class TestComponent {
-			@ViewChild(ForwardedDirective)
-			dirRef: ForwardedDirective;
+			const providers = [{
+				provide: ForwardedDirectiveRef,
+				useExisting: forwardRef(() => ForwardedDirective)
+			}];
 
-			@ViewChild(CatchDirective)
-			catchRef: CatchDirective;
-		}
+			@Directive({
+				selector: '[forwarded]',
+				exportAs: 'dirRef',
+				providers: providers
+			})
+			class ForwardedDirective {
+				value = 'Forward directive';
+			}
 
-		TestBed
-			.configureTestingModule({
-				imports: [],
-				declarations: [
-					ForwardedDirective,
-					CatchDirective,
-					TestComponent
-				],
-				providers: []
+			@Directive({
+				selector: '[catch]',
+				exportAs: 'catchRef'
+			})
+			class CatchDirective {
+				constructor(@Self() public forwardedDirectiveRef: ForwardedDirectiveRef) {
+				}
+			}
+
+			@Component({
+				selector: 'test',
+				template: `<span forwarded #dirRef="dirRef" catch #catchRef="catchRef"></span>`
+			})
+			class TestComponent {
+				@ViewChild(ForwardedDirective)
+				dirRef: ForwardedDirective;
+
+				@ViewChild(CatchDirective)
+				catchRef: CatchDirective;
+			}
+
+			TestBed
+				.configureTestingModule({
+					imports: [],
+					declarations: [
+						ForwardedDirective,
+						CatchDirective,
+						TestComponent
+					],
+					providers: []
+				});
+
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(compInstance.dirRef).toBeDefined();
+			expect(compInstance.catchRef).toBeDefined();
+			expect((compInstance.catchRef.forwardedDirectiveRef as ForwardedDirective).value).toBe('Forward directive');
+			expect(compInstance.catchRef.forwardedDirectiveRef).toBe(compInstance.dirRef);
+		});
+
+		/**
+		 * Circular dependency between two components.
+		 *
+		 * Both of them wants to have a reference the second one
+		 * as a ContentChild.
+		 *
+		 * <parent>
+		 * 		<child>
+		 * 			<parent>
+		 * 				...
+		 * 			</parent>
+		 * 		</child>
+		 * 	</parent>
+		 */
+		describe('recursion -', () => {
+
+			@Component({
+				template: `
+						<parent>
+							<child>
+								<parent>
+									<child></child>
+								</parent>
+							</child>
+						</parent>
+					`
+			})
+			class TestComponent {}
+
+			/**
+			 * Circular dependencies between components. Both Parent & Child component
+			 * require each other via ContentChild.
+			 *
+			 * ParentComponent {
+			 * 	@ContentChild(ChildComponent)
+			 * 	compRef: ChildComponent;
+			 * }
+			 *
+			 * ChildComponent {
+			 * 	@ContentChild(ParentComponent)
+			 * 	compRef: ParentComponent;
+			 * }
+			 */
+			it('is not possible to make it work', () => {
+
+				TestBed
+					.configureTestingModule({
+						declarations: [
+							ParentComponent,
+							ChildComponent,
+							TestComponent
+						]
+					});
+
+				expect(() => TestBed.createComponent(TestComponent)).toThrowError();
 			});
 
-		const fixture = TestBed.createComponent(TestComponent),
-			compInstance = fixture.componentInstance;
+			/**
+			 * To break the cycle you need to use forwardRef function in one of the Components.
+			 * In this case change was made in the ChildComponent.
+			 *
+			 * ChildComponent {
+			 * 	@ContentChild(forwardRef(() => ParentComponent))
+			 * 	compRef: ParentComponent;
+			 * }
+			 */
+			it('is possible to make it work with help of forwardRef', () => {
 
-		// when
-		fixture.detectChanges();
+				TestBed
+					.configureTestingModule({
+						declarations: [
+							ParentComponent,
+							FixedChildComponent,
+							TestComponent
+						]
+					});
 
-		// then
-		expect(compInstance.dirRef).toBeDefined();
-		expect(compInstance.catchRef).toBeDefined();
-		expect((compInstance.catchRef.forwardedDirectiveRef as ForwardedDirective).value).toBe('Forward directive');
-		expect(compInstance.catchRef.forwardedDirectiveRef).toBe(compInstance.dirRef);
+				expect(() => TestBed.createComponent(TestComponent)).not.toThrowError();
+			});
+		});
 	});
 
 });
