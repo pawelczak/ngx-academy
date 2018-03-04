@@ -7,40 +7,69 @@ describe('Dependency injection - providers -', () => {
 
 	describe('useClass -', () => {
 
-		it ('should work', () => {
+		it ('should provide instance of a class', () => {
 
 			//given
-			const providers = [{
-				provide: Service,
-				useClass: Service,
-				deps: []
-			} as StaticProvider];
+			const providers = [
+				{
+					provide: Service,
+					useClass: Service,
+					deps: []
+				} as StaticProvider
+			];
 
 			// when
-			const injector = Injector.create(providers);
+			const injector = Injector.create({providers});
 
 			// then
-			expect(injector.get(Service)).toBeDefined();
-			expect(injector.get(Service) instanceof Service).toBe(true);
+			const service = injector.get(Service);
+
+			expect(service).toBeDefined();
+			expect(service instanceof Service).toBe(true);
 		});
 	});
 
 	describe('useValue -', () => {
 
-		it ('should work', () => {
+		it ('should provide values', () => {
 
 			//given
 			const service = new Service();
-			const providers = [{
-				provide: Service,
-				useValue: service
-			}];
+			const providers = [
+				{
+					provide: Service,
+					useValue: service
+				}
+			];
 
 			// when
-			const injector = Injector.create(providers);
+			const injector = Injector.create({providers});
 
 			// then
 			expect(injector.get(Service)).toBe(service);
+		});
+
+		/**
+		 *	Providing a class to a useValue provider will get you back class,
+		 *	not an object of a class.
+		 */
+		it ('should provide class not instance of class', () => {
+
+			//given
+			const providers = [
+				{
+					provide: Service,
+					useValue: Service
+				}
+			];
+
+			// when
+			const injector = Injector.create({providers});
+
+			// then
+			const serviceClass: Service = injector.get(Service) as Service;
+
+			expect(serviceClass).toBe(Service);
 		});
 	});
 
@@ -59,16 +88,19 @@ describe('Dependency injection - providers -', () => {
 					deps: []
 				} as StaticProvider,
 				{
-				provide: serviceInjectionToken,
-				useExisting: Service
-			}];
+					provide: serviceInjectionToken,
+					useExisting: Service
+				}
+			];
 
 			// when
-			const injector = Injector.create(providers);
+			const injector = Injector.create({providers});
 
 			// then
-			expect(injector.get(serviceInjectionToken)).toBeDefined();
-			expect(injector.get(serviceInjectionToken) instanceof Service).toBe(true);
+			const service = injector.get(serviceInjectionToken);
+
+			expect(service).toBeDefined();
+			expect(service instanceof Service).toBe(true);
 		});
 	});
 
@@ -84,14 +116,17 @@ describe('Dependency injection - providers -', () => {
 						return new Service();
 					},
 					deps: []
-				} as StaticProvider];
+				} as StaticProvider
+			];
 
 			// when
-			const injector = Injector.create(providers);
+			const injector = Injector.create({providers});
 
 			// then
-			expect(injector.get(Service)).toBeDefined();
-			expect(injector.get(Service) instanceof Service).toBe(true);
+			const service = injector.get(Service);
+
+			expect(service).toBeDefined();
+			expect(service instanceof Service).toBe(true);
 		});
 
 		it ('should create service with dependencies', () => {
@@ -118,13 +153,15 @@ describe('Dependency injection - providers -', () => {
 				}];
 
 			// when
-			const injector = Injector.create(providers);
+			const injector = Injector.create({providers});
 
 			// then
-			expect(injector.get(ServiceWithDeps)).toBeDefined();
-			expect(injector.get(ServiceWithDeps) instanceof ServiceWithDeps).toBe(true);
-			expect(injector.get(ServiceWithDeps).service).toBeDefined();
-			expect(injector.get(ServiceWithDeps).service instanceof Service).toBe(true);
+			const serviceWithDeps = injector.get(ServiceWithDeps);
+
+			expect(serviceWithDeps).toBeDefined();
+			expect(serviceWithDeps instanceof ServiceWithDeps).toBe(true);
+			expect(serviceWithDeps.service).toBeDefined();
+			expect(serviceWithDeps.service instanceof Service).toBe(true);
 		});
 
 	});
