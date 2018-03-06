@@ -121,4 +121,35 @@ describe('InjectionToken -', () => {
 		});
 	});
 
+	/**
+	 * InjectionToken with useFactory
+	 */
+	describe('provider - useFactory -', () => {
+
+		beforeEach(() => {
+			TestBed
+				.configureTestingModule({
+					declarations: [
+						TestComponent
+					],
+					providers: [
+						{provide: token, useFactory: () => value}
+					]
+				});
+		});
+
+		it('should be possible to use injection token with useFactory', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(compInstance.value).toBe(value);
+		});
+	});
+
 });
