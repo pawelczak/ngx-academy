@@ -14,6 +14,8 @@ describe('InjectionToken -', () => {
 		token = new InjectionToken(tokenName),
 		value = 'Dean Winchester';
 
+	class TestClass {}
+
 	@Component({
 		template: ``
 	})
@@ -57,8 +59,6 @@ describe('InjectionToken -', () => {
 	 */
 	describe('provider - useClass -', () => {
 
-		class TestClass {}
-
 		beforeEach(() => {
 			TestBed
 				.configureTestingModule({
@@ -91,7 +91,7 @@ describe('InjectionToken -', () => {
 	 */
 	describe('provider - useExisting -', () => {
 
-		class TestClass {}
+
 
 		beforeEach(() => {
 			TestBed
@@ -149,6 +149,61 @@ describe('InjectionToken -', () => {
 
 			// then
 			expect(compInstance.value).toBe(value);
+		});
+	});
+
+	/**
+	 * InjectionToken prevents from name clashing.
+	 * String based providers doesn't prevent from issues
+	 * like name clashing. That is why it's allways better
+	 * to use InjectionTokens.
+	 */
+	describe('name clash -', () => {
+
+		const tokenOne = new InjectionToken(tokenName),
+			tokenTwo = new InjectionToken(tokenName);
+
+		const providers = [
+			{
+				provide: tokenOne,
+				useValue: value
+			},
+			{
+				provide: tokenTwo,
+				useClass: TestClass
+			}
+		];
+
+		@Component({
+			template: ``
+		})
+		class NameClashComponent {
+			constructor(@Inject(tokenOne) public injectOne: any,
+						@Inject(tokenTwo) public injectTwo: any) {}
+		}
+
+		beforeEach(() => {
+			TestBed
+				.configureTestingModule({
+					declarations: [
+						NameClashComponent
+					],
+					providers: providers
+				});
+		});
+
+		it('should be possible to use two different InjectionTokens with the same name', () => {
+
+			// given
+			const fixture = TestBed.createComponent(NameClashComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(compInstance.injectOne).toBe(value);
+			expect(compInstance.injectTwo instanceof TestClass).toBeTruthy();
 		});
 	});
 
