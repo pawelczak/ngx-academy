@@ -1,4 +1,4 @@
-import { Component, Inject, InjectionToken } from '@angular/core';
+import { Component, Inject, InjectionToken, Optional } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 /**
@@ -90,8 +90,6 @@ describe('InjectionToken -', () => {
 	 * InjectionToken with useExisting
 	 */
 	describe('provider - useExisting -', () => {
-
-
 
 		beforeEach(() => {
 			TestBed
@@ -204,6 +202,65 @@ describe('InjectionToken -', () => {
 			// then
 			expect(compInstance.injectOne).toBe(value);
 			expect(compInstance.injectTwo instanceof TestClass).toBeTruthy();
+		});
+	});
+
+	/**
+	 * Type of InjectionToken
+	 */
+	describe('type -', () => {
+
+		const numberTypeToken = new InjectionToken<number>('NUMBER_TYPE_TOKEN'),
+			classTypeToken = new InjectionToken<TestClass>('CLASS_TYPE_TOKEN');
+
+		const numberValue = 23;
+
+		const providers = [
+			{
+				provide: numberTypeToken,
+				useValue: numberValue
+			},
+			{
+				provide: classTypeToken,
+				useClass: TestClass
+			}
+		];
+
+		@Component({
+			template: ``
+		})
+		class NameClashComponent {
+			/**
+			 * Adding type to injectionToken allows you to provide objects/values of types
+			 * e.g.
+			 * I can write `numberValue: number`, because `numberTypeToken: InjectionToken<number>`.
+			 */
+			constructor(@Optional() @Inject(numberTypeToken) public numberValue: number,
+						@Optional() @Inject(classTypeToken) public injectedObject: TestClass) {}
+		}
+
+		beforeEach(() => {
+			TestBed
+				.configureTestingModule({
+					declarations: [
+						NameClashComponent
+					],
+					providers: providers
+				});
+		});
+
+		it('should inject value of number', () => {
+
+			// given
+			const fixture = TestBed.createComponent(NameClashComponent),
+				compInstance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(compInstance.numberValue).toBe(numberValue);
+			expect(compInstance.injectedObject instanceof TestClass).toBeTruthy();
 		});
 	});
 
