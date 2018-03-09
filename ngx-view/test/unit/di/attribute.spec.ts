@@ -27,9 +27,10 @@ describe('@Attribute -', () => {
 		})
 		class AttrComponent {
 
-			constructor(@Attribute('id') public id: any,
-						@Attribute('class') public cssClass: any,
-						@Attribute('data-config') public config: any) {}
+			constructor(@Attribute('id') public id: string,
+						@Attribute('class') public cssClass: string,
+						@Attribute('data-config') public config: string,
+						@Attribute('empty') public empty: string) {}
 		}
 
 		@Component({
@@ -38,7 +39,9 @@ describe('@Attribute -', () => {
 				<attr-test
 					id="${givenId}"
 					class="${givenCssClass}"
-					data-config="${givenConfig}" ></attr-test>
+					data-config="${givenConfig}"
+					empty >
+				</attr-test>
 			`
 		})
 		class TestComponent {
@@ -74,6 +77,9 @@ describe('@Attribute -', () => {
 
 			expect(compInstance.config).toEqual(givenConfig);
 			expect(typeof compInstance.config).toEqual('string');
+
+			expect(compInstance.empty).toEqual('');
+			expect(typeof compInstance.empty).toEqual('string');
 		});
 
 	});
