@@ -1,4 +1,4 @@
-import { Component, HostBinding } from '@angular/core';
+import { Component, Directive, ElementRef, HostBinding } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 
@@ -123,6 +123,67 @@ describe('HostBinding -', () => {
 
 			// then
 			assertHostBindings(fixture.nativeElement);
+		});
+
+	});
+
+	/**
+	 * It isn't possible to add a Directive via 'host' property.
+	 * You can declare it in host, but it's added to component
+	 * like any other attribute. Angular doesn't recognize it
+	 * as a directive.
+	 */
+	describe('a directive -', () => {
+
+		const dirAttribute = 'dir-active',
+			dirAttributeValue = 'true';
+
+		@Directive({
+			selector: '[host-dir]'
+		})
+		class HostDirective {
+			constructor(private el: ElementRef) {
+				this.el.nativeElement.setAttribute(dirAttribute, dirAttributeValue);
+			}
+		}
+
+		@Component({
+			template: `
+				<span host-dir ></span>
+			`,
+			host: {
+				'host-dir': ''
+			}
+		})
+		class HostDirComponent {}
+
+		beforeEach(() => {
+			TestBed
+				.configureTestingModule({
+					imports: [],
+					declarations: [
+						HostDirective,
+						HostDirComponent
+					]
+				});
+		});
+
+		it('doesn\'t recognize host-dir as a angular element ', () => {
+
+			// given
+			const fixture = TestBed.createComponent(HostDirComponent),
+				nativeEl = fixture.nativeElement;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			const divEl = nativeEl.querySelector('span');
+
+			expect(nativeEl.getAttribute(dirAttribute)).not.toEqual(dirAttributeValue);
+			expect(nativeEl.getAttribute(dirAttribute)).toBeNull();
+
+			expect(divEl.getAttribute(dirAttribute)).toEqual(dirAttributeValue);
 		});
 
 	});
