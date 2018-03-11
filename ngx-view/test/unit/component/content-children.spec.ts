@@ -1,5 +1,8 @@
-import { Component, ContentChildren, Directive, ElementRef, Input, QueryList, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import {
+	ChangeDetectorRef, Component, ContentChildren, Directive, ElementRef, Input, QueryList, TemplateRef, ViewChild,
+	ViewContainerRef
+} from '@angular/core';
+import { async, fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 import { isViewContainerRef } from './helpers/matchers';
 
@@ -580,6 +583,8 @@ describe('ContentChildren -', () => {
 
 	describe ('QueryList changes -', () => {
 
+		const simpleValue = 'Johny Bravo';
+
 		@Component({
 			selector: 'test',
 			template: `
@@ -587,10 +592,9 @@ describe('ContentChildren -', () => {
 				<content-children>
 
 					<simple *ngIf="flag"
-							[value]="'#1'" >#1</simple>
-
-					<simple *ngIf="!flag"
-							[value]="'#2'" >#2</simple>
+							[value]="value" >
+						value
+					</simple>
 
 				</content-children>
 
@@ -600,7 +604,11 @@ describe('ContentChildren -', () => {
 			@ViewChild(ContentChildrenComponent)
 			compRef: ContentChildrenComponent;
 
-			flag: boolean = false;
+			flag: boolean = true;
+
+			value = simpleValue;
+
+			constructor(public changeDetectorRef: ChangeDetectorRef) {}
 		}
 
 		beforeEach(() => {
@@ -613,7 +621,11 @@ describe('ContentChildren -', () => {
 			});
 		});
 
-		it ('should be possible to observe changes made to content', () => {
+		/**
+		 * Changing reference to the content component referenced by @ContentChildren,
+		 * will trigger change.
+		 */
+		it ('should be possible to observe changes made in the content', () => {
 
 			// given
 			const fixture = TestBed.createComponent(TestComponent),
@@ -622,16 +634,52 @@ describe('ContentChildren -', () => {
 			let simpleCompRefs: Array<SimpleComponent> = [];
 
 			// when
+			compInstance.flag = false;
 			fixture.detectChanges();
+
 			compInstance.compRef.simpleComponent.changes.subscribe(() => {
 				simpleCompRefs = compInstance.compRef.simpleComponent.toArray();
 			});
+
+			// then
+			expect(simpleCompRefs.length).toEqual(0);
+
+			// when
 			compInstance.flag = true;
 			fixture.detectChanges();
 
 			// then
 			expect(simpleCompRefs.length).toEqual(1);
-			expect(simpleCompRefs[0].value).toEqual('#1');
+			expect(simpleCompRefs[0].value).toEqual(simpleValue);
+		});
+
+		/**
+		 * Changing value in the content component referenced by @ContentChildren,
+		 * will not trigger any changes.
+		 */
+		it ('is not possible to observe value changes made in the content', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compInstance = fixture.componentInstance,
+				newValue = 'Time Duncan';
+
+			fixture.detectChanges();
+
+			let simpleCompRefs: Array<SimpleComponent> = [];
+
+			// when
+			compInstance.compRef.simpleComponent.changes.subscribe(() => {
+				simpleCompRefs = compInstance.compRef.simpleComponent.toArray();
+			});
+			fixture.detectChanges();
+
+			// when
+			compInstance.value = newValue;
+			fixture.detectChanges();
+
+			// then
+			expect(simpleCompRefs.length).toEqual(0);
 		});
 	});
 
