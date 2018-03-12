@@ -115,15 +115,22 @@ describe('ContentChildren -', () => {
 	describe('selector -', () => {
 
 		/**
-		 * Component selector
+		 * Possible selectors:
+		 * - Component
+		 * - Directive
 		 */
-		describe('component -', () => {
+		describe('view -', () => {
 
 			@Component({
 				selector: 'selector-comp',
 				template: ``
 			})
 			class SelectorComponent {}
+
+			@Directive({
+				selector: '[selector-dir]'
+			})
+			class SelectorDirective {}
 
 			@Component({
 				selector: 'content-children',
@@ -136,15 +143,21 @@ describe('ContentChildren -', () => {
 				 */
 				@ContentChildren(SelectorComponent)
 				compQL: QueryList<SimpleComponent>;
+
+				/**
+				 * directive as a selector
+				 */
+				@ContentChildren(SelectorDirective)
+				dirQL: QueryList<SelectorDirective>;
 			}
 
 			@Component({
 				template: `
 				<content-children>
 
-					<selector-comp #comp></selector-comp>
+					<selector-comp selector-dir #comp></selector-comp>
 
-					<selector-comp #comp></selector-comp>
+					<selector-comp selector-dir #comp></selector-comp>
 
 				</content-children>
 			`
@@ -154,34 +167,47 @@ describe('ContentChildren -', () => {
 				compRef: ContentChildrenComponent;
 			}
 
+			let compInstance: any;
+
 			beforeEach(() => {
 				TestBed.configureTestingModule({
 					declarations: [
 						SelectorComponent,
+						SelectorDirective,
 						ContentChildrenComponent,
 						TestComponent
 					]
 				});
+
+				// given
+				const fixture = TestBed.createComponent(TestComponent);
+				compInstance = fixture.componentInstance;
+
+				// when
+				fixture.detectChanges();
 			});
 
 			it ('possible to use component as a selector', () => {
 
-				// given
-				const fixture = TestBed.createComponent(TestComponent),
-					compInstance = fixture.componentInstance;
-
-				// when
-				fixture.detectChanges();
-
 				// then
 				const compRefs = compInstance.compRef.compQL.toArray();
 				expect(compRefs.length).toBe(2);
-				compRefs.forEach((comp) => {
+				compRefs.forEach((comp: SelectorComponent) => {
 					expect(comp instanceof SelectorComponent).toBe(true, 'SelectorComponent as a selector');
 				});
 			});
 
+			it ('possible to use directive as a selector', () => {
+
+				// then
+				const dirRefs = compInstance.compRef.dirQL.toArray();
+				expect(dirRefs.length).toBe(2);
+				dirRefs.forEach((dir: SelectorDirective) => {
+					expect(dir instanceof SelectorDirective).toBe(true, 'SelectorDirective as a selector');
+				});
+			});
 		});
+
 	});
 
 
