@@ -115,9 +115,10 @@ describe('ContentChildren -', () => {
 	describe('selector -', () => {
 
 		/**
-		 * Possible selectors:
+		 * Possible view selectors:
 		 * - Component
 		 * - Directive
+		 * - template variable
 		 */
 		describe('view -', () => {
 
@@ -149,15 +150,21 @@ describe('ContentChildren -', () => {
 				 */
 				@ContentChildren(SelectorDirective)
 				dirQL: QueryList<SelectorDirective>;
+
+				/**
+				 * directive as a selector
+				 */
+				@ContentChildren('selector')
+				templVariableQL: QueryList<SelectorDirective>;
 			}
 
 			@Component({
 				template: `
 				<content-children>
 
-					<selector-comp selector-dir #comp></selector-comp>
+					<selector-comp selector-dir #selector ></selector-comp>
 
-					<selector-comp selector-dir #comp></selector-comp>
+					<selector-comp selector-dir #selector ></selector-comp>
 
 				</content-children>
 			`
@@ -206,7 +213,22 @@ describe('ContentChildren -', () => {
 					expect(dir instanceof SelectorDirective).toBe(true, 'SelectorDirective as a selector');
 				});
 			});
+
+			it ('possible to use template variables as a selector', () => {
+
+				// then
+				const templVariableRefs = compInstance.compRef.templVariableQL.toArray();
+				expect(templVariableRefs.length).toBe(2);
+				templVariableRefs.forEach((comp: SelectorComponent) => {
+					expect(comp instanceof SelectorComponent).toBe(true, 'template variable as a selector');
+				});
+			});
 		});
+
+
+		// describe('different component', () => {
+		//
+		// });
 
 	});
 
