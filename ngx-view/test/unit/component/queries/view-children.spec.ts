@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 
-import { isViewContainerRef } from './helpers/matchers';
+import { isViewContainerRef } from '../helpers/matchers';
 
 
 describe('ViewChildren -', () => {

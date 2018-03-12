@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 import { async, fakeAsync, TestBed, tick } from '@angular/core/testing';
 
-import { isViewContainerRef } from './helpers/matchers';
+import { isViewContainerRef } from '../helpers/matchers';
 
 
 describe('ContentChildren -', () => {
@@ -108,9 +108,87 @@ describe('ContentChildren -', () => {
 	});
 
 	/**
+	 * Every time angular creates a component it puts that object
+	 * into the injector. Than created object can be used as a selector
+	 * for the @ContentChildren.
+	 */
+	describe('selector -', () => {
+
+		/**
+		 * Component selector
+		 */
+		describe('component -', () => {
+
+			@Component({
+				selector: 'selector-comp',
+				template: ``
+			})
+			class SelectorComponent {}
+
+			@Component({
+				selector: 'content-children',
+				template: ``
+			})
+			class ContentChildrenComponent {
+
+				/**
+				 * component as a selector
+				 */
+				@ContentChildren(SelectorComponent)
+				compQL: QueryList<SimpleComponent>;
+			}
+
+			@Component({
+				template: `
+				<content-children>
+
+					<selector-comp #comp></selector-comp>
+
+					<selector-comp #comp></selector-comp>
+
+				</content-children>
+			`
+			})
+			class TestComponent {
+				@ViewChild(ContentChildrenComponent)
+				compRef: ContentChildrenComponent;
+			}
+
+			beforeEach(() => {
+				TestBed.configureTestingModule({
+					declarations: [
+						SelectorComponent,
+						ContentChildrenComponent,
+						TestComponent
+					]
+				});
+			});
+
+			it ('possible to use component as a selector', () => {
+
+				// given
+				const fixture = TestBed.createComponent(TestComponent),
+					compInstance = fixture.componentInstance;
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				const compRefs = compInstance.compRef.compQL.toArray();
+				expect(compRefs.length).toBe(2);
+				compRefs.forEach((comp) => {
+					expect(comp instanceof SelectorComponent).toBe(true, 'SelectorComponent as a selector');
+				});
+			});
+
+		});
+	});
+
+
+	/**
 	 * @ContentChildren allows to get different types when referencing a component
 	 */
-	describe ('read component -', () => {
+	describe ('read -', () => {
 
 		@Component({
 			selector: 'content-children',

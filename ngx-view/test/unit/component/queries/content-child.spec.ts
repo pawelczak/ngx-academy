@@ -1,7 +1,7 @@
 import { Component, ContentChild, Directive, ElementRef, Input, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import { isViewContainerRef } from './helpers/matchers';
+import { isViewContainerRef } from '../helpers/matchers';
 
 
 describe('ContentChild -', () => {
