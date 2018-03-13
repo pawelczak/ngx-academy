@@ -1,5 +1,5 @@
 import {
-	ChangeDetectorRef, Component, ContentChildren, Directive, ElementRef, Input, QueryList, TemplateRef, ViewChild,
+	ChangeDetectorRef, Component, ContentChildren, Directive, ElementRef, InjectionToken, Input, QueryList, TemplateRef, ViewChild,
 	ViewContainerRef
 } from '@angular/core';
 import { async, fakeAsync, TestBed, tick } from '@angular/core/testing';
@@ -251,6 +251,130 @@ describe('ContentChildren -', () => {
 				expect(templVariableRefs[0] instanceof SelectorComponent).toBe(true, 'SelectorComponent as a selector');
 				expect(templVariableRefs[1] instanceof TemplateRef).toBe(true, 'template variable as a selector');
 			});
+		});
+
+		describe('service -', () => {
+
+			class SelectorService {}
+			class SelectorValue {}
+
+			const providedValue = 'Kobe Bryant',
+				stringToken = 'magic string',
+				injectionToken = new InjectionToken(stringToken);
+
+			@Component({
+				selector: 'selector-comp',
+				template: ``,
+				providers: [{
+					provide: SelectorService,
+					useExisting: SelectorComponent
+				}, {
+					provide: stringToken,
+					useExisting: SelectorComponent
+				}, {
+					provide: injectionToken,
+					useExisting: SelectorComponent
+				}, {
+					provide: SelectorValue,
+					useValue: providedValue
+				}]
+			})
+			class SelectorComponent {}
+
+			@Component({
+				selector: 'container',
+				template: ``
+			})
+			class ContainerComponent {
+				@ContentChildren(SelectorService)
+				compQL: QueryList<SelectorComponent>;
+
+				@ContentChildren(stringToken)
+				compByStringQL: QueryList<SelectorComponent>;
+
+				@ContentChildren(injectionToken as any)
+				compByTokenQL: QueryList<SelectorComponent>;
+
+				@ContentChildren(SelectorValue)
+				valueQL: QueryList<any>;
+			}
+
+			@Component({
+				template: `
+					<container>
+						<selector-comp></selector-comp>
+						<selector-comp></selector-comp>
+					</container>
+				`
+			})
+			class TestComponent {
+				@ViewChild(ContainerComponent)
+				compRef: ContainerComponent;
+			}
+
+			let compInstance: any;
+
+			beforeEach(() => {
+				TestBed.configureTestingModule({
+					declarations: [
+						SelectorComponent,
+						ContainerComponent,
+						TestComponent
+					]
+				});
+
+				// given
+				const fixture = TestBed.createComponent(TestComponent);
+				compInstance = fixture.componentInstance;
+
+				// when
+				fixture.detectChanges();
+			});
+
+			it ('should allow to select component by it\'s own service', () => {
+
+				// then
+				const compRefs = compInstance.compRef.compQL.toArray();
+				expect(compRefs.length).toBe(2);
+				compRefs.forEach((compRef: SelectorComponent) => {
+					expect(compRef instanceof SelectorComponent).toBe(true, 'service as a selector');
+				});
+			});
+
+			it ('should allow to select component by string provider', () => {
+
+				// then
+				const compRefs = compInstance.compRef.compByStringQL.toArray();
+				expect(compRefs.length).toBe(2);
+				compRefs.forEach((compRef: SelectorComponent) => {
+					expect(compRef instanceof SelectorComponent).toBe(true, 'service as a selector');
+				});
+			});
+
+			it ('should allow to select component by InjectionToken provider', () => {
+
+				// then
+				const compRefs = compInstance.compRef.compByTokenQL.toArray();
+				expect(compRefs.length).toBe(2);
+				compRefs.forEach((compRef: SelectorComponent) => {
+					expect(compRef instanceof SelectorComponent).toBe(true, 'service as a selector');
+				});
+			});
+
+			/**
+			 * ContentChild can by use to retrieve any provided service / value
+			 * from a components injector.
+			 */
+			it ('should allow to select value from container injector', () => {
+
+				// then
+				const values = compInstance.compRef.valueQL.toArray();
+				expect(values.length).toBe(2);
+				values.forEach((value: any) => {
+					expect(value).toBe(providedValue, 'useValue provider as a selector');
+				});
+			});
+
 		});
 
 
