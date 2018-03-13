@@ -118,6 +118,7 @@ describe('ContentChildren -', () => {
 		 * Possible view selectors:
 		 * - Component
 		 * - Directive
+		 * - TemplateRef<any>
 		 * - template variable
 		 */
 		describe('view -', () => {
@@ -152,7 +153,13 @@ describe('ContentChildren -', () => {
 				dirQL: QueryList<SelectorDirective>;
 
 				/**
-				 * directive as a selector
+				 * ng-template as a selector
+				 */
+				@ContentChildren(TemplateRef)
+				templQL: QueryList<TemplateRef<any>>;
+
+				/**
+				 * template variable as a selector
 				 */
 				@ContentChildren('selector')
 				templVariableQL: QueryList<SelectorDirective>;
@@ -164,7 +171,11 @@ describe('ContentChildren -', () => {
 	
 						<selector-comp selector-dir #selector ></selector-comp>
 	
-						<selector-comp selector-dir #selector ></selector-comp>
+						<selector-comp ></selector-comp>
+						
+						<ng-template selector-dir #selector ></ng-template>
+						
+						<ng-template></ng-template>
 	
 					</content-children>
 			`
@@ -215,6 +226,19 @@ describe('ContentChildren -', () => {
 			});
 
 			/**
+			 * TemplateRef selector allows to get reference to a <ng-template>.
+			 */
+			it ('possible to use ng-template as a selector', () => {
+
+				// then
+				const templRefs = compInstance.compRef.templQL.toArray();
+				expect(templRefs.length).toBe(2);
+				templRefs.forEach((templRef: any) => {
+					expect(templRef instanceof TemplateRef).toBe(true, 'TemplateRef as a selector');
+				});
+			});
+
+			/**
 			 * It should be noted that you can declare couple of template variables
 			 * with the same name. This way you can get references to multiple
 			 * components, like in the example below.
@@ -224,9 +248,8 @@ describe('ContentChildren -', () => {
 				// then
 				const templVariableRefs = compInstance.compRef.templVariableQL.toArray();
 				expect(templVariableRefs.length).toBe(2);
-				templVariableRefs.forEach((comp: SelectorComponent) => {
-					expect(comp instanceof SelectorComponent).toBe(true, 'template variable as a selector');
-				});
+				expect(templVariableRefs[0] instanceof SelectorComponent).toBe(true, 'SelectorComponent as a selector');
+				expect(templVariableRefs[1] instanceof TemplateRef).toBe(true, 'template variable as a selector');
 			});
 		});
 
@@ -238,6 +261,9 @@ describe('ContentChildren -', () => {
 		 *     <batman></batman>
 		 *     <wolverine></wolverine>
 		 * </heroes>
+		 *
+		 * To make it work, component needs to provide itself under an common alias,
+		 * then this alias is used as a selector in the ContentChildren.
 		 */
 		describe('multiple types of components -', () => {
 
