@@ -160,13 +160,13 @@ describe('ContentChildren -', () => {
 
 			@Component({
 				template: `
-				<content-children>
-
-					<selector-comp selector-dir #selector ></selector-comp>
-
-					<selector-comp selector-dir #selector ></selector-comp>
-
-				</content-children>
+					<content-children>
+	
+						<selector-comp selector-dir #selector ></selector-comp>
+	
+						<selector-comp selector-dir #selector ></selector-comp>
+	
+					</content-children>
 			`
 			})
 			class TestComponent {
@@ -214,6 +214,11 @@ describe('ContentChildren -', () => {
 				});
 			});
 
+			/**
+			 * It should be noted that you can declare couple of template variables
+			 * with the same name. This way you can get references to multiple
+			 * components, like in the example below.
+			 */
 			it ('possible to use template variables as a selector', () => {
 
 				// then
@@ -226,10 +231,82 @@ describe('ContentChildren -', () => {
 		});
 
 
-		// describe('different component', () => {
-		//
-		// });
+		/**
+		 * It's possible to get references to a couple of different type of components.
+		 *
+		 * <heroes>
+		 *     <batman></batman>
+		 *     <wolverine></wolverine>
+		 * </heroes>
+		 */
+		describe('multiple types of components -', () => {
 
+			class Hero {}
+
+			@Component({
+				selector: 'batman',
+				template: ``,
+				providers: [{
+					provide: Hero, useExisting: BatmanComponent
+				}]
+			})
+			class BatmanComponent {}
+
+			@Component({
+				selector: 'wolverine',
+				template: ``,
+				providers: [{
+					provide: Hero, useExisting: WolverineComponent
+				}]
+			})
+			class WolverineComponent {}
+
+			@Component({
+				selector: 'heroes',
+				template: ``
+			})
+			class Heroes {
+				@ContentChildren(Hero)
+				heroesQL: QueryList<any>;
+			}
+
+			@Component({
+				template: `
+					<heroes>
+						<batman></batman>
+						<wolverine></wolverine>
+					</heroes>
+				`
+			})
+			class TestComponent {
+				@ViewChild(Heroes)
+				multiRef: Heroes;
+			}
+
+			beforeEach(() => {
+				TestBed
+					.configureTestingModule({
+						declarations: [
+							BatmanComponent,
+							WolverineComponent,
+							Heroes,
+							TestComponent
+						]
+					});
+			});
+
+			it ('should get reference to different components', () => {
+				const fixture = TestBed.createComponent(TestComponent);
+
+				fixture.detectChanges();
+
+				const heroes = fixture.componentInstance.multiRef.heroesQL.toArray();
+
+				expect(heroes.length).toBe(2);
+				expect(heroes[0] instanceof BatmanComponent).toBeTruthy();
+				expect(heroes[1] instanceof WolverineComponent).toBeTruthy();
+			});
+		});
 	});
 
 
