@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, Provider, Type, ViewEncapsulation }
 import { TestBed } from '@angular/core/testing';
 
 /**
- * Metadata Properties:**
+ * Components Metadata Properties:
  *
  * - animations - list of animations of this component
  * - changeDetection - change detection strategy used by this component
@@ -50,9 +50,10 @@ describe('Component - metadata -', () => {
 		// templateUrl: '',
 		viewProviders: [] as Array<Provider>
 	})
-	class MetadataComponent {}
+	class MetadataComponent {
+	}
 
-	it('should have all the metadata', () => {
+	it('should create component with all the metadata', () => {
 		TestBed
 			.configureTestingModule({
 				declarations: [
@@ -64,4 +65,3 @@ describe('Component - metadata -', () => {
 	});
 
 });
-
