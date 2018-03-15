@@ -803,12 +803,6 @@ describe('ContentChildren -', () => {
 			class ContentChildrenComponent {
 
 				/**
-				 * component references
-				 */
-				@ContentChildren(SimpleComponent)
-				compRefs: QueryList<SimpleComponent>;
-
-				/**
 				 * component references as ElementRefs
 				 */
 				@ContentChildren(SimpleComponent, {read: ElementRef})
@@ -874,10 +868,6 @@ describe('ContentChildren -', () => {
 				fixture.detectChanges();
 
 				// then
-				let compRefs = compInstance.compRef.compRefs.toArray();
-				expect(compRefs.length).toEqual(2);
-				expect(compRefs[0] instanceof SimpleComponent).toBe(true, 'componentRef as componentRef'); // TRUE
-
 				let compAsElemRefs = compInstance.compRef.compAsElementRefs.toArray();
 				expect(compAsElemRefs.length).toEqual(2);
 				expect(compAsElemRefs[0] instanceof ElementRef).toBe(true, 'componentRef as ElementRef'); // TRUE
@@ -932,34 +922,28 @@ describe('ContentChildren -', () => {
 			class ContentChildrenForDirectiveComponent {
 
 				/**
-				 * directive references
-				 */
-				@ContentChildren(PropDirective)
-				dirRefs: QueryList<PropDirective>;
-
-				/**
 				 * directive references as ElementRefs
 				 */
-				@ContentChildren(SimpleComponent, {read: ElementRef})
+				@ContentChildren(PropDirective, {read: ElementRef})
 				dirAsElementRefs: QueryList<ElementRef>;
 
 				/**
 				 * directive references as ElementRefs
 				 */
-				@ContentChildren(SimpleComponent, {read: TemplateRef})
+				@ContentChildren(PropDirective, {read: TemplateRef})
 				dirAsTempRefs: QueryList<TemplateRef<any>>;
 
 				/**
 				 * directive references as ViewContainerRef
 				 */
-				@ContentChildren(SimpleComponent, {read: ViewContainerRef})
+				@ContentChildren(PropDirective, {read: ViewContainerRef})
 				dirAsVcrs: QueryList<ViewContainerRef>;
 
 				/**
 				 * directive references by template variable
 				 */
 				@ContentChildren('dirOne')
-				dirByTemplVarRefs: QueryList<SimpleComponent>;
+				dirByTemplVarRefs: QueryList<PropDirective>;
 			}
 
 			@Component({
@@ -989,25 +973,6 @@ describe('ContentChildren -', () => {
 				});
 			});
 
-			it('should get reference to a directive', () => {
-
-				// given
-				const fixture = TestBed.createComponent(TestComponent),
-					compInstance = fixture.componentInstance;
-
-				// when
-				fixture.detectChanges();
-
-				// then
-				let propDirectivesRefs = compInstance.compRef.dirRefs.toArray();
-
-				expect(propDirectivesRefs.length).toEqual(3);
-				expect(propDirectivesRefs[0].value).toEqual('#1');
-				expect(propDirectivesRefs[1].value).toEqual('#2');
-				expect(propDirectivesRefs[2].value).toEqual('#3');
-				expect(propDirectivesRefs[0] instanceof PropDirective).toBe(true, 'directiveRef as directiveRef'); // TRUE
-			});
-
 			/**
 			 * When you want to get reference to a directive by @ContentChildren, you cannot use read option. It doesn't work.
 			 */
@@ -1022,16 +987,16 @@ describe('ContentChildren -', () => {
 
 				// then
 				let dirAsElementRefs = compInstance.compRef.dirAsElementRefs.toArray();
-				expect(dirAsElementRefs.length).toEqual(0);
-				expect(dirAsElementRefs[0] instanceof ElementRef).toBe(false, 'directiveRef as ElementRef'); // FALSE
+				expect(dirAsElementRefs.length).toEqual(3);
+				expect(dirAsElementRefs[0] instanceof ElementRef).toBe(true, 'directiveRef as ElementRef'); // FALSE
 
 				let dirAsTempRefs = compInstance.compRef.dirAsTempRefs.toArray();
-				expect(dirAsTempRefs.length).toEqual(0);
+				expect(dirAsTempRefs.length).toEqual(3);
 				expect(dirAsTempRefs[0] instanceof TemplateRef).toBe(false, 'directiveRef as TemplateRef'); // FALSE
 
 				let dirAsVcrs = compInstance.compRef.dirAsVcrs.toArray();
-				expect(dirAsVcrs.length).toEqual(0);
-				expect(isViewContainerRef(dirAsVcrs[0])).toBe(false, 'directiveRef as ViewContainerRef'); // FALSE
+				expect(dirAsVcrs.length).toEqual(3);
+				expect(isViewContainerRef(dirAsVcrs[0])).toBe(true, 'directiveRef as ViewContainerRef'); // FALSE
 			});
 
 			/**
@@ -1064,12 +1029,6 @@ describe('ContentChildren -', () => {
 				template: ``
 			})
 			class ContentChildrenComponent {
-
-				/**
-				 * ng-template references
-				 */
-				@ContentChildren(TemplateRef)
-				templRefs: QueryList<TemplateRef<any>>;
 
 				/**
 				 * ng-template references as ElementRefs
@@ -1137,10 +1096,6 @@ describe('ContentChildren -', () => {
 				fixture.detectChanges();
 
 				// then
-				let templRefs = compInstance.compRef.templRefs.toArray();
-				expect(templRefs.length).toEqual(2);
-				expect(templRefs[0] instanceof TemplateRef).toBe(true, 'TemplateRef as TemplateRef'); // TRUE
-
 				let templAsElementRefs = compInstance.compRef.templAsElementRefs.toArray();
 				expect(templAsElementRefs.length).toEqual(2);
 				expect(templAsElementRefs[0] instanceof ElementRef).toBe(true, 'TemplateRef as ElementRef'); // TRUE
