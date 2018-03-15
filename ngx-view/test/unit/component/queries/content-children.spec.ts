@@ -2,7 +2,7 @@ import {
 	ChangeDetectorRef, Component, ContentChildren, Directive, ElementRef, InjectionToken, Input, QueryList, TemplateRef, ViewChild,
 	ViewContainerRef
 } from '@angular/core';
-import { async, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 
 import { isViewContainerRef } from '../helpers/matchers';
 
@@ -41,11 +41,11 @@ describe('ContentChildren -', () => {
 			template: `
 
 				<content-children>
-					<simple [value]="'#1'" >#1</simple>
-					<simple [value]="'#2'" >#2</simple>
-					<simple [value]="'#3'" >#3</simple>
+					<simple [value]="'#1'">#1</simple>
+					<simple [value]="'#2'">#2</simple>
+					<simple [value]="'#3'">#3</simple>
 				</content-children>
-			
+
 			`
 		})
 		class TestComponent {
@@ -67,7 +67,7 @@ describe('ContentChildren -', () => {
 		 * Before the AfterContentInit lifecycle hook occurs
 		 * @ContentChildren variables are undefined
 		 */
-		it ('should accessible after AfterContentInit lifecycle', () => {
+		it('should accessible after AfterContentInit lifecycle', () => {
 
 			// given
 			const fixture = TestBed.createComponent(TestComponent);
@@ -88,7 +88,7 @@ describe('ContentChildren -', () => {
 			expect(fixture.componentInstance.compRefs.simpleComponent).toBeDefined();
 		});
 
-		it ('should be possible to get component instance(with inputs) from QueryList', () => {
+		it('should be possible to get component instance(with inputs) from QueryList', () => {
 
 			// given
 			const fixture = TestBed.createComponent(TestComponent),
@@ -127,12 +127,14 @@ describe('ContentChildren -', () => {
 				selector: 'selector-comp',
 				template: ``
 			})
-			class SelectorComponent {}
+			class SelectorComponent {
+			}
 
 			@Directive({
 				selector: '[selector-dir]'
 			})
-			class SelectorDirective {}
+			class SelectorDirective {
+			}
 
 			@Component({
 				selector: 'content-children',
@@ -168,17 +170,17 @@ describe('ContentChildren -', () => {
 			@Component({
 				template: `
 					<content-children>
-	
-						<selector-comp selector-dir #selector ></selector-comp>
-	
-						<selector-comp ></selector-comp>
-						
-						<ng-template selector-dir #selector ></ng-template>
-						
+
+						<selector-comp selector-dir #selector></selector-comp>
+
+						<selector-comp></selector-comp>
+
+						<ng-template selector-dir #selector></ng-template>
+
 						<ng-template></ng-template>
-	
+
 					</content-children>
-			`
+				`
 			})
 			class TestComponent {
 				@ViewChild(ContentChildrenComponent)
@@ -205,7 +207,7 @@ describe('ContentChildren -', () => {
 				fixture.detectChanges();
 			});
 
-			it ('possible to use component as a selector', () => {
+			it('possible to use component as a selector', () => {
 
 				// then
 				const compRefs = compInstance.compRef.compQL.toArray();
@@ -215,7 +217,7 @@ describe('ContentChildren -', () => {
 				});
 			});
 
-			it ('possible to use directive as a selector', () => {
+			it('possible to use directive as a selector', () => {
 
 				// then
 				const dirRefs = compInstance.compRef.dirQL.toArray();
@@ -228,7 +230,7 @@ describe('ContentChildren -', () => {
 			/**
 			 * TemplateRef selector allows to get reference to a <ng-template>.
 			 */
-			it ('possible to use ng-template as a selector', () => {
+			it('possible to use ng-template as a selector', () => {
 
 				// then
 				const templRefs = compInstance.compRef.templQL.toArray();
@@ -243,7 +245,7 @@ describe('ContentChildren -', () => {
 			 * with the same name. This way you can get references to multiple
 			 * components, like in the example below.
 			 */
-			it ('possible to use template variables as a selector', () => {
+			it('possible to use template variables as a selector', () => {
 
 				// then
 				const templVariableRefs = compInstance.compRef.templVariableQL.toArray();
@@ -253,10 +255,17 @@ describe('ContentChildren -', () => {
 			});
 		});
 
+		/**
+		 * Providers provided in the component can be used as a selectors
+		 * in the ContentChild query.
+		 */
 		describe('service -', () => {
 
-			class SelectorService {}
-			class SelectorValue {}
+			class SelectorService {
+			}
+
+			class SelectorValue {
+			}
 
 			const providedValue = 'Kobe Bryant',
 				stringToken = 'magic string',
@@ -279,7 +288,8 @@ describe('ContentChildren -', () => {
 					useValue: providedValue
 				}]
 			})
-			class SelectorComponent {}
+			class SelectorComponent {
+			}
 
 			@Component({
 				selector: 'container',
@@ -331,7 +341,7 @@ describe('ContentChildren -', () => {
 				fixture.detectChanges();
 			});
 
-			it ('should allow to select component by it\'s own service', () => {
+			it('should allow to select component by it\'s own service', () => {
 
 				// then
 				const compRefs = compInstance.compRef.compQL.toArray();
@@ -341,7 +351,7 @@ describe('ContentChildren -', () => {
 				});
 			});
 
-			it ('should allow to select component by string provider', () => {
+			it('should allow to select component by string provider', () => {
 
 				// then
 				const compRefs = compInstance.compRef.compByStringQL.toArray();
@@ -351,7 +361,7 @@ describe('ContentChildren -', () => {
 				});
 			});
 
-			it ('should allow to select component by InjectionToken provider', () => {
+			it('should allow to select component by InjectionToken provider', () => {
 
 				// then
 				const compRefs = compInstance.compRef.compByTokenQL.toArray();
@@ -365,7 +375,7 @@ describe('ContentChildren -', () => {
 			 * ContentChild can by use to retrieve any provided service / value
 			 * from a components injector.
 			 */
-			it ('should allow to select value from container injector', () => {
+			it('should allow to select value from container injector', () => {
 
 				// then
 				const values = compInstance.compRef.valueQL.toArray();
@@ -374,9 +384,7 @@ describe('ContentChildren -', () => {
 					expect(value).toBe(providedValue, 'useValue provider as a selector');
 				});
 			});
-
 		});
-
 
 		/**
 		 * It's possible to get references to a couple of different type of components.
@@ -391,7 +399,8 @@ describe('ContentChildren -', () => {
 		 */
 		describe('multiple types of components -', () => {
 
-			class Hero {}
+			class Hero {
+			}
 
 			@Component({
 				selector: 'batman',
@@ -400,7 +409,8 @@ describe('ContentChildren -', () => {
 					provide: Hero, useExisting: BatmanComponent
 				}]
 			})
-			class BatmanComponent {}
+			class BatmanComponent {
+			}
 
 			@Component({
 				selector: 'wolverine',
@@ -409,7 +419,8 @@ describe('ContentChildren -', () => {
 					provide: Hero, useExisting: WolverineComponent
 				}]
 			})
-			class WolverineComponent {}
+			class WolverineComponent {
+			}
 
 			@Component({
 				selector: 'heroes',
@@ -445,11 +456,15 @@ describe('ContentChildren -', () => {
 					});
 			});
 
-			it ('should get reference to different components', () => {
+			it('should get reference to different components', () => {
+
+				// given
 				const fixture = TestBed.createComponent(TestComponent);
 
+				// when
 				fixture.detectChanges();
 
+				// then
 				const heroes = fixture.componentInstance.multiRef.heroesQL.toArray();
 
 				expect(heroes.length).toBe(2);
@@ -459,11 +474,27 @@ describe('ContentChildren -', () => {
 		});
 	});
 
-
 	/**
-	 * @ContentChildren allows to get different types when referencing a component
+	 * ContentChildren allow to get any object from the selected components context.
+	 * In order to use it you need to specify second argument in the query,
+	 * which is 'read' e.g.
+	 * @ContentChildren(SimpleComponent, {read: ElementRef})
+	 * Argument read allows to get any object from the components injector.
 	 */
-	describe ('read -', () => {
+	describe('read -', () => {
+
+		class Service {
+		}
+
+		@Component({
+			selector: 'read-comp',
+			template: ``,
+			providers: [
+				Service
+			]
+		})
+		class ReadComponent {
+		}
 
 		@Component({
 			selector: 'content-children',
@@ -472,50 +503,30 @@ describe('ContentChildren -', () => {
 		class ContentChildrenComponent {
 
 			/**
-			 * component references
+			 * read default
 			 */
-			@ContentChildren(SimpleComponent)
-			compRefs: QueryList<SimpleComponent>;
+			@ContentChildren(ReadComponent)
+			compQL: QueryList<ReadComponent>;
 
 			/**
-			 * component references as ElementRefs
+			 * read service
 			 */
-			@ContentChildren(SimpleComponent, {read: ElementRef})
-			compAsElementRefs: QueryList<ElementRef>;
+			@ContentChildren(ReadComponent, {read: Service})
+			serviceQL: QueryList<Service>;
 
 			/**
-			 * component references as ElementRefs
+			 * read native objects
 			 */
-			@ContentChildren(SimpleComponent, {read: TemplateRef})
-			compAsTempRefs: QueryList<TemplateRef<any>>;
-
-			/**
-			 * component references as ViewContainerRef
-			 */
-			@ContentChildren(SimpleComponent, {read: ViewContainerRef})
-			compAsVcrs: QueryList<ViewContainerRef>;
-
-			/**
-			 * component references by template variable
-			 */
-			@ContentChildren('compOne')
-			compByTemplVarRefs: QueryList<SimpleComponent>;
+			@ContentChildren(ReadComponent, {read: ElementRef})
+			elRefQL: QueryList<Service>;
 		}
 
 		@Component({
-			selector: 'test',
 			template: `
-
 				<content-children>
-
-					<simple #compOne [value]="'#1'" >
-					</simple>
-
-					<simple #compTwo [value]="'#2'" >
-					</simple>
-
+					<read-comp></read-comp>
+					<read-comp></read-comp>
 				</content-children>
-
 			`
 		})
 		class TestComponent {
@@ -523,330 +534,71 @@ describe('ContentChildren -', () => {
 			compRef: ContentChildrenComponent;
 		}
 
+		let compIntance: any;
+
 		beforeEach(() => {
-			TestBed.configureTestingModule({
-				declarations: [
-					SimpleComponent,
-					ContentChildrenComponent,
-					TestComponent
-				]
+			TestBed
+				.configureTestingModule({
+					declarations: [
+						ReadComponent,
+						ContentChildrenComponent,
+						TestComponent
+					]
+				});
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent);
+			compIntance = fixture.componentInstance;
+
+			// when
+			fixture.detectChanges();
+		});
+
+
+		it('should read selector component', () => {
+
+			// then
+			const compRefs = compIntance.compRef.compQL.toArray();
+
+			expect(compRefs.length).toBe(2);
+			compRefs.forEach((compRef: ReadComponent) => {
+				expect(compRef instanceof ReadComponent).toBeTruthy();
 			});
 		});
 
-		it ('should get component as different objects', () => {
-
-			// given
-			const fixture = TestBed.createComponent(TestComponent),
-				compInstance = fixture.componentInstance;
-
-			// when
-			fixture.detectChanges();
-
-			// then
-			let compRefs = compInstance.compRef.compRefs.toArray();
-			expect(compRefs.length).toEqual(2);
-			expect(compRefs[0] instanceof SimpleComponent).toBe(true, 'componentRef as componentRef'); // TRUE
-
-			let compAsElemRefs = compInstance.compRef.compAsElementRefs.toArray();
-			expect(compAsElemRefs.length).toEqual(2);
-			expect(compAsElemRefs[0] instanceof ElementRef).toBe(true, 'componentRef as ElementRef'); // TRUE
-
-			let compAsTempRefs = compInstance.compRef.compAsTempRefs.toArray();
-			expect(compAsTempRefs.length).toEqual(2);
-			expect(compAsTempRefs[0] instanceof TemplateRef).toBe(false, 'componentRef as TemplateRef'); // FALSE
-
-			let compAsVcrs = compInstance.compRef.compAsVcrs.toArray();
-			expect(compAsVcrs.length).toEqual(2);
-			expect(isViewContainerRef(compAsVcrs[0])).toBe(true, 'componentRef as ViewContainerRef'); // TRUE
-		});
-
 		/**
-		 * @ContentChildren allows to get reference to a component by template variable
+		 * Read allows to get any object from injector context, even service
 		 */
-		it ('should be possible to get reference by template variable', () => {
-			// given
-			const fixture = TestBed.createComponent(TestComponent),
-				compInstance = fixture.componentInstance;
-
-			// when
-			fixture.detectChanges();
+		it('should read service from components injector', () => {
 
 			// then
-			let compByTemplVarRefs = compInstance.compRef.compByTemplVarRefs.toArray();
-			expect(compByTemplVarRefs.length).toEqual(1);
-			expect(compByTemplVarRefs[0].value).toEqual('#1');
-			expect(compByTemplVarRefs[0] instanceof SimpleComponent).toBe(true, 'componentRef as componentRef'); // TRUE
-		});
+			const services = compIntance.compRef.serviceQL.toArray();
 
-	});
-
-	/**
-	 * @ContentChildren allows to get reference to multiple instances of directives
-	 */
-	describe ('directive -', () => {
-
-		@Directive({
-			selector: '[propDir]',
-			exportAs: 'propDir'
-		})
-		class PropDirective {
-			@Input('propDir')
-			value: string;
-		}
-
-		@Component({
-			selector: 'content-children-for-directive',
-			template: ``
-		})
-		class ContentChildrenForDirectiveComponent {
-
-			/**
-			 * directive references
-			 */
-			@ContentChildren(PropDirective)
-			dirRefs: QueryList<PropDirective>;
-
-			/**
-			 * directive references as ElementRefs
-			 */
-			@ContentChildren(SimpleComponent, {read: ElementRef})
-			dirAsElementRefs: QueryList<ElementRef>;
-
-			/**
-			 * directive references as ElementRefs
-			 */
-			@ContentChildren(SimpleComponent, {read: TemplateRef})
-			dirAsTempRefs: QueryList<TemplateRef<any>>;
-
-			/**
-			 * directive references as ViewContainerRef
-			 */
-			@ContentChildren(SimpleComponent, {read: ViewContainerRef})
-			dirAsVcrs: QueryList<ViewContainerRef>;
-
-			/**
-			 * directive references by template variable
-			 */
-			@ContentChildren('dirOne')
-			dirByTemplVarRefs: QueryList<SimpleComponent>;
-		}
-
-		@Component({
-			selector: 'test',
-			template: `
-
-				<content-children-for-directive>
-					<p #dirOne="propDir" [propDir]="'#1'" ></p>
-					<p #dirTwo="propDir" [propDir]="'#2'" ></p>
-					<p #dirThree="propDir" [propDir]="'#3'" ></p>
-				</content-children-for-directive>
-
-			`
-		})
-		class TestComponent {
-			@ViewChild(ContentChildrenForDirectiveComponent)
-			compRef: ContentChildrenForDirectiveComponent;
-		}
-
-		beforeEach(() => {
-			TestBed.configureTestingModule({
-				declarations: [
-					PropDirective,
-					ContentChildrenForDirectiveComponent,
-					TestComponent
-				]
+			expect(services.length).toBe(2);
+			services.forEach((service: Service) => {
+				expect(service instanceof Service).toBeTruthy();
 			});
 		});
 
-		it ('should get reference to a directive', () => {
-
-			// given
-			const fixture = TestBed.createComponent(TestComponent),
-				compInstance = fixture.componentInstance;
-
-			// when
-			fixture.detectChanges();
-
-			// then
-			let propDirectivesRefs = compInstance.compRef.dirRefs.toArray();
-
-			expect(propDirectivesRefs.length).toEqual(3);
-			expect(propDirectivesRefs[0].value).toEqual('#1');
-			expect(propDirectivesRefs[1].value).toEqual('#2');
-			expect(propDirectivesRefs[2].value).toEqual('#3');
-			expect(propDirectivesRefs[0] instanceof PropDirective).toBe(true, 'directiveRef as directiveRef'); // TRUE
-		});
-
 		/**
-		 * When you want to get reference to a directive by @ContentChildren, you cannot use read option. It doesn't work.
+		 * Native objects like: ElementRef, ViewContainerRef, etc.
 		 */
-		it ('shouldn\'t be possible to use read parameter with directive', () => {
-
-			// given
-			const fixture = TestBed.createComponent(TestComponent),
-				compInstance = fixture.componentInstance;
-
-			// when
-			fixture.detectChanges();
+		it('should read native objects from components injector', () => {
 
 			// then
-			let dirAsElementRefs = compInstance.compRef.dirAsElementRefs.toArray();
-			expect(dirAsElementRefs.length).toEqual(0);
-			expect(dirAsElementRefs[0] instanceof ElementRef).toBe(false, 'directiveRef as ElementRef'); // FALSE
+			const elRefs = compIntance.compRef.elRefQL.toArray();
 
-			let dirAsTempRefs = compInstance.compRef.dirAsTempRefs.toArray();
-			expect(dirAsTempRefs.length).toEqual(0);
-			expect(dirAsTempRefs[0] instanceof TemplateRef).toBe(false, 'directiveRef as TemplateRef'); // FALSE
-
-			let dirAsVcrs = compInstance.compRef.dirAsVcrs.toArray();
-			expect(dirAsVcrs.length).toEqual(0);
-			expect(isViewContainerRef(dirAsVcrs[0])).toBe(false, 'directiveRef as ViewContainerRef'); // FALSE
-		});
-
-		/**
-		 * @ContentChildren allows to get reference to a directive by template variable
-		 */
-		it ('should be possible to get reference by template variable', () => {
-			// given
-			const fixture = TestBed.createComponent(TestComponent),
-				compInstance = fixture.componentInstance;
-
-			// when
-			fixture.detectChanges();
-
-			// then
-			let dirByTemplVarRefs = compInstance.compRef.dirByTemplVarRefs.toArray();
-			expect(dirByTemplVarRefs.length).toEqual(1);
-			expect(dirByTemplVarRefs[0].value).toEqual('#1');
-			expect(dirByTemplVarRefs[0] instanceof PropDirective).toBe(true, 'directiveRef as directiveRef'); // TRUE
-		});
-
-	});
-
-	/**
-	 * @ContentChildren allows to get different types when referencing a template
-	 */
-	describe ('read ng-template -', () => {
-
-		@Component({
-			selector: 'content-children',
-			template: ``
-		})
-		class ContentChildrenComponent {
-
-			/**
-			 * ng-template references
-			 */
-			@ContentChildren(TemplateRef)
-			templRefs: QueryList<TemplateRef<any>>;
-
-			/**
-			 * ng-template references as ElementRefs
-			 */
-			@ContentChildren(TemplateRef, {read: ElementRef})
-			templAsElementRefs: QueryList<ElementRef>;
-
-			/**
-			 * ng-template references as ElementRefs
-			 */
-			@ContentChildren(TemplateRef, {read: SimpleComponent})
-			templAsCompRefs: QueryList<SimpleComponent>;
-
-			/**
-			 * ng-template references as ViewContainerRef
-			 */
-			@ContentChildren(TemplateRef, {read: ViewContainerRef})
-			templAsVcrs: QueryList<ViewContainerRef>;
-
-			/**
-			 * component references by template variable
-			 */
-			@ContentChildren('templOne')
-			templByTemplVarRefs: QueryList<SimpleComponent>;
-		}
-
-		@Component({
-			selector: 'test',
-			template: `
-
-				<content-children>
-
-					<ng-template #templOne >
-					</ng-template>
-
-					<ng-template #templTwo >
-					</ng-template>
-
-				</content-children>
-
-			`
-		})
-		class TestComponent {
-			@ViewChild(ContentChildrenComponent)
-			compRef: ContentChildrenComponent;
-		}
-
-		beforeEach(() => {
-			TestBed.configureTestingModule({
-				declarations: [
-					SimpleComponent,
-					ContentChildrenComponent,
-					TestComponent
-				]
+			expect(elRefs.length).toBe(2);
+			elRefs.forEach((elRef: ElementRef) => {
+				expect(elRef instanceof ElementRef).toBeTruthy();
 			});
 		});
-
-		it ('should get template references as different objects', () => {
-
-			// given
-			const fixture = TestBed.createComponent(TestComponent),
-				compInstance = fixture.componentInstance;
-
-			// when
-			fixture.detectChanges();
-
-			// then
-			let templRefs = compInstance.compRef.templRefs.toArray();
-			expect(templRefs.length).toEqual(2);
-			expect(templRefs[0] instanceof TemplateRef).toBe(true, 'TemplateRef as TemplateRef'); // TRUE
-
-			let templAsElementRefs = compInstance.compRef.templAsElementRefs.toArray();
-			expect(templAsElementRefs.length).toEqual(2);
-			expect(templAsElementRefs[0] instanceof ElementRef).toBe(true, 'TemplateRef as ElementRef'); // TRUE
-
-			let templAsCompRefs = compInstance.compRef.templAsCompRefs.toArray();
-			expect(templAsCompRefs.length).toEqual(0);
-			expect(templAsCompRefs[0] instanceof SimpleComponent).toBe(false, 'TemplateRef as SimpleComponent'); // FALSE
-
-			let templAsVcrs = compInstance.compRef.templAsVcrs.toArray();
-			expect(templAsVcrs.length).toEqual(2);
-			expect(isViewContainerRef(templAsVcrs[0])).toBe(true, 'TemplateRef as ViewContainerRef'); // TRUE
-		});
-
-		/**
-		 * @ContentChildren allows to get reference to a template by template variable
-		 */
-		it ('should be possible to get reference to a template by template variable', () => {
-
-			// given
-			const fixture = TestBed.createComponent(TestComponent),
-				compInstance = fixture.componentInstance;
-
-			// when
-			fixture.detectChanges();
-
-			// then
-			let templByTemplVarRefs = compInstance.compRef.templByTemplVarRefs.toArray();
-			expect(templByTemplVarRefs.length).toEqual(1);
-			expect(templByTemplVarRefs[0] instanceof TemplateRef).toBe(true, 'TemplateRef as TemplateRef'); // TRUE
-		})
-
 	});
 
 	/**
 	 * @ContentChildren allows to read descendants
 	 */
-	describe ('descendants -', () => {
+	describe('descendants -', () => {
 
 		@Component({
 			selector: 'content-children-descendants',
@@ -873,11 +625,11 @@ describe('ContentChildren -', () => {
 
 				<content-children-descendants>
 
-					<simple [value]="'#1'" >
+					<simple [value]="'#1'">
 					</simple>
 
-					<simple [value]="'#2'" >
-						<simple [value]="'#3'" >#3</simple>
+					<simple [value]="'#2'">
+						<simple [value]="'#3'">#3</simple>
 					</simple>
 
 				</content-children-descendants>
@@ -899,7 +651,7 @@ describe('ContentChildren -', () => {
 			});
 		});
 
-		it ('should get content from first level - no descendants', () => {
+		it('should get content from first level - no descendants', () => {
 
 			// given
 			const fixture = TestBed.createComponent(TestComponent),
@@ -915,7 +667,7 @@ describe('ContentChildren -', () => {
 			expect(simpleCompRefs[1].value).toEqual('#2');
 		});
 
-		it ('should get all content children - with descendants', () => {
+		it('should get all content children - with descendants', () => {
 
 			// given
 			const fixture = TestBed.createComponent(TestComponent),
@@ -934,7 +686,7 @@ describe('ContentChildren -', () => {
 
 	});
 
-	describe ('QueryList changes -', () => {
+	describe('QueryList changes -', () => {
 
 		const simpleValue = 'Johny Bravo';
 
@@ -945,7 +697,7 @@ describe('ContentChildren -', () => {
 				<content-children>
 
 					<simple *ngIf="flag"
-							[value]="value" >
+							[value]="value">
 						value
 					</simple>
 
@@ -961,7 +713,8 @@ describe('ContentChildren -', () => {
 
 			value = simpleValue;
 
-			constructor(public changeDetectorRef: ChangeDetectorRef) {}
+			constructor(public changeDetectorRef: ChangeDetectorRef) {
+			}
 		}
 
 		beforeEach(() => {
@@ -978,7 +731,7 @@ describe('ContentChildren -', () => {
 		 * Changing reference to the content component referenced by @ContentChildren,
 		 * will trigger change.
 		 */
-		it ('should be possible to observe changes made in the content', () => {
+		it('should be possible to observe changes made in the content', () => {
 
 			// given
 			const fixture = TestBed.createComponent(TestComponent),
@@ -1010,7 +763,7 @@ describe('ContentChildren -', () => {
 		 * Changing value in the content component referenced by @ContentChildren,
 		 * will not trigger any changes.
 		 */
-		it ('is not possible to observe value changes made in the content', () => {
+		it('is not possible to observe value changes made in the content', () => {
 
 			// given
 			const fixture = TestBed.createComponent(TestComponent),
@@ -1034,6 +787,393 @@ describe('ContentChildren -', () => {
 			// then
 			expect(simpleCompRefs.length).toEqual(0);
 		});
+	});
+
+	describe('common examples -', () => {
+
+		/**
+		 * @ContentChildren allows to get different types when referencing a component
+		 */
+		describe('read -', () => {
+
+			@Component({
+				selector: 'content-children',
+				template: ``
+			})
+			class ContentChildrenComponent {
+
+				/**
+				 * component references
+				 */
+				@ContentChildren(SimpleComponent)
+				compRefs: QueryList<SimpleComponent>;
+
+				/**
+				 * component references as ElementRefs
+				 */
+				@ContentChildren(SimpleComponent, {read: ElementRef})
+				compAsElementRefs: QueryList<ElementRef>;
+
+				/**
+				 * component references as ElementRefs
+				 */
+				@ContentChildren(SimpleComponent, {read: TemplateRef})
+				compAsTempRefs: QueryList<TemplateRef<any>>;
+
+				/**
+				 * component references as ViewContainerRef
+				 */
+				@ContentChildren(SimpleComponent, {read: ViewContainerRef})
+				compAsVcrs: QueryList<ViewContainerRef>;
+
+				/**
+				 * component references by template variable
+				 */
+				@ContentChildren('compOne')
+				compByTemplVarRefs: QueryList<SimpleComponent>;
+			}
+
+			@Component({
+				selector: 'test',
+				template: `
+
+					<content-children>
+
+						<simple #compOne [value]="'#1'">
+						</simple>
+
+						<simple #compTwo [value]="'#2'">
+						</simple>
+
+					</content-children>
+
+				`
+			})
+			class TestComponent {
+				@ViewChild(ContentChildrenComponent)
+				compRef: ContentChildrenComponent;
+			}
+
+			beforeEach(() => {
+				TestBed.configureTestingModule({
+					declarations: [
+						SimpleComponent,
+						ContentChildrenComponent,
+						TestComponent
+					]
+				});
+			});
+
+			it('should get component as different objects', () => {
+
+				// given
+				const fixture = TestBed.createComponent(TestComponent),
+					compInstance = fixture.componentInstance;
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				let compRefs = compInstance.compRef.compRefs.toArray();
+				expect(compRefs.length).toEqual(2);
+				expect(compRefs[0] instanceof SimpleComponent).toBe(true, 'componentRef as componentRef'); // TRUE
+
+				let compAsElemRefs = compInstance.compRef.compAsElementRefs.toArray();
+				expect(compAsElemRefs.length).toEqual(2);
+				expect(compAsElemRefs[0] instanceof ElementRef).toBe(true, 'componentRef as ElementRef'); // TRUE
+
+				let compAsTempRefs = compInstance.compRef.compAsTempRefs.toArray();
+				expect(compAsTempRefs.length).toEqual(2);
+				expect(compAsTempRefs[0] instanceof TemplateRef).toBe(false, 'componentRef as TemplateRef'); // FALSE
+
+				let compAsVcrs = compInstance.compRef.compAsVcrs.toArray();
+				expect(compAsVcrs.length).toEqual(2);
+				expect(isViewContainerRef(compAsVcrs[0])).toBe(true, 'componentRef as ViewContainerRef'); // TRUE
+			});
+
+			/**
+			 * @ContentChildren allows to get reference to a component by template variable
+			 */
+			it('should be possible to get reference by template variable', () => {
+				// given
+				const fixture = TestBed.createComponent(TestComponent),
+					compInstance = fixture.componentInstance;
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				let compByTemplVarRefs = compInstance.compRef.compByTemplVarRefs.toArray();
+				expect(compByTemplVarRefs.length).toEqual(1);
+				expect(compByTemplVarRefs[0].value).toEqual('#1');
+				expect(compByTemplVarRefs[0] instanceof SimpleComponent).toBe(true, 'componentRef as componentRef'); // TRUE
+			});
+
+		});
+
+		/**
+		 * @ContentChildren allows to get reference to multiple instances of directives
+		 */
+		describe('directive -', () => {
+
+			@Directive({
+				selector: '[propDir]',
+				exportAs: 'propDir'
+			})
+			class PropDirective {
+				@Input('propDir')
+				value: string;
+			}
+
+			@Component({
+				selector: 'content-children-for-directive',
+				template: ``
+			})
+			class ContentChildrenForDirectiveComponent {
+
+				/**
+				 * directive references
+				 */
+				@ContentChildren(PropDirective)
+				dirRefs: QueryList<PropDirective>;
+
+				/**
+				 * directive references as ElementRefs
+				 */
+				@ContentChildren(SimpleComponent, {read: ElementRef})
+				dirAsElementRefs: QueryList<ElementRef>;
+
+				/**
+				 * directive references as ElementRefs
+				 */
+				@ContentChildren(SimpleComponent, {read: TemplateRef})
+				dirAsTempRefs: QueryList<TemplateRef<any>>;
+
+				/**
+				 * directive references as ViewContainerRef
+				 */
+				@ContentChildren(SimpleComponent, {read: ViewContainerRef})
+				dirAsVcrs: QueryList<ViewContainerRef>;
+
+				/**
+				 * directive references by template variable
+				 */
+				@ContentChildren('dirOne')
+				dirByTemplVarRefs: QueryList<SimpleComponent>;
+			}
+
+			@Component({
+				selector: 'test',
+				template: `
+
+					<content-children-for-directive>
+						<p #dirOne="propDir" [propDir]="'#1'"></p>
+						<p #dirTwo="propDir" [propDir]="'#2'"></p>
+						<p #dirThree="propDir" [propDir]="'#3'"></p>
+					</content-children-for-directive>
+
+				`
+			})
+			class TestComponent {
+				@ViewChild(ContentChildrenForDirectiveComponent)
+				compRef: ContentChildrenForDirectiveComponent;
+			}
+
+			beforeEach(() => {
+				TestBed.configureTestingModule({
+					declarations: [
+						PropDirective,
+						ContentChildrenForDirectiveComponent,
+						TestComponent
+					]
+				});
+			});
+
+			it('should get reference to a directive', () => {
+
+				// given
+				const fixture = TestBed.createComponent(TestComponent),
+					compInstance = fixture.componentInstance;
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				let propDirectivesRefs = compInstance.compRef.dirRefs.toArray();
+
+				expect(propDirectivesRefs.length).toEqual(3);
+				expect(propDirectivesRefs[0].value).toEqual('#1');
+				expect(propDirectivesRefs[1].value).toEqual('#2');
+				expect(propDirectivesRefs[2].value).toEqual('#3');
+				expect(propDirectivesRefs[0] instanceof PropDirective).toBe(true, 'directiveRef as directiveRef'); // TRUE
+			});
+
+			/**
+			 * When you want to get reference to a directive by @ContentChildren, you cannot use read option. It doesn't work.
+			 */
+			it('shouldn\'t be possible to use read parameter with directive', () => {
+
+				// given
+				const fixture = TestBed.createComponent(TestComponent),
+					compInstance = fixture.componentInstance;
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				let dirAsElementRefs = compInstance.compRef.dirAsElementRefs.toArray();
+				expect(dirAsElementRefs.length).toEqual(0);
+				expect(dirAsElementRefs[0] instanceof ElementRef).toBe(false, 'directiveRef as ElementRef'); // FALSE
+
+				let dirAsTempRefs = compInstance.compRef.dirAsTempRefs.toArray();
+				expect(dirAsTempRefs.length).toEqual(0);
+				expect(dirAsTempRefs[0] instanceof TemplateRef).toBe(false, 'directiveRef as TemplateRef'); // FALSE
+
+				let dirAsVcrs = compInstance.compRef.dirAsVcrs.toArray();
+				expect(dirAsVcrs.length).toEqual(0);
+				expect(isViewContainerRef(dirAsVcrs[0])).toBe(false, 'directiveRef as ViewContainerRef'); // FALSE
+			});
+
+			/**
+			 * @ContentChildren allows to get reference to a directive by template variable
+			 */
+			it('should be possible to get reference by template variable', () => {
+				// given
+				const fixture = TestBed.createComponent(TestComponent),
+					compInstance = fixture.componentInstance;
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				let dirByTemplVarRefs = compInstance.compRef.dirByTemplVarRefs.toArray();
+				expect(dirByTemplVarRefs.length).toEqual(1);
+				expect(dirByTemplVarRefs[0].value).toEqual('#1');
+				expect(dirByTemplVarRefs[0] instanceof PropDirective).toBe(true, 'directiveRef as directiveRef'); // TRUE
+			});
+
+		});
+
+		/**
+		 * @ContentChildren allows to get different types when referencing a template
+		 */
+		describe('read ng-template -', () => {
+
+			@Component({
+				selector: 'content-children',
+				template: ``
+			})
+			class ContentChildrenComponent {
+
+				/**
+				 * ng-template references
+				 */
+				@ContentChildren(TemplateRef)
+				templRefs: QueryList<TemplateRef<any>>;
+
+				/**
+				 * ng-template references as ElementRefs
+				 */
+				@ContentChildren(TemplateRef, {read: ElementRef})
+				templAsElementRefs: QueryList<ElementRef>;
+
+				/**
+				 * ng-template references as ElementRefs
+				 */
+				@ContentChildren(TemplateRef, {read: SimpleComponent})
+				templAsCompRefs: QueryList<SimpleComponent>;
+
+				/**
+				 * ng-template references as ViewContainerRef
+				 */
+				@ContentChildren(TemplateRef, {read: ViewContainerRef})
+				templAsVcrs: QueryList<ViewContainerRef>;
+
+				/**
+				 * component references by template variable
+				 */
+				@ContentChildren('templOne')
+				templByTemplVarRefs: QueryList<SimpleComponent>;
+			}
+
+			@Component({
+				selector: 'test',
+				template: `
+
+					<content-children>
+
+						<ng-template #templOne>
+						</ng-template>
+
+						<ng-template #templTwo>
+						</ng-template>
+
+					</content-children>
+
+				`
+			})
+			class TestComponent {
+				@ViewChild(ContentChildrenComponent)
+				compRef: ContentChildrenComponent;
+			}
+
+			beforeEach(() => {
+				TestBed.configureTestingModule({
+					declarations: [
+						SimpleComponent,
+						ContentChildrenComponent,
+						TestComponent
+					]
+				});
+			});
+
+			it('should get template references as different objects', () => {
+
+				// given
+				const fixture = TestBed.createComponent(TestComponent),
+					compInstance = fixture.componentInstance;
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				let templRefs = compInstance.compRef.templRefs.toArray();
+				expect(templRefs.length).toEqual(2);
+				expect(templRefs[0] instanceof TemplateRef).toBe(true, 'TemplateRef as TemplateRef'); // TRUE
+
+				let templAsElementRefs = compInstance.compRef.templAsElementRefs.toArray();
+				expect(templAsElementRefs.length).toEqual(2);
+				expect(templAsElementRefs[0] instanceof ElementRef).toBe(true, 'TemplateRef as ElementRef'); // TRUE
+
+				let templAsCompRefs = compInstance.compRef.templAsCompRefs.toArray();
+				expect(templAsCompRefs.length).toEqual(0);
+				expect(templAsCompRefs[0] instanceof SimpleComponent).toBe(false, 'TemplateRef as SimpleComponent'); // FALSE
+
+				let templAsVcrs = compInstance.compRef.templAsVcrs.toArray();
+				expect(templAsVcrs.length).toEqual(2);
+				expect(isViewContainerRef(templAsVcrs[0])).toBe(true, 'TemplateRef as ViewContainerRef'); // TRUE
+			});
+
+			/**
+			 * @ContentChildren allows to get reference to a template by template variable
+			 */
+			it('should be possible to get reference to a template by template variable', () => {
+
+				// given
+				const fixture = TestBed.createComponent(TestComponent),
+					compInstance = fixture.componentInstance;
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				let templByTemplVarRefs = compInstance.compRef.templByTemplVarRefs.toArray();
+				expect(templByTemplVarRefs.length).toEqual(1);
+				expect(templByTemplVarRefs[0] instanceof TemplateRef).toBe(true, 'TemplateRef as TemplateRef'); // TRUE
+			})
+
+		});
+
 	});
 
 });
