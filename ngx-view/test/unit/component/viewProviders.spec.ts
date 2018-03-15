@@ -69,7 +69,6 @@ describe('Component -', () => {
 			// then
 			expect(fixture.componentInstance.viewProvidersService.value).toEqual(givenTitle, 'ViewProvidersService parent injector');
 			expect(fixture.componentInstance.childRef.viewProvidersService.value).toEqual(givenTitle, 'ViewProvidersService child injector');
-
 		});
 
 	});
@@ -135,13 +134,12 @@ describe('Component -', () => {
 			// then
 			const parent = fixture.componentInstance.compRef;
 
-			// expect(true).toBe(false)
 			expect(parent.providersService.value).toBe(givenTitle);
 			expect(parent.viewProvidersService.value).toBe(givenTitle);
 		});
 
 		/**
-		 * ContentChild component shouldn't have access to the services provided in the viewProviders.
+		 * Projected component shouldn't have access to the services provided in the viewProviders.
 		 */
 		it ('should not be possible to access viewProviders from projected content', () => {
 
@@ -157,7 +155,6 @@ describe('Component -', () => {
 			expect(child.providersService.value).toEqual(givenTitle);
 			expect(child.viewProvidersService).toBeNull();
 		});
-
 
 	});
 

@@ -165,6 +165,12 @@ describe('ContentChildren -', () => {
 				 */
 				@ContentChildren('selector')
 				templVariableQL: QueryList<SelectorDirective>;
+
+				/**
+				 * HTML tag as a selector (doesn't work)
+				 */
+				@ContentChildren('p')
+				pTagQL: QueryList<ElementRef>;
 			}
 
 			@Component({
@@ -178,6 +184,8 @@ describe('ContentChildren -', () => {
 						<ng-template selector-dir #selector></ng-template>
 
 						<ng-template></ng-template>
+
+						<p></p>
 
 					</content-children>
 				`
@@ -207,7 +215,7 @@ describe('ContentChildren -', () => {
 				fixture.detectChanges();
 			});
 
-			it('possible to use component as a selector', () => {
+			it('is possible to use component as a selector', () => {
 
 				// then
 				const compRefs = compInstance.compRef.compQL.toArray();
@@ -217,7 +225,7 @@ describe('ContentChildren -', () => {
 				});
 			});
 
-			it('possible to use directive as a selector', () => {
+			it('is possible to use directive as a selector', () => {
 
 				// then
 				const dirRefs = compInstance.compRef.dirQL.toArray();
@@ -230,7 +238,7 @@ describe('ContentChildren -', () => {
 			/**
 			 * TemplateRef selector allows to get reference to a <ng-template>.
 			 */
-			it('possible to use ng-template as a selector', () => {
+			it('is possible to use ng-template as a selector', () => {
 
 				// then
 				const templRefs = compInstance.compRef.templQL.toArray();
@@ -245,13 +253,23 @@ describe('ContentChildren -', () => {
 			 * with the same name. This way you can get references to multiple
 			 * components, like in the example below.
 			 */
-			it('possible to use template variables as a selector', () => {
+			it('is possible to use template variables as a selector', () => {
 
 				// then
 				const templVariableRefs = compInstance.compRef.templVariableQL.toArray();
 				expect(templVariableRefs.length).toBe(2);
 				expect(templVariableRefs[0] instanceof SelectorComponent).toBe(true, 'SelectorComponent as a selector');
 				expect(templVariableRefs[1] instanceof TemplateRef).toBe(true, 'template variable as a selector');
+			});
+
+			/**
+			 * Doesn't work
+			 */
+			it('isn\'t possible to use HTML tag as a selector', () => {
+
+				// then
+				const pTagRefs = compInstance.compRef.pTagQL.toArray();
+				expect(pTagRefs.length).toBe(0);
 			});
 		});
 
