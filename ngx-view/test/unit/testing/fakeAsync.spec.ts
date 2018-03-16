@@ -1,6 +1,5 @@
 import { fakeAsync, flush, flushMicrotasks, tick } from '@angular/core/testing';
 
-
 /**
  * Different method should be used to resolve / finish micro & macro tasks
  *
@@ -38,37 +37,81 @@ describe('Function fakeAsync -', () => {
 		}
 
 		/**
-		 * setTimeout runs after 10 sec, so tick(9) is not enough
+		 * The one way to drain macrotask queue is to use tick.
 		 */
-		it ('should not run setTimeout', fakeAsync(() => {
+		describe('tick -', () => {
 
-			// given
-			timerFinished = false;
+			/**
+			 * setTimeout runs after 10 sec, so tick(9) is not enough
+			 */
+			it ('should not run setTimeout', fakeAsync(() => {
 
-			// when
-			startTimer();
-			tick(9);
+				// given
+				timerFinished = false;
 
-			// then
-			expect(timerFinished).not.toBeTruthy();
-			flush();
-		}));
+				// when
+				startTimer();
+				tick(9);
+
+				// then
+				expect(timerFinished).not.toBeTruthy();
+				clearTimeout(timer);
+			}));
+
+			/**
+			 * tick(10) is enough time for setTimeout to finish
+			 */
+			it ('should finish timer in setTimeout', fakeAsync(() => {
+
+				// given
+				timerFinished = false;
+
+				// when
+				startTimer();
+				tick(10);
+
+				// then
+				expect(timerFinished).toBeTruthy();
+			}));
+
+		});
 
 		/**
-		 * tick(10) is enough time for setTimeout to finish
+		 * The second way of draining macrotask queue is flush(),
+		 * which resolves all tasks from macrotask queue
 		 */
-		it ('should finish timer in setTimeout', fakeAsync(() => {
+		describe('flush -', () => {
 
-			// given
-			timerFinished = false;
+			it ('should not run setTimeout', fakeAsync(() => {
 
-			// when
-			startTimer();
-			tick(10);
+				// given
+				timerFinished = false;
 
-			// then
-			expect(timerFinished).toBeTruthy();
-		}));
+				// when
+				startTimer();
+
+				// then
+				expect(timerFinished).not.toBeTruthy();
+				clearTimeout(timer);
+			}));
+
+			/**
+			 * flush resolves setTimeout task
+			 */
+			it ('should finish timer in setTimeout', fakeAsync(() => {
+
+				// given
+				timerFinished = false;
+
+				// when
+				startTimer();
+				flush();
+
+				// then
+				expect(timerFinished).toBeTruthy();
+			}));
+
+		});
 
 	});
 
