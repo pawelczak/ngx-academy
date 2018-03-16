@@ -12,37 +12,49 @@ describe('Function fakeAsync -', () => {
 		});
 	};
 
-	/**
-	 * setTimeout runs after 10 sec, so tick(9) is not enough
-	 */
-	it ('should not resolve promise', fakeAsync(() => {
+	describe('timer', () => {
 
-		// given
-		let promiseFinished = false;
+		let timerFinished = false;
 
-		// when
-		promise().then(() => promiseFinished = true);
-		tick(9);
+		function startTimer() {
+			timer = setTimeout(() => {
+				timerFinished = true;
+			}, 10);
+		}
 
-		// then
-		expect(promiseFinished).not.toBeTruthy();
-		clearTimeout(timer);
-	}));
+		/**
+		 * setTimeout runs after 10 sec, so tick(9) is not enough
+		 */
+		it ('should not run setTimeout', fakeAsync(() => {
 
-	/**
-	 * tick(10) is enough time for promise to resolve
-	 */
-	it ('should resolve promise', fakeAsync(() => {
+			// given
+			timerFinished = false;
 
-		// given
-		let promiseFinished = false;
+			// when
+			startTimer();
+			tick(9);
 
-		// when
-		promise().then(() => promiseFinished = true);
-		tick(10);
+			// then
+			expect(timerFinished).not.toBeTruthy();
+			clearTimeout(timer);
+		}));
 
-		// then
-		expect(promiseFinished).toBeTruthy();
-	}));
+		/**
+		 * tick(10) is enough time for setTimeout to finish
+		 */
+		it ('should finish timer in setTimeout', fakeAsync(() => {
+
+			// given
+			timerFinished = false;
+
+			// when
+			startTimer();
+			tick(10);
+
+			// then
+			expect(timerFinished).toBeTruthy();
+		}));
+
+	});
 
 });
