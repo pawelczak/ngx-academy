@@ -1,20 +1,35 @@
-import { fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
+import { fakeAsync, flush, flushMicrotasks, tick } from '@angular/core/testing';
 
 
+/**
+ * Different method should be used to resolve / finish micro & macro tasks
+ *
+ * Macrotasks:
+ * - setTimeout,
+ * - setInterval,
+ * - setImmediate,
+ * - requestAnimationFrame,
+ * - I/O,
+ * - UI rendering
+ *
+ * Microtasks:
+ * - Promises,
+ * - process.nextTick,
+ * - Object.observe,
+ * - MutationObserver
+ *
+ */
 describe('Function fakeAsync -', () => {
 
-	let timer: any;
-	let promise = () => {
-		return new Promise((resolve) => {
-			timer = setTimeout(() => {
-						resolve();
-					}, 10);
-		});
-	};
-
-	describe('timer', () => {
+	/**
+	 * Function setTimeout puts task to do in micro task queue,
+	 * it also represents a macrotask
+	 *
+	 */
+	describe('setTimeout -', () => {
 
 		let timerFinished = false;
+		let timer: any;
 
 		function startTimer() {
 			timer = setTimeout(() => {
@@ -36,7 +51,7 @@ describe('Function fakeAsync -', () => {
 
 			// then
 			expect(timerFinished).not.toBeTruthy();
-			clearTimeout(timer);
+			flush();
 		}));
 
 		/**
@@ -53,6 +68,42 @@ describe('Function fakeAsync -', () => {
 
 			// then
 			expect(timerFinished).toBeTruthy();
+		}));
+
+	});
+
+	/**
+	 * Promise is representation of microtask
+	 */
+	describe('Promise -', () => {
+
+		let promiseFinised = false;
+
+		let promise = Promise.resolve(true);
+
+		it('should not resolve by itself', fakeAsync(() => {
+
+			// given
+			promiseFinised = false;
+
+			// when
+			promise.then(() => promiseFinised = true);
+
+			// then
+			expect(promiseFinised).toBeFalsy();
+		}));
+
+		it('should be resolved with flushMicroTasks', fakeAsync(() => {
+
+			// given
+			promiseFinised = false;
+
+			// when
+			promise.then(() => promiseFinised = true);
+			flushMicrotasks();
+
+			// then
+			expect(promiseFinised).toBeTruthy();
 		}));
 
 	});
