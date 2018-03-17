@@ -1,8 +1,9 @@
 import {
+	AfterContentInit,
 	ChangeDetectorRef, Component, ContentChildren, Directive, ElementRef, InjectionToken, Input, QueryList, TemplateRef, ViewChild,
 	ViewContainerRef
 } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { isViewContainerRef } from '../helpers/matchers';
 
@@ -713,12 +714,9 @@ describe('ContentChildren -', () => {
 			template: `
 
 				<content-children>
-
 					<simple *ngIf="flag"
 							[value]="value">
-						value
 					</simple>
-
 				</content-children>
 
 			`
@@ -804,6 +802,128 @@ describe('ContentChildren -', () => {
 
 			// then
 			expect(simpleCompRefs.length).toEqual(0);
+		});
+
+
+		/**
+		 * Observe changes to a component with value and template.
+		 */
+		describe('complex changes -', () => {
+
+			const givenValue = 'Itachi Uchiha';
+
+			@Component({
+				selector: 'shifter',
+				template: ``
+			})
+			class ShifterComponent implements AfterContentInit {
+				@ContentChildren(TemplateRef)
+				templateQL: QueryList<TemplateRef<any>>;
+
+				@Input()
+				value: string;
+
+				templates: Array<TemplateRef<any>>;
+
+				ngAfterContentInit() {
+					this.updateTemplate();
+
+					this.templateQL
+						.changes
+						.subscribe(() => {
+							this.updateTemplate();
+						});
+				}
+
+				private updateTemplate(): void {
+					this.templates = this.templateQL.toArray();
+				}
+			}
+
+			@Component({
+				selector: 'parent-shifter',
+				template: ``
+			})
+			class ParentShifterComponent implements AfterContentInit {
+				@ContentChildren(ShifterComponent)
+				shifterQL: QueryList<ShifterComponent>;
+
+				shifters: Array<ShifterComponent>;
+
+				ngAfterContentInit() {
+					this.updateShifter();
+
+					this.shifterQL
+						.changes
+						.subscribe(() => {
+							this.updateShifter();
+						});
+				}
+
+				private updateShifter(): void {
+					this.shifters = this.shifterQL.toArray();
+				}
+			}
+
+			@Component({
+				template: `
+				
+					<parent-shifter>
+						
+						<shifter [value]="value">
+							
+							<!-- Cannot use structural directives, like *ngIf -->
+							<ng-template [ngIf]="flag" ></ng-template>
+							
+						</shifter>
+						
+					</parent-shifter>
+					
+				`
+			})
+			class TestComponent {
+				@ViewChild(ParentShifterComponent)
+				parent: ParentShifterComponent;
+
+				@ViewChild(TemplateRef)
+				template: TemplateRef<any>;
+
+				value = givenValue;
+
+				flag = true;
+			}
+
+			let fixture: ComponentFixture<TestComponent>,
+				compInstance: TestComponent;
+
+			beforeEach(() => {
+				TestBed
+					.configureTestingModule({
+						declarations: [
+							ShifterComponent,
+							ParentShifterComponent,
+							TestComponent
+						]
+					});
+				fixture = TestBed.createComponent(TestComponent);
+				compInstance = fixture.componentInstance;
+			});
+
+			it('should get initial values of shifter component', () => {
+
+				fixture.detectChanges();
+
+				// then
+				const fixtureTemplate = [compInstance.template],
+					shifters = compInstance.parent.shifters;
+
+				expect(shifters.length).toBe(1);
+
+				shifters.forEach((shifter: ShifterComponent) => {
+					expect(shifter.value).toEqual(givenValue);
+					expect(shifter.templates).toEqual(fixtureTemplate);
+				});
+			});
 		});
 	});
 
