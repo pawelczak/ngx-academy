@@ -808,7 +808,7 @@ describe('ContentChildren -', () => {
 		/**
 		 * Observe changes to a component with value and template.
 		 */
-		describe('complex changes -', () => {
+		xdescribe('complex changes -', () => {
 
 			const givenValue = 'Itachi Uchiha';
 
@@ -831,6 +831,7 @@ describe('ContentChildren -', () => {
 					this.templateQL
 						.changes
 						.subscribe(() => {
+							console.log('abc');
 							this.updateTemplate();
 						});
 				}
@@ -856,6 +857,7 @@ describe('ContentChildren -', () => {
 					this.shifterQL
 						.changes
 						.subscribe(() => {
+
 							this.updateShifter();
 						});
 				}
@@ -870,10 +872,10 @@ describe('ContentChildren -', () => {
 				
 					<parent-shifter>
 						
-						<shifter [value]="value">
+						<shifter [value]="value" #container *ngIf="flag" >
 							
 							<!-- Cannot use structural directives, like *ngIf -->
-							<ng-template [ngIf]="flag" ></ng-template>
+							<ng-template></ng-template>
 							
 						</shifter>
 						
@@ -887,6 +889,9 @@ describe('ContentChildren -', () => {
 
 				@ViewChild(TemplateRef)
 				template: TemplateRef<any>;
+
+				@ViewChild('container', {read: ViewContainerRef})
+				container: ViewContainerRef;
 
 				value = givenValue;
 
@@ -922,6 +927,29 @@ describe('ContentChildren -', () => {
 				shifters.forEach((shifter: ShifterComponent) => {
 					expect(shifter.value).toEqual(givenValue);
 					expect(shifter.templates).toEqual(fixtureTemplate);
+				});
+			});
+
+			xit('should react to changes', () => {
+
+				//given
+				const newValue = 'Jiraiya';
+				fixture.detectChanges();
+
+				// when
+				compInstance.value = newValue;
+				compInstance.container.clear();
+
+				fixture.detectChanges();
+
+				// then
+				const shifters = compInstance.parent.shifters;
+
+				expect(shifters.length).toBe(1);
+
+				shifters.forEach((shifter: ShifterComponent) => {
+					expect(shifter.value).toEqual(newValue);
+					expect(shifter.templates.length).toEqual(0);
 				});
 			});
 		});
