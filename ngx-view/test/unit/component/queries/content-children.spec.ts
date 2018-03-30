@@ -883,6 +883,88 @@ describe('ContentChildren -', () => {
 
 		});
 
+		describe('ng-template -', () => {
+
+			@Component({
+				selector: 'content-template',
+				template: `
+					<ng-content></ng-content>
+				`
+			})
+			class ContentTemplateComponent {
+				@ContentChildren(TemplateRef)
+				templateQL: QueryList<TemplateRef<any>>;
+			}
+
+			@Component({
+				selector: 'test',
+				template: `
+					<content-template>
+						<ng-container #container></ng-container>
+					</content-template>
+
+					<ng-template #template>
+						<p>Samurai Jack</p>
+					</ng-template>
+				`
+			})
+			class TestComponent {
+				@ViewChild(ContentTemplateComponent)
+				compRef: ContentTemplateComponent;
+
+				@ViewChild('container', {read: ViewContainerRef})
+				compVCR: ViewContainerRef;
+
+				@ViewChild(TemplateRef)
+				templRef: TemplateRef<any>;
+
+				constructor(public changeDetectorRef: ChangeDetectorRef) {
+				}
+			}
+
+			let fixture: ComponentFixture<TestComponent>,
+				compInstance: TestComponent,
+				templateRefs: Array<TemplateRef<any>> = [];
+
+			beforeEach(() => {
+				TestBed.configureTestingModule({
+					declarations: [
+						ContentTemplateComponent,
+						TestComponent
+					]
+				});
+
+				// given
+				fixture = TestBed.createComponent(TestComponent);
+				compInstance = fixture.componentInstance;
+
+				// when
+				fixture.detectChanges();
+
+				compInstance.compRef.templateQL.changes.subscribe(() => {
+					templateRefs = compInstance.compRef.templateQL.toArray();
+				});
+
+				// then
+				expect(templateRefs.length).toEqual(0);
+			});
+
+			/**
+			 * It's not possible to trigger changes, when you observe ng-template
+			 * with ContentChildren.
+			 */
+			it('isn\'t possible to dynamically add ng-template', () => {
+
+				compInstance.compVCR.createEmbeddedView(compInstance.templRef);
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				expect(templateRefs.length).toEqual(0);
+			});
+		});
+
 
 		/**
 		 * Observe changes to a component with value and template.
