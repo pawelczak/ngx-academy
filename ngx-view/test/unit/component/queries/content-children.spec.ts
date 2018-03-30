@@ -705,103 +705,182 @@ describe('ContentChildren -', () => {
 
 	});
 
+	/**
+	 * Changing reference to observed components will trigger ContentChildren#changes.
+	 */
 	describe('QueryList changes -', () => {
 
-		const simpleValue = 'Johny Bravo';
+		describe('component - ngIf', () => {
 
-		@Component({
-			selector: 'test',
-			template: `
+			const simpleValue = 'Johnny Bravo';
 
-				<content-children>
-					<simple *ngIf="flag"
-							[value]="value">
-					</simple>
-				</content-children>
+			@Component({
+				selector: 'test',
+				template: `
+	
+					<content-children>
+						<simple *ngIf="flag"
+								[value]="value">
+						</simple>
+					</content-children>
+	
+				`
+			})
+			class TestComponent {
+				@ViewChild(ContentChildrenComponent)
+				compRef: ContentChildrenComponent;
 
-			`
-		})
-		class TestComponent {
-			@ViewChild(ContentChildrenComponent)
-			compRef: ContentChildrenComponent;
+				flag: boolean = true;
 
-			flag: boolean = true;
+				value = simpleValue;
 
-			value = simpleValue;
-
-			constructor(public changeDetectorRef: ChangeDetectorRef) {
+				constructor(public changeDetectorRef: ChangeDetectorRef) {
+				}
 			}
-		}
 
-		beforeEach(() => {
-			TestBed.configureTestingModule({
-				declarations: [
-					SimpleComponent,
-					ContentChildrenComponent,
-					TestComponent
-				]
-			});
-		});
+			let fixture: ComponentFixture<TestComponent>,
+				compInstance: TestComponent,
+				simpleCompRefs: Array<SimpleComponent> = [];
 
-		/**
-		 * Changing reference to the content component referenced by @ContentChildren,
-		 * will trigger change.
-		 */
-		it('should be possible to observe changes made in the content', () => {
+			beforeEach(() => {
+				TestBed.configureTestingModule({
+					declarations: [
+						SimpleComponent,
+						ContentChildrenComponent,
+						TestComponent
+					]
+				});
 
-			// given
-			const fixture = TestBed.createComponent(TestComponent),
+				// given
+				fixture = TestBed.createComponent(TestComponent);
 				compInstance = fixture.componentInstance;
 
-			let simpleCompRefs: Array<SimpleComponent> = [];
+				simpleCompRefs = [];
 
-			// when
-			compInstance.flag = false;
-			fixture.detectChanges();
+				// when
+				compInstance.flag = false;
+				fixture.detectChanges();
 
-			compInstance.compRef.simpleComponent.changes.subscribe(() => {
-				simpleCompRefs = compInstance.compRef.simpleComponent.toArray();
+				compInstance.compRef.simpleComponent.changes.subscribe(() => {
+					simpleCompRefs = compInstance.compRef.simpleComponent.toArray();
+				});
+
+				// then
+				expect(simpleCompRefs.length).toEqual(0);
 			});
 
-			// then
-			expect(simpleCompRefs.length).toEqual(0);
+			/**
+			 * Changing reference to the content component referenced by @ContentChildren,
+			 * will trigger change.
+			 */
+			it('should be possible to observe changes made in the content', () => {
 
-			// when
-			compInstance.flag = true;
-			fixture.detectChanges();
+				// when
+				compInstance.flag = true;
+				fixture.detectChanges();
 
-			// then
-			expect(simpleCompRefs.length).toEqual(1);
-			expect(simpleCompRefs[0].value).toEqual(simpleValue);
+				// then
+				expect(simpleCompRefs.length).toEqual(1);
+				expect(simpleCompRefs[0].value).toEqual(simpleValue);
+			});
+
+			/**
+			 * Changing value in the content component referenced by @ContentChildren,
+			 * will not trigger any changes.
+			 */
+			it('is not possible to observe value changes made in the content', () => {
+
+				// given
+				const newValue = 'Time Duncan';
+
+				// when
+				compInstance.value = newValue;
+				fixture.detectChanges();
+
+				// then
+				expect(simpleCompRefs.length).toEqual(0);
+			});
+
 		});
 
-		/**
-		 * Changing value in the content component referenced by @ContentChildren,
-		 * will not trigger any changes.
-		 */
-		it('is not possible to observe value changes made in the content', () => {
+		describe('component - ngFor', () => {
 
-			// given
-			const fixture = TestBed.createComponent(TestComponent),
-				compInstance = fixture.componentInstance,
-				newValue = 'Time Duncan';
+			const simpleValues = [
+				'Cow & Chicken',
+				'Dexter\'s Lab',
+				'I am Weasel',
+				'Johnny Bravo'
+			];
 
-			fixture.detectChanges();
+			@Component({
+				selector: 'test',
+				template: `
+	
+					<content-children>
+						<simple *ngFor="let value of values"
+								[value]="value">
+						</simple>
+					</content-children>
+	
+				`
+			})
+			class TestComponent {
+				@ViewChild(ContentChildrenComponent)
+				compRef: ContentChildrenComponent;
 
-			let simpleCompRefs: Array<SimpleComponent> = [];
+				values: Array<string> = [];
 
-			// when
-			compInstance.compRef.simpleComponent.changes.subscribe(() => {
-				simpleCompRefs = compInstance.compRef.simpleComponent.toArray();
+				constructor(public changeDetectorRef: ChangeDetectorRef) {
+				}
+			}
+
+			let fixture: ComponentFixture<TestComponent>,
+				compInstance: TestComponent,
+				simpleCompRefs: Array<SimpleComponent> = [];
+
+			beforeEach(() => {
+				TestBed.configureTestingModule({
+					declarations: [
+						SimpleComponent,
+						ContentChildrenComponent,
+						TestComponent
+					]
+				});
+
+				// given
+				fixture = TestBed.createComponent(TestComponent);
+				compInstance = fixture.componentInstance;
+
+				simpleCompRefs = [];
+
+				// when
+				fixture.detectChanges();
+
+				compInstance.compRef.simpleComponent.changes.subscribe(() => {
+					simpleCompRefs = compInstance.compRef.simpleComponent.toArray();
+				});
+
+				// then
+				expect(simpleCompRefs.length).toEqual(0);
 			});
-			fixture.detectChanges();
 
-			// when
-			compInstance.value = newValue;
-			fixture.detectChanges();
+			/**
+			 * Changing reference to the content component referenced by @ContentChildren,
+			 * will trigger change.
+			 */
+			it('should be possible to observe changes made in the content', () => {
 
-			// then
-			expect(simpleCompRefs.length).toEqual(0);
+				// when
+				compInstance.values = simpleValues; // changing reference to an array
+				fixture.detectChanges();
+
+				// then
+				expect(simpleCompRefs.length).toEqual(simpleValues.length);
+				simpleCompRefs.forEach((c: SimpleComponent, index: number) => {
+					expect(c.value).toEqual(simpleValues[index]);
+				});
+			});
+
 		});
 
 
