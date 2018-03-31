@@ -86,6 +86,56 @@ describe('StaticInjector -', () => {
 
 	});
 
+	describe('record creation -', () => {
+
+		let recordCreated = false;
+
+		class Record {
+			constructor() {
+				recordCreated = true;
+			}
+		}
+
+		let injector: Injector;
+
+		beforeEach(() => {
+			recordCreated = false;
+			injector = InjectorCreator.create();
+		});
+
+		it('should not create object before it is requested', () => {
+
+			// then
+			expect(recordCreated).toBeFalsy();
+		});
+
+		/**
+		 * When Record is a class, object from that class should be created
+		 * when the record is requested.
+		 */
+		it('should create object when it is requested', () => {
+
+			// when
+			injector.get(Record);
+
+			// then
+			expect(recordCreated).toBeTruthy();
+		});
+
+
+		class InjectorCreator {
+			static providers = [{
+				provide: Record,
+				useClass: Record,
+				deps: []
+			} as StaticProvider];
+
+			static create(): Injector {
+				return Injector.create({providers: InjectorCreator.providers});
+			}
+		}
+	});
+
 	/**
 	 * There is no public method to get all records from Injector.
 	 * Although there should be a couple of methods how to do that.
