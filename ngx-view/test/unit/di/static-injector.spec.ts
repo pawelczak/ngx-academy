@@ -5,6 +5,8 @@ describe('StaticInjector -', () => {
 
 	class Record {}
 
+	class OtherRecord {}
+
 	/**
 	 *
 	 * static create(options: {
@@ -33,6 +35,42 @@ describe('StaticInjector -', () => {
 			const record = injector.get(Record);
 
 			expect(record instanceof Record).toEqual(true);
+		});
+
+		it('should create Injector based on providers and parent injector', () => {
+
+			// given
+			const parentInjector = createParentInjector(),
+				providers = [{
+					provide: OtherRecord,
+					useClass: OtherRecord,
+					deps: []
+				} as StaticProvider],
+				expectedContext = `StaticInjector[Injector, OtherRecord]`;
+
+			// when
+			const injector = Injector.create({providers, parent: parentInjector});
+
+			// then
+			const records = (injector as any)._records;
+
+			expect(records.size).toBe(2);
+			expect(injector.toString()).toEqual(expectedContext);
+			expect(injector.get(OtherRecord)).toBeDefined();
+			expect(injector.get(Injector)).toBeDefined();
+
+			function createParentInjector(): Injector {
+				const parentProviders = [
+						{
+							provide: Record,
+							useClass: Record,
+							deps: []
+						} as StaticProvider
+					],
+					parentInjector = Injector.create({providers: parentProviders});
+
+				return parentInjector;
+			}
 		});
 
 		/**
@@ -130,7 +168,7 @@ describe('StaticInjector -', () => {
 				});
 
 				// when
-				expect(foundedRecords.size).toBe(3);
+				expect(foundedRecords.size).toBe(givenProviders.length + 1); // records + injector
 
 				/**
 				 * This method allows to get all the tokens and records from a injector.
