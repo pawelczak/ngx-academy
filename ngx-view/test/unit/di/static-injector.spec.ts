@@ -15,8 +15,6 @@ describe('StaticInjector -', () => {
 	 */
 	describe('create -', () => {
 
-
-
 		it('should be possible to create Injector with providers', () => {
 
 			// given
@@ -50,7 +48,6 @@ describe('StaticInjector -', () => {
 
 	});
 
-
 	/**
 	 * There is no public method to get all records from Injector.
 	 * Although there should be a couple of methods how to do that.
@@ -73,7 +70,7 @@ describe('StaticInjector -', () => {
 
 				// given
 				const injector = createInjectorWithRecords(),
-					foundRecords = new Map<any, any>();
+					foundedRecords = new Map<any, any>();
 
 				// when
 				let records = injector.toString();
@@ -87,14 +84,14 @@ describe('StaticInjector -', () => {
 					let record = injector.get(token, notFoundValue);
 
 					if (record !== notFoundValue) {
-						foundRecords.set(token, record);
+						foundedRecords.set(token, record);
 					}
 
 					expect(injector.get(token, notFoundValue)).toBeDefined();
 				});
 
-				expect(foundRecords.size).toBe(1);
-				expect(foundRecords.get('HERO')).toBeDefined();
+				expect(foundedRecords.size).toBe(1);
+				expect(foundedRecords.get('HERO')).toBeDefined();
 
 				/**
 				 * Conclusion
@@ -109,6 +106,36 @@ describe('StaticInjector -', () => {
 				return tokens;
 			}
 
+		});
+
+		/**
+		 * To get all records from a injector we can use the private property
+		 * on a injector object called '_records'. This property is a Map,
+		 * where key represents token and value it provider/record.
+		 */
+		describe('_records -', () => {
+
+			it ('should be possible to get records from private property _records', () => {
+
+				// given
+				const injector = createInjectorWithRecords(),
+					foundedRecords = new Map();
+
+				// when
+				(injector as any)._records.forEach((value: any, key: any) => {
+
+					let record = injector.get(key, foundedRecords);
+
+					foundedRecords.set(key, record);
+				});
+
+				// when
+				expect(foundedRecords.size).toBe(3);
+
+				/**
+				 * This method allows to get all the tokens and records from a injector.
+				 */
+			});
 		});
 
 		function createInjectorWithRecords(): Injector {
@@ -130,12 +157,5 @@ describe('StaticInjector -', () => {
 		}
 
 	});
-
-	xit('should be possible to get all records from StaticInjector', () => {
-
-		Injector.create({providers: []});
-
-	});
-
 
 });
