@@ -37,42 +37,6 @@ describe('StaticInjector -', () => {
 			expect(record instanceof Record).toEqual(true);
 		});
 
-		it('should create Injector based on providers and parent injector', () => {
-
-			// given
-			const parentInjector = createParentInjector(),
-				providers = [{
-					provide: OtherRecord,
-					useClass: OtherRecord,
-					deps: []
-				} as StaticProvider],
-				expectedContext = `StaticInjector[Injector, OtherRecord]`;
-
-			// when
-			const injector = Injector.create({providers, parent: parentInjector});
-
-			// then
-			const records = (injector as any)._records;
-
-			expect(records.size).toBe(2);
-			expect(injector.toString()).toEqual(expectedContext);
-			expect(injector.get(OtherRecord)).toBeDefined();
-			expect(injector.get(Injector)).toBeDefined();
-
-			function createParentInjector(): Injector {
-				const parentProviders = [
-						{
-							provide: Record,
-							useClass: Record,
-							deps: []
-						} as StaticProvider
-					],
-					parentInjector = Injector.create({providers: parentProviders});
-
-				return parentInjector;
-			}
-		});
-
 		/**
 		 * Empty injector has only one record - reference to itself
 		 */
@@ -84,6 +48,84 @@ describe('StaticInjector -', () => {
 			expect(emptyInjector.get(Injector)).toBe(emptyInjector);
 		});
 
+		describe('with parent injector -', () => {
+
+			let parentInjector: Injector,
+				providers,
+				expectedContext: string,
+				injector: Injector;
+
+			beforeEach(() => {
+				parentInjector = ParentInjectorFactory.create();
+				providers = [{
+					provide: OtherRecord,
+					useClass: OtherRecord,
+					deps: []
+				} as StaticProvider];
+				expectedContext = `StaticInjector[Injector, OtherRecord]`;
+
+				injector = Injector.create({providers, parent: parentInjector});
+			});
+
+			it('should create Injector based on providers and parent injector', () => {
+
+				// then
+				const records = (injector as any)._records;
+
+				expect(records.size).toBe(2);
+				expect(injector.toString()).toEqual(expectedContext);
+				expect(injector.get(OtherRecord)).toBeDefined();
+				expect(injector.get(Injector)).toBeDefined();
+			});
+
+			/**
+			 * Although injector has only two records (class Record and reference to itself)
+			 * method get will traverse the tree of injectors in order to find requested
+			 * record. So method get will look inside parentInjector in order to find
+			 * requested record.
+			 */
+			it('should be possible to get records from parent injector', () => {
+
+				// then
+				let record = (ParentInjectorFactory.parentProviders[0] as any).provide;
+
+				expect(injector.get(record)).toBeDefined();
+			});
+
+			/**
+			 * Injector should have access to parent injector
+			 */
+			it('should have access to parentInjector', () => {
+
+				// then
+				expect((injector as any).parent).toBe(parentInjector);
+			});
+
+			/**
+			 * Root injector should have empty parent
+			 */
+			it('root injector shouldn\'t have parent', () => {
+
+				// then
+				const parent = (injector as any).parent;
+
+				expect((parent as any).parent).toBe(Injector.NULL);
+			});
+
+			class ParentInjectorFactory {
+				static parentProviders = [
+					{
+						provide: Record,
+						useClass: Record,
+						deps: []
+					} as StaticProvider
+				];
+
+				static create(): Injector {
+					return Injector.create({providers: ParentInjectorFactory.parentProviders});
+				}
+			}
+		});
 	});
 
 	describe('record creation -', () => {
@@ -100,7 +142,7 @@ describe('StaticInjector -', () => {
 
 		beforeEach(() => {
 			recordCreated = false;
-			injector = InjectorCreator.create();
+			injector = InjectorFactory.create();
 		});
 
 		it('should not create object before it is requested', () => {
@@ -123,7 +165,7 @@ describe('StaticInjector -', () => {
 		});
 
 
-		class InjectorCreator {
+		class InjectorFactory {
 			static providers = [{
 				provide: Record,
 				useClass: Record,
@@ -131,7 +173,7 @@ describe('StaticInjector -', () => {
 			} as StaticProvider];
 
 			static create(): Injector {
-				return Injector.create({providers: InjectorCreator.providers});
+				return Injector.create({providers: InjectorFactory.providers});
 			}
 		}
 	});
