@@ -42,7 +42,6 @@ describe('@Injectable() -', () => {
 
 			expect(() => TestBed.get(Car)).toThrowError();
 		});
-
 	});
 
 });
