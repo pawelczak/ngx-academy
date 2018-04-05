@@ -560,6 +560,70 @@ describe('ContentChild -', () => {
 			expect(compInstance.compRef.simpleComponent.value).toBe('#2');
 		});
 
+	});
+
+	fdescribe('set -', () => {
+
+		const givenValue = 'Ciri';
+
+		@Component({
+			selector: 'content-child',
+			template: ``
+		})
+		class ContentChildComponent {
+
+			simpleRef: SimpleComponent;
+
+			/**
+			 * component references
+			 */
+			@ContentChild(SimpleComponent)
+			set simpleComponent(simple: SimpleComponent) {
+				this.simpleRef = simple;
+			}
+		}
+
+		@Component({
+			selector: 'test',
+			template: `
+
+				<content-child>
+
+					<simple [value]="'${givenValue}'" >
+					</simple>
+					
+				</content-child>
+			`
+		})
+		class TestComponent {
+			@ViewChild(ContentChildComponent)
+			compRef: ContentChildComponent;
+		}
+
+		beforeEach(() => {
+			TestBed.configureTestingModule({
+				declarations: [
+					SimpleComponent,
+					ContentChildComponent,
+					TestComponent
+				]
+			});
+		});
+
+		it('should work with typescript setter', () => {
+
+			// given
+			const fixture = TestBed.createComponent(TestComponent),
+				compRef = fixture.componentInstance.compRef;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(compRef.simpleRef).toBeDefined();
+			expect(compRef.simpleRef instanceof SimpleComponent).toBeTruthy();
+			expect(compRef.simpleRef.value).toBe(givenValue);
+		});
 	})
 
 });

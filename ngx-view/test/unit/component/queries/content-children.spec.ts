@@ -30,6 +30,7 @@ describe('ContentChildren -', () => {
 		 */
 		@ContentChildren(SimpleComponent)
 		simpleComponent: QueryList<SimpleComponent>;
+
 	}
 
 	/**
@@ -170,7 +171,7 @@ describe('ContentChildren -', () => {
 				/**
 				 * HTML tag as a selector (doesn't work)
 				 */
-				@ContentChildren('p')
+				@ContentChildren('<p>')
 				pTagQL: QueryList<ElementRef>;
 			}
 
