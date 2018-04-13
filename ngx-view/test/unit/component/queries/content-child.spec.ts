@@ -562,7 +562,7 @@ describe('ContentChild -', () => {
 
 	});
 
-	fdescribe('set -', () => {
+	describe('set -', () => {
 
 		const givenValue = 'Ciri';
 
