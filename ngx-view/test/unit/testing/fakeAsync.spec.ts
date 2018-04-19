@@ -116,7 +116,7 @@ describe('Function fakeAsync -', () => {
 	});
 
 	/**
-	 * Promise is representation of microtask
+	 * Promise represents microtask
 	 */
 	describe('Promise -', () => {
 
