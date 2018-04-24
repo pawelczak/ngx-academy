@@ -27,7 +27,7 @@ describe('Observables testing -', () => {
 		@Component({
 			template: `
 			
-				<div *ngIf="!listReady" class="loader">
+				<div *ngIf="showLoader" class="loader">
 					Loading...
 				</div>
 				
@@ -40,7 +40,7 @@ describe('Observables testing -', () => {
 		class HeroesComponent implements OnInit {
 
 			heroes: Array<string>;
-			listReady: boolean = false;
+			showLoader: boolean = true;
 
 			constructor(private heroesService: HeroesService) {}
 
@@ -49,7 +49,7 @@ describe('Observables testing -', () => {
 					.getHeroes()
 					.subscribe((heroes: Array<string>) => {
 						this.heroes = heroes;
-						this.listReady = true;
+						this.showLoader = false;
 					});
 			}
 		}
@@ -156,7 +156,7 @@ describe('Observables testing -', () => {
 		/**
 		 * Defer creates observable when someone tries to subscribe to it.
 		 */
-		xdescribe('defer -', () => {
+		describe('defer -', () => {
 
 			class DeferHeroesService extends HeroesService {
 				getHeroes(): Observable<Array<string>> {
@@ -188,20 +188,26 @@ describe('Observables testing -', () => {
 				const fixture = TestBed.createComponent(HeroesComponent),
 					debugElement = fixture.debugElement;
 
-				// when
+				// when before async data appears
 				fixture.detectChanges();
+
+				// then loader should be present
+				let loaderElement = debugElement.query(By.css('.loader'));
+				expect(loaderElement).toBeTruthy();
+
+				// when data appears
 				flushMicrotasks();
 				fixture.detectChanges();
 
-				// then
-				const loaderElement = debugElement.query(By.css('.loader'));
+				// then loader should be hidden
+				loaderElement = debugElement.query(By.css('.loader'));
 
-				expect(loaderElement).toBeTruthy();
+				expect(loaderElement).toBeFalsy();
 			}));
 
 		});
 
-		xdescribe('jasmine-marbles -', () => {
+		describe('jasmine-marbles -', () => {
 
 			class MarbleHeroesService extends HeroesService {
 				getHeroes(): Observable<Array<string>> {
@@ -233,15 +239,21 @@ describe('Observables testing -', () => {
 				const fixture = TestBed.createComponent(HeroesComponent),
 					debugElement = fixture.debugElement;
 
-				// when
+				// when before async data appears
 				fixture.detectChanges();
+
+				// then loader should be present
+				let loaderElement = debugElement.query(By.css('.loader'));
+				expect(loaderElement).toBeTruthy();
+
+				// when
 				getTestScheduler().flush();
 				fixture.detectChanges();
 
 				// then
-				const loaderElement = debugElement.query(By.css('.loader'));
+				loaderElement = debugElement.query(By.css('.loader'));
 
-				expect(loaderElement).toBeTruthy();
+				expect(loaderElement).toBeFalsy();
 			});
 
 		});
