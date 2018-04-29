@@ -1,5 +1,5 @@
 import { Component, ContentChild, Host, Inject, InjectionToken, ViewChild } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
 /**
@@ -7,7 +7,7 @@ import { By } from '@angular/platform-browser';
  *
  * It kind of works like a portal.
  */
-fdescribe('ng-content -', () => {
+describe('ng-content -', () => {
 
 	@Component({
 		selector: 'simple',
@@ -80,9 +80,80 @@ fdescribe('ng-content -', () => {
 			fixture.detectChanges();
 
 			// then
-			const el = fixture.debugElement.queryAll(By.css('simple'));
+			const el = fixture.debugElement.query(By.css('simple'));
 
 			expect(el).toBeDefined();
+		});
+
+	});
+
+	/**
+	 * Multi ng-content.
+	 *
+	 * Ng-content projection is kind of like move operation.
+	 */
+	describe('multi -', () => {
+
+		@Component({
+			selector: 'projector',
+			template: `
+				<div class="portal-one">
+					<ng-content></ng-content>
+				</div>
+				<div class="portal-two">
+					<ng-content></ng-content>
+				</div>
+				<div class="portal-three">
+					<ng-content></ng-content>
+				</div>
+			`
+		})
+		class ProjectorComponent {
+		}
+
+		@Component({
+			selector: '',
+			template: `
+				<projector>
+					<simple></simple>
+				</projector>
+			`
+		})
+		class ParentComponent {
+		}
+
+		let fixture: ComponentFixture<ParentComponent>;
+
+		beforeEach(() => {
+			TestBed.configureTestingModule({
+				declarations: [
+					SimpleComponent,
+					ProjectorComponent,
+					ParentComponent
+				]
+			});
+			fixture = TestBed.createComponent(ParentComponent);
+			fixture.detectChanges();
+		});
+
+		it('should project component to only one ng-content', () => {
+
+			// when & then
+			const simple = fixture.debugElement.queryAll(By.css('simple'));
+
+			expect(simple.length).toBe(1);
+		});
+
+		it('should project component to last', () => {
+
+			// when & then
+			const portalOne = fixture.debugElement.queryAll(By.css('.portal-one > simple')),
+				portalTwp = fixture.debugElement.queryAll(By.css('.portal-two > simple')),
+				portalThree = fixture.debugElement.queryAll(By.css('.portal-three > simple'));
+
+			expect(portalOne.length).toBe(0, 'Portal-one');
+			expect(portalTwp.length).toBe(0, 'Portal-two');
+			expect(portalThree.length).toBe(1, 'Portal-three');
 		});
 
 	});
