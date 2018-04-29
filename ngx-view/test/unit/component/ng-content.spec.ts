@@ -9,6 +9,13 @@ import { By } from '@angular/platform-browser';
  */
 describe('ng-content -', () => {
 
+	@Component({
+		selector: 'simple',
+		template: ``
+	})
+	class SimpleComponent {
+	}
+
 	describe('content projection -', () => {
 
 		@Component({
@@ -17,27 +24,30 @@ describe('ng-content -', () => {
 				<ng-content></ng-content>
 			`
 		})
-		class ProjectorTemplate {}
+		class ProjectorTemplate {
+		}
 
 		@Component({
 			selector: '',
 			template: `
-				
+
 			`
 		})
-		class TestComponent {}
+		class TestComponent {
+		}
 
 		beforeEach(() => {
 			TestBed
 				.configureTestingModule({
 					declarations: [
 						TestComponent,
-						ProjectorTemplate
+						ProjectorTemplate,
+						SimpleComponent
 					]
 				});
 		});
 
-		it ('should project basic html', () => {
+		it('should project basic html', () => {
 
 			// given
 			TestBed.overrideTemplate(TestComponent, `
@@ -52,6 +62,25 @@ describe('ng-content -', () => {
 
 			// then
 			const el = fixture.debugElement.queryAll(By.css('div'));
+
+			expect(el).toBeDefined();
+		});
+
+		it('should project components', () => {
+
+			// given
+			TestBed.overrideTemplate(TestComponent, `
+				<projector>
+					<simple></simple>
+				</projector>
+			`);
+			const fixture = TestBed.createComponent(TestComponent);
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			const el = fixture.debugElement.queryAll(By.css('simple'));
 
 			expect(el).toBeDefined();
 		});
