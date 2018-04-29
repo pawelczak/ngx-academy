@@ -1,4 +1,4 @@
-import { Component, Host, Inject, InjectionToken, ViewChild } from '@angular/core';
+import { Component, ContentChild, Host, Inject, InjectionToken, ViewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
@@ -83,6 +83,67 @@ fdescribe('ng-content -', () => {
 			const el = fixture.debugElement.queryAll(By.css('simple'));
 
 			expect(el).toBeDefined();
+		});
+
+	});
+
+	/**
+	 * Projected component can be accesed by ViewChild from ParentComponent
+	 * level and from ProjectorComponent level by ContentChild.
+	 */
+	describe('reference -', () => {
+
+		@Component({
+			selector: 'projector',
+			template: `
+				<ng-content></ng-content>
+			`
+		})
+		class ProjectorComponent {
+			@ContentChild(SimpleComponent)
+			simpleRef: SimpleComponent;
+		}
+
+		@Component({
+			selector: 'parent',
+			template: `
+				<projector>
+					<simple></simple>
+				</projector>
+			`
+		})
+		class ParentComponent {
+			@ViewChild(ProjectorComponent)
+			projectorRef: ProjectorComponent;
+
+			@ViewChild(SimpleComponent)
+			simpleRef: SimpleComponent;
+		}
+
+		beforeEach(() => {
+			TestBed.configureTestingModule({
+				declarations: [
+					SimpleComponent,
+					ProjectorComponent,
+					ParentComponent
+				]
+			})
+		});
+
+		it('should be possible to get reference from parent and projector', () => {
+
+			// given
+			const fixture = TestBed.createComponent(ParentComponent),
+				parentInstance = fixture.componentInstance,
+				projectorInstance = parentInstance.projectorRef;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(parentInstance.simpleRef instanceof SimpleComponent).toBeTruthy();
+			expect(projectorInstance.simpleRef instanceof SimpleComponent).toBeTruthy();
+			expect(parentInstance.simpleRef).toBe(projectorInstance.simpleRef);
 		});
 
 	});
