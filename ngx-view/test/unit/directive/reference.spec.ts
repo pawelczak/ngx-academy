@@ -5,7 +5,6 @@ import { By } from '@angular/platform-browser';
 
 describe('Directive - reference -', () => {
 
-
 	describe('exportAs -', () => {
 
 		@Directive({

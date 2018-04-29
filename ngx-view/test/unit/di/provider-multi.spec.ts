@@ -1,4 +1,4 @@
-import { Component, Inject, InjectionToken, Injector, NgModule } from '@angular/core';
+import { Component, Inject, InjectionToken, Injector, NgModule, ViewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 
@@ -210,12 +210,15 @@ describe('Dependency injection - providers - multi -', () => {
 				}]
 			})
 			class ParentComponent {
+				@ViewChild(MultiComponent)
+				multiComp: MultiComponent;
 			}
 
 			beforeEach(() => {
 				TestBed.configureTestingModule({
 					declarations: [
-						MultiComponent
+						MultiComponent,
+						ParentComponent
 					]
 				});
 			});
@@ -223,8 +226,8 @@ describe('Dependency injection - providers - multi -', () => {
 			it('should provide values declared only in the component', () => {
 
 				// given
-				const fixture = TestBed.createComponent(MultiComponent),
-					compInstance = fixture.componentInstance,
+				const fixture = TestBed.createComponent(ParentComponent),
+					compInstance = fixture.componentInstance.multiComp,
 					expectedValue = [givenValueOne];
 
 				// when

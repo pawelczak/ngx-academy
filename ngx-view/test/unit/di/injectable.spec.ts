@@ -11,7 +11,7 @@ describe('@Injectable() -', () => {
 		class Engine {}
 
 		/**
-		 * Creating a service without dependencies doesn't requrie the @Injectable
+		 * Creating a service without dependencies doesn't require the @Injectable
 		 * annotation.
 		 */
 		it ('should create service without dependencies', () => {

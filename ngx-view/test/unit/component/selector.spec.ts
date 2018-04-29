@@ -1,7 +1,9 @@
 import { Component, Input, ViewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-
+/**
+ * Different methods of declaring components
+ */
 describe('Component - selector -', () => {
 
 	describe('basic -', () => {
