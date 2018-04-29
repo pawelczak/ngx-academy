@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Host, Inject, InjectionToken, ViewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
@@ -7,7 +7,7 @@ import { By } from '@angular/platform-browser';
  *
  * It kind of works like a portal.
  */
-describe('ng-content -', () => {
+fdescribe('ng-content -', () => {
 
 	@Component({
 		selector: 'simple',
@@ -24,7 +24,7 @@ describe('ng-content -', () => {
 				<ng-content></ng-content>
 			`
 		})
-		class ProjectorTemplate {
+		class ProjectorComponent {
 		}
 
 		@Component({
@@ -41,7 +41,7 @@ describe('ng-content -', () => {
 				.configureTestingModule({
 					declarations: [
 						TestComponent,
-						ProjectorTemplate,
+						ProjectorComponent,
 						SimpleComponent
 					]
 				});
@@ -87,5 +87,80 @@ describe('ng-content -', () => {
 
 	});
 
+	/**
+	 * Projected component lives in the context of the component,
+	 * in which it has been declared.
+	 */
+	describe('context -', () => {
+
+		const token = new InjectionToken<string>('NG_CONTENT_CONTEXT'),
+			projector = 'projector',
+			parent = 'parent';
+
+		@Component({
+			selector: 'simple',
+			template: ``
+		})
+		class SimpleComponent {
+			constructor(@Inject(token) public context: string) {}
+		}
+
+		@Component({
+			selector: 'projector',
+			template: `
+				<ng-content></ng-content>
+			`,
+			providers: [{
+				provide: token,
+				useValue: projector
+			}]
+		})
+		class ProjectorComponent {
+		}
+
+		@Component({
+			selector: 'parent',
+			template: `
+				<projector>
+					<simple></simple>
+				</projector>
+			`,
+			providers: [{
+				provide: token,
+				useValue: parent
+			}]
+		})
+		class ParentComponent {
+			@ViewChild(SimpleComponent)
+			simpleRef: SimpleComponent;
+		}
+
+		beforeEach(() => {
+			TestBed.configureTestingModule({
+				declarations: [
+					SimpleComponent,
+					ProjectorComponent,
+					ParentComponent
+				]
+			})
+		});
+
+		/**
+		 * Components that are projected with ng-content, live in the context
+		 * of the component in which they are declared.
+		 */
+		it('should create component in the parent context', () => {
+
+			// given
+			const fixture = TestBed.createComponent(ParentComponent),
+				simpleCompInstance = fixture.componentInstance.simpleRef;
+
+			// when
+			fixture.detectChanges();
+
+			// then
+			expect(simpleCompInstance.context).toEqual(projector);
+		});
+	});
 });
 
