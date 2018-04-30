@@ -1,4 +1,4 @@
-import { Component, ContentChild, Host, Inject, InjectionToken, ViewChild } from '@angular/core';
+import { Component, ContentChild, Host, Inject, InjectionToken, Input, ViewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
@@ -11,9 +11,13 @@ describe('ng-content -', () => {
 
 	@Component({
 		selector: 'simple',
-		template: ``
+		template: `
+			{{value}}
+		`
 	})
 	class SimpleComponent {
+		@Input()
+		value: string;
 	}
 
 	describe('content projection -', () => {
@@ -83,6 +87,100 @@ describe('ng-content -', () => {
 			const el = fixture.debugElement.query(By.css('simple'));
 
 			expect(el).toBeDefined();
+		});
+
+	});
+
+	/**
+	 * <ng-content> supports a select attribute that lets you project specific content in specific places.
+	 * This attribute takes a CSS selector like:
+	 * - HTML tag e.g. my-element,
+	 * - CSS class e.g. .my-class,
+	 * - Attribute [my-attribute]
+	 * to match the children you want.
+	 */
+	describe('select', () => {
+
+		@Component({
+			selector: 'projector',
+			template: `
+				<div class="portal-one">
+					<ng-content select="simple"></ng-content>
+				</div>
+				<div class="portal-two">
+					<ng-content select=".cssClass"></ng-content>
+				</div>
+				<div class="portal-three">
+					<ng-content select="[data-attr]"></ng-content>
+				</div>
+			`
+		})
+		class ProjectorComponent {
+		}
+
+		@Component({
+			selector: '',
+			template: `
+				<projector>
+					
+					<!--Tag HTML 'simple' -->
+					<simple value="#1" ></simple>
+					
+					<!--CSS class '.css-class'-->
+					<div class="cssClass" >
+						#2
+					</div>
+					
+					<!--Attribute 'data-attr' -->
+					<div data-attr="" >
+						#3
+					</div>
+					
+				</projector>
+			`
+		})
+		class ParentComponent {
+		}
+
+		let fixture: ComponentFixture<ParentComponent>;
+
+		beforeEach(() => {
+			TestBed.configureTestingModule({
+				declarations: [
+					SimpleComponent,
+					ProjectorComponent,
+					ParentComponent
+				]
+			});
+			fixture = TestBed.createComponent(ParentComponent);
+			fixture.detectChanges();
+		});
+
+		it('should project component by HTML tag selector', () => {
+
+			// when & then
+			const el = fixture.debugElement.queryAll(By.css('.portal-one > *'));
+
+			expect(el.length).toEqual(1, 'only one element being projected');
+			expect(el[0].nativeElement.textContent.trim()).toEqual('#1');
+		});
+
+		it('should project component by CSS class selector', () => {
+
+			// when & then
+			const el = fixture.debugElement.queryAll(By.css('.portal-two > *'));
+
+			expect(el.length).toEqual(1, 'only one element being projected');
+			expect(el[0].nativeElement.textContent.trim()).toEqual('#2');
+		});
+
+		it('should project component by Attribute selector', () => {
+
+			// when & then
+			const el = fixture.debugElement.queryAll(By.css('.portal-three > *'));
+
+			expect(el.length).toEqual(1, 'only one element being projected');
+			expect(el[0].nativeElement.textContent.trim()).toEqual('#3');
 		});
 
 	});
