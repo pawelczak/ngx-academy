@@ -92,100 +92,6 @@ describe('ng-content -', () => {
 	});
 
 	/**
-	 * <ng-content> supports a select attribute that lets you project specific content in specific places.
-	 * This attribute takes a CSS selector like:
-	 * - HTML tag e.g. my-element,
-	 * - CSS class e.g. .my-class,
-	 * - Attribute [my-attribute]
-	 * to match the children you want.
-	 */
-	describe('select', () => {
-
-		@Component({
-			selector: 'projector',
-			template: `
-				<div class="portal-one">
-					<ng-content select="simple"></ng-content>
-				</div>
-				<div class="portal-two">
-					<ng-content select=".cssClass"></ng-content>
-				</div>
-				<div class="portal-three">
-					<ng-content select="[data-attr]"></ng-content>
-				</div>
-			`
-		})
-		class ProjectorComponent {
-		}
-
-		@Component({
-			selector: '',
-			template: `
-				<projector>
-					
-					<!--Tag HTML 'simple' -->
-					<simple value="#1" ></simple>
-					
-					<!--CSS class '.css-class'-->
-					<div class="cssClass" >
-						#2
-					</div>
-					
-					<!--Attribute 'data-attr' -->
-					<div data-attr="" >
-						#3
-					</div>
-					
-				</projector>
-			`
-		})
-		class ParentComponent {
-		}
-
-		let fixture: ComponentFixture<ParentComponent>;
-
-		beforeEach(() => {
-			TestBed.configureTestingModule({
-				declarations: [
-					SimpleComponent,
-					ProjectorComponent,
-					ParentComponent
-				]
-			});
-			fixture = TestBed.createComponent(ParentComponent);
-			fixture.detectChanges();
-		});
-
-		it('should project component by HTML tag selector', () => {
-
-			// when & then
-			const el = fixture.debugElement.queryAll(By.css('.portal-one > *'));
-
-			expect(el.length).toEqual(1, 'only one element being projected');
-			expect(el[0].nativeElement.textContent.trim()).toEqual('#1');
-		});
-
-		it('should project component by CSS class selector', () => {
-
-			// when & then
-			const el = fixture.debugElement.queryAll(By.css('.portal-two > *'));
-
-			expect(el.length).toEqual(1, 'only one element being projected');
-			expect(el[0].nativeElement.textContent.trim()).toEqual('#2');
-		});
-
-		it('should project component by Attribute selector', () => {
-
-			// when & then
-			const el = fixture.debugElement.queryAll(By.css('.portal-three > *'));
-
-			expect(el.length).toEqual(1, 'only one element being projected');
-			expect(el[0].nativeElement.textContent.trim()).toEqual('#3');
-		});
-
-	});
-
-	/**
 	 * Multi ng-content.
 	 *
 	 * Ng-content projection is kind of like move operation.
@@ -252,6 +158,153 @@ describe('ng-content -', () => {
 			expect(portalOne.length).toBe(0, 'Portal-one');
 			expect(portalTwp.length).toBe(0, 'Portal-two');
 			expect(portalThree.length).toBe(1, 'Portal-three');
+		});
+
+	});
+
+	/**
+	 * <ng-content> supports a select attribute that lets you project specific content in specific places.
+	 * This attribute takes a CSS selector like:
+	 * - HTML tag e.g. my-element,
+	 * - CSS class e.g. .my-class,
+	 * - Attribute [my-attribute]
+	 * to match the children you want.
+	 */
+	describe('select -', () => {
+
+		@Component({
+			selector: 'projector',
+			template: `
+				<div class="portal-one">
+					<ng-content select="simple"></ng-content>
+				</div>
+				<div class="portal-two">
+					<ng-content select=".cssClass"></ng-content>
+				</div>
+				<div class="portal-three">
+					<ng-content select="[data-attr]"></ng-content>
+				</div>
+			`
+		})
+		class ProjectorComponent {
+		}
+
+		describe('different selectors -', () => {
+
+			@Component({
+				template: `
+					<projector>
+
+						<!--Tag HTML 'simple' -->
+						<simple value="#1" ></simple>
+
+						<!--CSS class '.css-class'-->
+						<div class="cssClass" >
+							#2
+						</div>
+
+						<!--Attribute 'data-attr' -->
+						<div data-attr="" >
+							#3
+						</div>
+
+					</projector>
+				`
+			})
+			class ParentComponent {
+			}
+
+			let fixture: ComponentFixture<ParentComponent>;
+
+			beforeEach(() => {
+				TestBed.configureTestingModule({
+					declarations: [
+						SimpleComponent,
+						ProjectorComponent,
+						ParentComponent
+					]
+				});
+				fixture = TestBed.createComponent(ParentComponent);
+				fixture.detectChanges();
+			});
+
+			it('should project component by HTML tag selector', () => {
+
+				// when & then
+				const el = fixture.debugElement.queryAll(By.css('.portal-one > *'));
+
+				expect(el.length).toEqual(1, 'only one element being projected');
+				expect(el[0].nativeElement.textContent.trim()).toEqual('#1');
+			});
+
+			it('should project component by CSS class selector', () => {
+
+				// when & then
+				const el = fixture.debugElement.queryAll(By.css('.portal-two > *'));
+
+				expect(el.length).toEqual(1, 'only one element being projected');
+				expect(el[0].nativeElement.textContent.trim()).toEqual('#2');
+			});
+
+			it('should project component by Attribute selector', () => {
+
+				// when & then
+				const el = fixture.debugElement.queryAll(By.css('.portal-three > *'));
+
+				expect(el.length).toEqual(1, 'only one element being projected');
+				expect(el[0].nativeElement.textContent.trim()).toEqual('#3');
+			});
+		});
+
+		/**
+		 * <ng-content> select catches the first element that matches the selector.
+		 */
+		describe('selector collision -', () => {
+
+			@Component({
+				template: `
+					<projector>
+
+						<!--Tag HTML 'simple' -->
+						<simple value="#1" ></simple>
+
+						<!--CSS class '.css-class'-->
+						<simple value="#2" class="cssClass" ></simple>
+
+					</projector>
+				`
+			})
+			class ParentComponent {
+			}
+
+			let fixture: ComponentFixture<ParentComponent>;
+
+			beforeEach(() => {
+				TestBed.configureTestingModule({
+					declarations: [
+						SimpleComponent,
+						ProjectorComponent,
+						ParentComponent
+					]
+				});
+				fixture = TestBed.createComponent(ParentComponent);
+				fixture.detectChanges();
+			});
+
+			/**
+			 * First <ng-content select="simple"> catches both elements,
+			 * eventhought the second simple component has a class that
+			 * matches the second <ng-content> select case.
+			 */
+			it('should project component by HTML tag selector', () => {
+
+				// when & then
+				const el = fixture.debugElement.queryAll(By.css('.portal-one > *'));
+
+				expect(el.length).toEqual(2, 'both elements being projected');
+				expect(el[0].nativeElement.textContent.trim()).toEqual('#1');
+				expect(el[1].nativeElement.textContent.trim()).toEqual('#2');
+			});
 		});
 
 	});
