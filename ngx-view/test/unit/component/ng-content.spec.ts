@@ -307,6 +307,61 @@ describe('ng-content -', () => {
 			});
 		});
 
+		describe('ngProjectAs -', () => {
+
+			@Component({
+				template: `
+					<projector>
+
+						<div ngProjectAs="simple"
+							 class="cssClass" >
+							#1
+						</div>
+
+						<simple ngProjectAs=".cssClass"
+								value="#2"
+								class="cssClass">
+						</simple>
+
+					</projector>
+				`
+			})
+			class ParentComponent {
+			}
+
+			let fixture: ComponentFixture<ParentComponent>;
+
+			beforeEach(() => {
+				TestBed.configureTestingModule({
+					declarations: [
+						SimpleComponent,
+						ProjectorComponent,
+						ParentComponent
+					]
+				});
+				fixture = TestBed.createComponent(ParentComponent);
+				fixture.detectChanges();
+			});
+
+			it('should project div as component case', () => {
+
+				// when & then
+				const el = fixture.debugElement.queryAll(By.css('.portal-one > *'));
+
+				expect(el.length).toBe(1);
+				expect(el[0].nativeElement.textContent.trim()).toEqual('#1');
+			});
+
+			it('should project component as css class case', () => {
+
+				// when & then
+				const el = fixture.debugElement.queryAll(By.css('.portal-two > *'));
+
+				expect(el.length).toBe(1);
+				expect(el[0].nativeElement.textContent.trim()).toEqual('#2');
+			});
+		});
+
 	});
 
 	/**
