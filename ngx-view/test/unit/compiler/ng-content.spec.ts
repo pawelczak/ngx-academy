@@ -1,9 +1,9 @@
-import { Component, ContentChild, Inject, InjectionToken, Input, ViewChild } from '@angular/core';
+import { Component, ContentChild, Inject, InjectionToken, Input, OnInit, ViewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
 /**
- * Feature ng-content allows to project content.
+ * Feature <ng-content> allows to project content.
  *
  * It kind of works like a portal.
  */
@@ -25,7 +25,9 @@ describe('ng-content -', () => {
 		@Component({
 			selector: 'projector',
 			template: `
-				<ng-content></ng-content>
+				<p class="target">
+					<ng-content></ng-content>
+				</p>
 			`
 		})
 		class ProjectorComponent {
@@ -33,9 +35,7 @@ describe('ng-content -', () => {
 
 		@Component({
 			selector: '',
-			template: `
-
-			`
+			template: ``
 		})
 		class TestComponent {
 		}
@@ -56,7 +56,7 @@ describe('ng-content -', () => {
 			// given
 			TestBed.overrideTemplate(TestComponent, `
 				<projector>
-					<div></div>
+					<div class="projected-element"></div>
 				</projector>
 			`);
 			const fixture = TestBed.createComponent(TestComponent);
@@ -65,9 +65,10 @@ describe('ng-content -', () => {
 			fixture.detectChanges();
 
 			// then
-			const el = fixture.debugElement.queryAll(By.css('div'));
+			const el = fixture.debugElement.queryAll(By.css('.target > .projected-element'));
 
-			expect(el).toBeDefined();
+			expect(el).not.toBeNull();
+			expect(el).toBeTruthy();
 		});
 
 		it('should project components', () => {
@@ -75,7 +76,7 @@ describe('ng-content -', () => {
 			// given
 			TestBed.overrideTemplate(TestComponent, `
 				<projector>
-					<simple></simple>
+					<simple class="projected-component" ></simple>
 				</projector>
 			`);
 			const fixture = TestBed.createComponent(TestComponent);
@@ -84,9 +85,10 @@ describe('ng-content -', () => {
 			fixture.detectChanges();
 
 			// then
-			const el = fixture.debugElement.query(By.css('simple'));
+			const el = fixture.debugElement.query(By.css('.target > .projected-component'));
 
-			expect(el).toBeDefined();
+			expect(el).not.toBeNull();
+			expect(el).toBeTruthy();
 		});
 
 	});
@@ -307,6 +309,9 @@ describe('ng-content -', () => {
 			});
 		});
 
+		/**
+		 * Allows element to projected as specific case.
+		 */
 		describe('ngProjectAs -', () => {
 
 			@Component({
@@ -364,8 +369,112 @@ describe('ng-content -', () => {
 
 	});
 
+
 	/**
-	 * Projected component can be accesed by ViewChild from ParentComponent
+	 * <ng-content> just moves ("projects") content.
+	 * It makes interesting use cases with structural directives
+	 * like *ngIf and *ngFor.
+	 */
+	describe('structural directives', () => {
+
+		/**
+		 * Using *ngIf with ng-content, creating and removing ng-content
+		 * should not create create & destroy projected elements,
+		 * it should just create and remove place where projected elements
+		 * should appear.
+		 */
+		describe('*ngIf', () => {
+
+			@Component({
+				selector: 'simple',
+				template: ``
+			})
+			class SimpleComponent {
+				static counter = 0;
+
+				constructor() {
+					SimpleComponent.counter += 1;
+				}
+			}
+
+			@Component({
+				selector: 'projector',
+				template: `
+					<ng-content *ngIf="flag"></ng-content>
+				`
+			})
+			class ProjectorComponent {
+				flag = false;
+			}
+
+			@Component({
+				selector: 'parent',
+				template: `
+					<projector>
+						<simple></simple>
+					</projector>
+				`
+			})
+			class ParentComponent {
+				@ViewChild(ProjectorComponent)
+				projectorRef: ProjectorComponent;
+			}
+
+			beforeEach(() => {
+				TestBed.configureTestingModule({
+					declarations: [
+						SimpleComponent,
+						ProjectorComponent,
+						ParentComponent
+					]
+				});
+				SimpleComponent.counter = 0;
+			});
+
+
+			/**
+			 * Although component is not projected, it has been created.
+			 *
+			 * <ng-content> work like move, so '*ngIf=false' doesn't affect
+			 * creation of a projected content it only says that it shouldn't be moved.
+			 */
+			it('should not project element', () => {
+
+				// given
+				const fixture = TestBed.createComponent(ParentComponent);
+
+				// when
+				fixture.detectChanges();
+
+				//then
+				const el = fixture.debugElement.query(By.css('simple'));
+
+				expect(el).toBeNull();
+				expect(SimpleComponent.counter).toBe(1);
+			});
+
+			it('should project element', () => {
+
+				// given
+				const fixture = TestBed.createComponent(ParentComponent);
+
+				// when
+				fixture.componentInstance.projectorRef.flag = true;
+				fixture.detectChanges();
+
+				//then
+				const el = fixture.debugElement.query(By.css('simple'));
+
+				expect(el).not.toBeNull();
+				expect(SimpleComponent.counter).toBe(1);
+			});
+
+		});
+
+	});
+
+	/**
+	 * Projected component can be accessed by ViewChild from ParentComponent
 	 * level and from ProjectorComponent level by ContentChild.
 	 */
 	describe('reference -', () => {
