@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { Component, NgModule } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 
@@ -10,10 +10,27 @@ describe('Module providers scope -', () => {
 
 	class RootService extends Service {}
 
+	@Component({
+		template: ``
+	})
+	class AppComponent {
+		constructor(public service: Service) {}
+	}
+
+	@Component({
+		template: ``
+	})
+	class RootComponent {
+		constructor(public service: Service) {}
+	}
+
 	@NgModule({
 		providers: [
 			{provide: Service, useClass: AppService},
 			{provide: AppService, useClass: AppService}
+		],
+		declarations: [
+			AppComponent
 		]
 	})
 	class AppModule {}
@@ -26,6 +43,9 @@ describe('Module providers scope -', () => {
 			{provide: Service, useClass: RootService},
 			{provide: RootService, useClass: RootService}
 
+		],
+		declarations: [
+			RootComponent
 		]
 	})
 	class RootModule {}
@@ -90,6 +110,32 @@ describe('Module providers scope -', () => {
 			// then
 			expect(service instanceof RootService).toBeTruthy();
 			expect(service instanceof AppService).toBeFalsy();
+		});
+
+		/**
+		 * No matter in which module service has been provided,
+		 * always the one from the highest module is taken.
+		 */
+		it('should inject RootService to RootComponent', () => {
+
+			// given & when
+			const fixture = TestBed.createComponent(RootComponent);
+
+			// then
+			const service = fixture.componentInstance.service;
+
+			expect(service instanceof RootService).toBeTruthy();
+		});
+
+		it('should inject RootService to AppComponent', () => {
+
+			// given & when
+			const fixture = TestBed.createComponent(AppComponent);
+
+			// then
+			const service = fixture.componentInstance.service;
+
+			expect(service instanceof RootService).toBeTruthy();
 		});
 
 	});
