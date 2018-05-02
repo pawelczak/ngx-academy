@@ -369,7 +369,6 @@ describe('ng-content -', () => {
 
 	});
 
-
 	/**
 	 * <ng-content> just moves ("projects") content.
 	 * It makes interesting use cases with structural directives
