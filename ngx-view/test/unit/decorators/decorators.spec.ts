@@ -9,15 +9,63 @@ describe('Decorators -', () => {
 			}
 
 			@engine
-			class Car {}
+			class Car {
+			}
 
 			it('should add value to decorated object', () => {
 
+				// when
 				let car = new Car() as any;
 
+				// then
 				expect(car.engineType).toEqual('Diesel');
 			});
 		});
 
+		/**
+		 * Decorator factory need to return function.
+		 */
+		describe('decorator factory -', () => {
+
+			function engine(type: string = 'Diesel') {
+				return function (constructor: Function) {
+					constructor.prototype.engineType = type;
+				};
+			}
+
+			it('should add value to object', () => {
+
+				// given
+				@engine()
+				class Car {
+				}
+
+				// when
+				let car = new Car() as any;
+
+				// then
+				expect(car.engineType).toEqual('Diesel');
+			});
+
+			/**
+			 * It is possible to pass values to decorator functions.
+			 */
+			it('should assign passed value to the decorator', () => {
+
+				// given
+				const engineType = 'Hybrid';
+
+				@engine(engineType)
+				class Car {
+				}
+
+				// when
+				let car = new Car() as any;
+
+				// then
+				expect(car.engineType).toEqual(engineType);
+			});
+		});
 	});
+
 });
