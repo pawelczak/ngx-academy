@@ -78,7 +78,7 @@ describe('Decorators -', () => {
 				}
 			}
 
-			it ('should work', () => {
+			it('should work', () => {
 
 				@engine
 				class Car {
@@ -89,6 +89,50 @@ describe('Decorators -', () => {
 
 				// then
 				expect(car.engineType).toEqual(givenEngineType);
+			});
+
+		});
+
+		describe('class decorator factory -', () => {
+
+			const givenEngineType = 'Diesel';
+
+			function engine(type = givenEngineType) {
+				return function <T extends { new(...args: any[]): {} }>(constructor: T) {
+					return class extends constructor {
+						engineType = type;
+					}
+				}
+			}
+
+			it('should work', () => {
+
+				// given
+				@engine()
+				class Car {
+				}
+
+				// when
+				let car = new Car() as any;
+
+				// then
+				expect(car.engineType).toEqual(givenEngineType);
+			});
+
+			it('should work with arguments', () => {
+
+				// given
+				const engineType = 'Hybrid';
+
+				@engine(engineType)
+				class Car {
+				}
+
+				// when
+				let car = new Car() as any;
+
+				// then
+				expect(car.engineType).toEqual(engineType);
 			});
 
 		});
