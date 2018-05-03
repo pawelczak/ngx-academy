@@ -66,6 +66,32 @@ describe('Decorators -', () => {
 				expect(car.engineType).toEqual(engineType);
 			});
 		});
+
+		describe('class decorator -', () => {
+
+			// given
+			const givenEngineType = 'Hybrid';
+
+			function engine<T extends { new(...args: any[]): {} }>(constructor: T) {
+				return class extends constructor {
+					engineType = givenEngineType;
+				}
+			}
+
+			it ('should work', () => {
+
+				@engine
+				class Car {
+				}
+
+				// when
+				let car = new Car() as any;
+
+				// then
+				expect(car.engineType).toEqual(givenEngineType);
+			});
+
+		});
 	});
 
 });
