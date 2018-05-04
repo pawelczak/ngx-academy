@@ -1,4 +1,4 @@
-import { Injector, StaticProvider } from '@angular/core';
+import { Injector, StaticProvider, INJECTOR } from '@angular/core';
 
 
 describe('StaticInjector -', () => {
@@ -6,6 +6,8 @@ describe('StaticInjector -', () => {
 	class Record {}
 
 	class OtherRecord {}
+
+	const numberOfRecordsInEmptyInjector = 2; // Injector + InjectionToken('INJECTOR') - INJECTOR
 
 	/**
 	 *
@@ -38,14 +40,17 @@ describe('StaticInjector -', () => {
 		});
 
 		/**
-		 * Empty injector has only one record - reference to itself
+		 * Empty injector has two records:
+		 * - reference to itself
+		 * - InjectionToken INJECTOR which points to injector
 		 */
 		it('should be possible to create empty Injector', () => {
 
 			const emptyInjector = Injector.create({providers: []});
 
-			expect((emptyInjector as any)._records.size).toBe(1);
+			expect((emptyInjector as any)._records.size).toBe(numberOfRecordsInEmptyInjector);
 			expect(emptyInjector.get(Injector)).toBe(emptyInjector);
+			expect(emptyInjector.get(INJECTOR)).toBe(emptyInjector);
 		});
 
 		describe('with parent injector -', () => {
@@ -62,7 +67,7 @@ describe('StaticInjector -', () => {
 					useClass: OtherRecord,
 					deps: []
 				} as StaticProvider];
-				expectedContext = `StaticInjector[Injector, OtherRecord]`;
+				expectedContext = `StaticInjector[Injector, InjectionToken INJECTOR, OtherRecord]`;
 
 				injector = Injector.create({providers, parent: parentInjector});
 			});
@@ -72,10 +77,11 @@ describe('StaticInjector -', () => {
 				// then
 				const records = (injector as any)._records;
 
-				expect(records.size).toBe(2);
+				expect(records.size).toBe(1 + numberOfRecordsInEmptyInjector);
 				expect(injector.toString()).toEqual(expectedContext);
 				expect(injector.get(OtherRecord)).toBeDefined();
 				expect(injector.get(Injector)).toBeDefined();
+				expect(injector.get(INJECTOR)).toBeDefined();
 			});
 
 			/**
@@ -185,7 +191,7 @@ describe('StaticInjector -', () => {
 	 * Although there should be a couple of methods how to do that.
 	 *
 	 */
-	describe('get all Records', () => {
+	describe('get all Records -', () => {
 
 		let givenProviders: Array<StaticProvider>,
 			notFoundValue = 'Bruce Wayne';
@@ -209,7 +215,7 @@ describe('StaticInjector -', () => {
 				let tokens = parseRecordNames(records);
 
 				// then
-				expect(tokens.length).toBe(givenProviders.length + 1); // records + injector
+				expect(tokens.length).toBe(givenProviders.length + numberOfRecordsInEmptyInjector); // records + injector + injector token
 
 				tokens.forEach((token: string) => {
 
@@ -262,7 +268,7 @@ describe('StaticInjector -', () => {
 				});
 
 				// when
-				expect(foundedRecords.size).toBe(givenProviders.length + 1); // records + injector
+				expect(foundedRecords.size).toBe(givenProviders.length + numberOfRecordsInEmptyInjector); // records + injector + injectorToken
 
 				/**
 				 * This method allows to get all the tokens and records from a injector.

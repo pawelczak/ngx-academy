@@ -1,8 +1,7 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { CommonModule } from '@angular/common';
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
+import { Observable, Subject } from 'rxjs';
 
 
 describe('AsyncPipe -', () => {

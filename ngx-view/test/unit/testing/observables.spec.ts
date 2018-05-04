@@ -1,10 +1,7 @@
 import { Component, Injectable, OnInit } from '@angular/core';
 import { fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { Observable } from 'rxjs/Observable';
-import { defer } from 'rxjs/observable/defer';
-import { of } from 'rxjs/observable/of';
-import { async as asyncScheduler } from 'rxjs/scheduler/async';
+import { Observable, defer, of, asyncScheduler } from 'rxjs';
 import { cold, getTestScheduler } from 'jasmine-marbles';
 
 /**

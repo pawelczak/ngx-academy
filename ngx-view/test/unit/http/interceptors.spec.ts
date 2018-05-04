@@ -1,7 +1,7 @@
 import { HTTP_INTERCEPTORS, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { getTestBed, TestBed } from '@angular/core/testing';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 
 import { Car, CarsService } from './helpers/helpers';
