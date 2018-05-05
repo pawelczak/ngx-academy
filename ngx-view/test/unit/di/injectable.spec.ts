@@ -1,4 +1,4 @@
-import { Injectable, NgModule } from '@angular/core';
+import { Injectable, INJECTOR, NgModule } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 describe('@Injectable() -', () => {
@@ -13,7 +13,41 @@ describe('@Injectable() -', () => {
 		class EmptyModule {
 		}
 
-		describe('',() => {
+		/**
+		 * Service providedIn 'root' means that service
+		 * will be added to the root injector context.
+		 * RootInjector is located higher than the ApplicationInjector.
+		 */
+		describe('root -',() => {
+
+			@Injectable({
+				providedIn: 'root'
+			})
+			class ProvidedInService {
+			}
+
+			beforeEach(() => {
+				TestBed
+					.configureTestingModule({
+						imports: [
+							EmptyModule
+						]
+					});
+			});
+
+			it('should allow to provide service at root level', () => {
+
+				// given & when
+				let service = TestBed.get(ProvidedInService);
+
+				// then
+				expect(service).toBeDefined();
+				expect(service instanceof ProvidedInService).toBeTruthy();
+			});
+
+		});
+
+		describe('module -',() => {
 
 			@Injectable({
 				providedIn: EmptyModule
@@ -37,11 +71,9 @@ describe('@Injectable() -', () => {
 
 				// then
 				expect(service).toBeDefined();
-				expect(service instanceof ProvidedInService).toEqual(true);
+				expect(service instanceof ProvidedInService).toBeTruthy();
 			});
-
 		});
-
 	});
 
 
