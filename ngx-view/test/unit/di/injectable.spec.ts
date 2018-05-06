@@ -7,7 +7,7 @@ describe('@Injectable() -', () => {
 	 * ProvidedIn allows to specify to which module
 	 * decorated sevice should be added as a provided class.
 	 */
-	describe('providedIn -', () => {
+	fdescribe('providedIn -', () => {
 
 		@NgModule()
 		class EmptyModule {
@@ -44,7 +44,6 @@ describe('@Injectable() -', () => {
 				expect(service).toBeDefined();
 				expect(service instanceof ProvidedInService).toBeTruthy();
 			});
-
 		});
 
 		describe('module -',() => {
@@ -74,6 +73,39 @@ describe('@Injectable() -', () => {
 				expect(service instanceof ProvidedInService).toBeTruthy();
 			});
 		});
+
+		describe('factory', () => {
+
+			@Injectable({
+				providedIn: EmptyModule,
+				useFactory: () => {
+					return new ProvidedInService();
+				}
+			})
+			class ProvidedInService {
+			}
+
+			beforeEach(() => {
+				TestBed
+					.configureTestingModule({
+						imports: [
+							EmptyModule
+						]
+					});
+			});
+
+			it('should create service with provided factory function', () => {
+
+				// given & when
+				let service = TestBed.get(ProvidedInService);
+
+				// then
+				expect(service).toBeDefined();
+				expect(service instanceof ProvidedInService).toBeTruthy();
+			});
+
+		});
+
 	});
 
 
