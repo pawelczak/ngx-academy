@@ -7,7 +7,7 @@ describe('@Injectable() -', () => {
 	 * ProvidedIn allows to specify to which module
 	 * decorated sevice should be added as a provided class.
 	 */
-	fdescribe('providedIn -', () => {
+	describe('providedIn -', () => {
 
 		@NgModule()
 		class EmptyModule {
@@ -18,7 +18,7 @@ describe('@Injectable() -', () => {
 		 * will be added to the root injector context.
 		 * RootInjector is located higher than the ApplicationInjector.
 		 */
-		describe('root -',() => {
+		describe('root -', () => {
 
 			@Injectable({
 				providedIn: 'root'
@@ -46,7 +46,7 @@ describe('@Injectable() -', () => {
 			});
 		});
 
-		describe('module -',() => {
+		describe('module -', () => {
 
 			@Injectable({
 				providedIn: EmptyModule
@@ -74,34 +74,82 @@ describe('@Injectable() -', () => {
 			});
 		});
 
-		describe('factory', () => {
+		describe('factory -', () => {
 
-			@Injectable({
-				providedIn: EmptyModule,
-				useFactory: () => {
-					return new ProvidedInService();
+			describe('basic -', () => {
+
+				@Injectable({
+					providedIn: EmptyModule,
+					useFactory: () => {
+						return new ProvidedInService();
+					}
+				})
+				class ProvidedInService {
 				}
-			})
-			class ProvidedInService {
-			}
 
-			beforeEach(() => {
-				TestBed
-					.configureTestingModule({
-						imports: [
-							EmptyModule
-						]
-					});
+				it('should create service with provided factory function', () => {
+
+					// given
+					TestBed
+						.configureTestingModule({
+							imports: [
+								EmptyModule
+							]
+						});
+
+					// when
+					let service = TestBed.get(ProvidedInService);
+
+					// then
+					expect(service).toBeDefined();
+					expect(service instanceof ProvidedInService).toBeTruthy();
+				});
 			});
 
-			it('should create service with provided factory function', () => {
+			/**
+			 * 'useFactory' doesn't allow to provide dependencies to
+			 * the factory function.
+			 */
+			describe('dependencies -', () => {
 
-				// given & when
-				let service = TestBed.get(ProvidedInService);
+				@Injectable()
+				class DepService {}
 
-				// then
-				expect(service).toBeDefined();
-				expect(service instanceof ProvidedInService).toBeTruthy();
+				@NgModule({
+					providers: [
+						DepService
+					]
+				})
+				class ModuleWithDependency {}
+
+				@Injectable({
+					providedIn: ModuleWithDependency,
+					useFactory: (depService: DepService) => {
+						return new ProvidedInService(depService);
+					}
+				})
+				class ProvidedInService {
+					constructor(public depService: DepService) {}
+				}
+
+				beforeEach(() => {
+					TestBed
+						.configureTestingModule({
+							imports: [
+								ModuleWithDependency
+							]
+						});
+				});
+
+				it('should create service without dependencies', () => {
+
+					// given & when
+					let service = TestBed.get(ProvidedInService);
+
+					// then
+					expect(service.depService).toBeUndefined();
+				});
+
 			});
 
 		});
