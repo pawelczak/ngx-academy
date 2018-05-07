@@ -1,4 +1,4 @@
-import { Injectable, INJECTOR, NgModule } from '@angular/core';
+import { forwardRef, Inject, Injectable, INJECTOR, NgModule } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 describe('@Injectable() -', () => {
@@ -149,14 +149,14 @@ describe('@Injectable() -', () => {
 					// then
 					expect(service.depService).toBeUndefined();
 				});
-
 			});
-
 		});
 
 	});
 
-
+	/**
+	 * Classes provided as to injector, without Injectable decorator.
+	 */
 	describe('without -', () => {
 
 		class Car {

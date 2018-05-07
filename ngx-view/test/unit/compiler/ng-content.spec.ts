@@ -310,7 +310,7 @@ describe('ng-content -', () => {
 		});
 
 		/**
-		 * Allows element to projected as specific case.
+		 * Allows element to be projected as a specific case.
 		 */
 		describe('ngProjectAs -', () => {
 
