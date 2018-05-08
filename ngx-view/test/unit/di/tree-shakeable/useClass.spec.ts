@@ -3,33 +3,76 @@ import { TestBed } from '@angular/core/testing';
 
 describe('useClass -', () => {
 
-	const heroName = 'Just a hero',
-		superHeroName = 'Super Hero';
+	describe('basic -', () => {
 
-	class SuperHero {
-		name = superHeroName;
-	}
+		const heroName = 'Just a hero',
+			superHeroName = 'Super Hero';
 
-	@Injectable({
-		providedIn: 'root',
-		useClass: SuperHero
-	})
-	class Hero {
-		name = heroName;
-	}
+		class SuperHero {
+			name = superHeroName;
+		}
 
-	beforeEach(() => {
-		TestBed.configureTestingModule({});
+		@Injectable({
+			providedIn: 'root',
+			useClass: SuperHero
+		})
+		class Hero {
+			name = heroName;
+		}
+
+		beforeEach(() => {
+			TestBed.configureTestingModule({});
+		});
+
+		it('should provide useClass service', () => {
+
+			// given
+			const service = TestBed.get(Hero);
+
+			// when & then
+			expect(service instanceof SuperHero).toBeTruthy();
+			expect(service.name).toEqual(superHeroName);
+		});
 	});
 
-	it('should provide useClass service', () => {
+	/**
+	 * With the provdedIn & useClass syntax you can easily provide token
+	 * as abstract class.
+	 */
+	describe('abstract class as a token -', () => {
 
-		// given
-		const service = TestBed.get(Hero);
+		class Wolverine implements AbstractHero {
+			name = 'Logan';
+		}
 
-		// when & then
-		expect(service instanceof SuperHero).toBeTruthy();
-		expect(service.name).toEqual(superHeroName);
+		@Injectable({
+			providedIn: 'root',
+			useClass: Wolverine
+		})
+		abstract class AbstractHero {
+			abstract name: string;
+		}
+
+		beforeEach(() => {
+			TestBed.configureTestingModule({});
+		});
+
+		it('should provide useClass service', () => {
+
+			// given
+			const abstractHero = TestBed.get(AbstractHero);
+
+			// when & then
+			expect(abstractHero instanceof Wolverine).toBeTruthy();
+			expect(abstractHero.name).toEqual('Logan');
+		});
+
+		it('should not be Wolverine class in the context', () => {
+
+			// when & then
+			expect(() => TestBed.get(Wolverine)).toThrowError();
+		})
+
 	});
 
 });
