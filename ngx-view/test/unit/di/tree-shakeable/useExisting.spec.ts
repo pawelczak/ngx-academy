@@ -1,4 +1,4 @@
-import { Injectable, Injector, NgModule } from '@angular/core';
+import { Injectable, NgModule } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 describe('useExisting -', () => {
