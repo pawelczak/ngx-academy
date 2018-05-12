@@ -1,0 +1,39 @@
+{
+	"name": "typescript-academy",
+	"version": "1.0.0",
+	"description": "TypeScript test examples",
+	"keywords": [
+		"typescript"
+	],
+	"author": "Łukasz Pawełczak",
+	"license": "MIT",
+	"scripts": {
+		"purge": "rimraf node_modules",
+		"test": "karma start",
+		"test:watch": "karma start --no-single-run --auto-watch"
+	},
+	"dependencies": {
+		"typescript": "2.7.x"
+	},
+	"devDependencies": {
+		"@types/es6-shim": "0.0.31",
+		"@types/jasmine": "^2.6.0",
+		"@types/lodash": "ts2.0",
+		"@types/node": "^6.0.38",
+		"awesome-typescript-loader": "~3.1.2",
+		"husky": "^0.14.3",
+		"jasmine-core": "^2.4.3",
+		"jasmine-marbles": "0.3.1",
+		"karma": "^1.2.0",
+		"karma-chrome-launcher": "^2.2.0",
+		"karma-jasmine": "^1.0.2",
+		"karma-sourcemap-loader": "^0.3.7",
+		"karma-webpack": "2.0.1",
+		"ts-node": "^3.3.0",
+		"tslib": "^1.7.1",
+		"tslint": "^3.14.0",
+		"tslint-loader": "^2.1.5",
+		"typescript": "2.7.x",
+		"webpack": "2.5.1"
+	}
+}

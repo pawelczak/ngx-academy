@@ -1,0 +1,8 @@
+.*
+!.gitignore
+!.gitkeep
+!.editorconfig
+*.log
+*.iml
+/node_modules/
+/coverage/
