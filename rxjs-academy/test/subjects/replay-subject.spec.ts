@@ -69,6 +69,7 @@ describe('ReplaySubject -', () => {
 		subject.complete();
 	});
 
+
 	class SubjectTester {
 
 		private counter = 0;

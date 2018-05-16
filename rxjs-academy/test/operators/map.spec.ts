@@ -2,7 +2,7 @@ import { cold } from 'jasmine-marbles';
 import { map } from 'rxjs/operators';
 
 
-describe('RxJS - operators -', () => {
+describe('RxJS - operators - map -', () => {
 
 	it('should map onle value to another', () => {
 
