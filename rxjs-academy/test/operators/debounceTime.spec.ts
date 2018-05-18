@@ -17,8 +17,10 @@ describe('Rxjs - operators - debounceTime -', () => {
 		testScheduler.run(({ cold, expectObservable }) => {
 
 			// given
-			const givenValues = cold('-a-b-c-----|'),
-				expectedValues = 	 '--------c--|';
+			const givenValues = cold('-a-b-c-----|');
+			// 						       c123
+			//							   c--c <- move value 'c' by 3 frames
+			const expectedValues = 	 '--------c--|';
 
 			// when
 			const actualValues = givenValues.pipe(

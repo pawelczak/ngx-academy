@@ -139,6 +139,33 @@ describe('Component - input -', () => {
 			expect(valueChanges).toEqual(expectedOrder);
 		});
 
+		/**
+		 * Multiple input change triggers onChanges only once
+		 */
+		it('should trigger OnChanges only once', () => {
+
+			// when component is initialized
+			valueChanges = [];
+			fixture = TestBed.createComponent(TestComponent);
+			compInstance = fixture.componentInstance;
+			fixture.detectChanges();
+
+			// then
+			let numberOfOnChanges = (valueChanges.filter(c => c === 'OnChanges')).length;
+
+			expect(numberOfOnChanges).toBe(1);
+
+			// when components value changes
+			compInstance.value = 'new value';
+			valueChanges = [];
+			fixture.detectChanges();
+
+			// then
+			numberOfOnChanges = (valueChanges.filter(c => c === 'OnChanges')).length;
+
+			expect(numberOfOnChanges).toBe(1);
+		});
+
 
 	});
 

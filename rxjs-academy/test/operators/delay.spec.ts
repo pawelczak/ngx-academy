@@ -24,7 +24,7 @@ describe('RxJS - operators - delay -', () => {
 	it('should delay by one frame - 10 ms', () => {
 
 		// given
-		const givenValues$ = cold('a|', givenValues);
+		const givenValues$ = 	cold('a|', givenValues);
 		const expectedValues$ = cold('-a|', expectedValues);
 
 		const scheduler = getTestScheduler();

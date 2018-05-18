@@ -4,7 +4,7 @@ import { map } from 'rxjs/operators';
 
 describe('RxJS - operators - map -', () => {
 
-	it('should map onle value to another', () => {
+	it('should map one value to another', () => {
 
 		// given
 		const givenValues = {
