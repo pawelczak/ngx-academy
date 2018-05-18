@@ -40,6 +40,19 @@ describe('RxJS - operators - delay -', () => {
 
 	it('should delay multiple values by 5 time frames', () => {
 
+		// given
+		const givenValues$ = 	cold('a-b--c--|', givenValues);
+		const expectedValues$ = cold('-----a-b--c--|', expectedValues);
+
+		const scheduler = getTestScheduler();
+
+		// when
+		const actualValues$ = givenValues$.pipe(
+			delay(50, scheduler)
+		);
+
+		// then
+		expect(actualValues$).toBeObservable(expectedValues$);
 
 	});
 
