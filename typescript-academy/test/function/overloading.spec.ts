@@ -121,4 +121,27 @@ describe('Function - overloading -', () => {
 
 	});
 
+	describe('generics -', () => {
+
+		it ('should work with generics', () => {
+
+			// given
+			function play(value: number): string;
+			function play<T>(value: T): T;
+			function play<T>(value: number | T): string | T {
+
+				if (typeof value === 'number') {
+					return '1';
+				} else {
+					return value;
+				}
+			}
+
+			// when & then
+			expect(play(2)).toBe('1');
+			expect(play('string')).toBe('string');
+		});
+
+	})
+
 });
