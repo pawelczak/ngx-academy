@@ -54,13 +54,51 @@ describe('Function - overloading -', () => {
 			}
 
 			// when & then
-			// expect(play(1)).toBe('A');
+			expect(play(1)).toBe('A');
 			expect(play(1, 2)).toBe('B');
 			expect(play(1, 2, 3)).toBe('C');
 			expect(play(1, 2, 3, 4)).toBe('D');
+		});
 
+		it ('should be possible to overload number of arguments and types', () => {
+
+			function play(value: number): string;
+			function play(value: string): string;
+			function play(valueOne: string, valueTwo: string, valueThree: number): string;
+			function play(valueOne: number, valueTwo: number, valueThree: number): string;
+			function play(valueOne?: number | string, valueTwo?: number | string, valueThree?: number): string {
+
+				if (arguments.length === 1) {
+					if (typeof valueOne === 'number') {
+						return 'A';
+					} else if (typeof valueOne === 'string') {
+						return 'B';
+					}
+				}
+
+				if (arguments.length === 3) {
+					if (typeof valueOne === 'number' &&
+						typeof valueTwo === 'number') {
+						return 'C';
+					} else if (typeof valueOne === 'string' &&
+							   typeof valueTwo === 'string') {
+						return 'D';
+					}
+				}
+			}
+
+			// when & then
+			expect(play(1)).toBe('A');
+			expect(play('text')).toBe('B');
+			expect(play('text', 'text', 3)).toBe('C');
+			expect(play(1, 2, 3)).toBe('C');
+
+			// TypeScript throws error coz play doesn't have implementation with two arguments
+			// expect(play('text', 'text')).toBe('B');
 
 		});
 	});
+
+
 
 });
