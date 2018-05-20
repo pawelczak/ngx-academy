@@ -90,15 +90,35 @@ describe('Function - overloading -', () => {
 			// when & then
 			expect(play(1)).toBe('A');
 			expect(play('text')).toBe('B');
-			expect(play('text', 'text', 3)).toBe('C');
 			expect(play(1, 2, 3)).toBe('C');
+			expect(play('text', 'text', 3)).toBe('D');
 
 			// TypeScript throws error coz play doesn't have implementation with two arguments
 			// expect(play('text', 'text')).toBe('B');
-
 		});
 	});
 
+	describe('return types -', () => {
 
+		it ('should work with primitives', () => {
+
+			function play(value: number): number;
+			function play(value: string): string;
+			function play(value: number | string): number | string {
+
+				if (typeof value === 'number') {
+					return 1;
+				} else if (typeof value === 'string') {
+					return 'string';
+				} else {
+					// default
+				}
+			}
+
+			expect(play(2)).toBe(1);
+			expect(play('text')).toBe('string');
+		});
+
+	});
 
 });
