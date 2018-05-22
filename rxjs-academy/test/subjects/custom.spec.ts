@@ -5,6 +5,9 @@ describe('Subject - custom -', () => {
 	describe('wrapper -', () => {
 
 		class WrapperSubject<T> extends Subject<T> {
+			constructor() {
+				super();
+			}
 		}
 
 		it('should be possible to wrap subject', (done) => {
@@ -29,7 +32,11 @@ describe('Subject - custom -', () => {
 
 		class Hero {}
 
-		class TypedSubject<T extends Hero> extends Subject<T> {}
+		class TypedSubject<T = Hero> extends Subject<T> {
+			constructor() {
+				super();
+			}
+		}
 
 		it ('should allow to create TypedSubject of specific type', (done) => {
 
