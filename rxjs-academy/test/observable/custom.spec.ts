@@ -28,25 +28,26 @@ describe('Observable - custom -', () => {
 		}
 	}
 
-	it('should be possible to create own observable', (done) => {
-
-		// given
-		const givenHeroes = [
-				new Hero('Magento'),
-				new Hero('DeadPool'),
-				new Hero(heroNames[0]),
-				new Hero(heroNames[1])
-			],
-			expectedHeores = [...givenHeroes];
-
-		const heroes$ = new HeroObservable((observer: Observer<Hero>) => {
+	const givenHeroes = [
+			new Hero('Magento'),
+			new Hero('DeadPool'),
+			new Hero(heroNames[0]),
+			new Hero(heroNames[1])
+		],
+		expectedHeores = [...givenHeroes];
+	let actualHeroes: Array<Hero> = [],
+		heroes$: HeroObservable = new HeroObservable((observer: Observer<Hero>) => {
 			givenHeroes.forEach((h: Hero) => {
 				observer.next(h);
 			});
 			observer.complete();
 		});
 
-		const actualHeroes: Array<Hero> = [];
+	beforeEach(() => {
+		actualHeroes = [];
+	});
+
+	it('should be possible to create own observable', (done) => {
 
 		// when
 		heroes$
@@ -54,13 +55,31 @@ describe('Observable - custom -', () => {
 				tap((h: Hero) => actualHeroes.push(h)),
 				count()
 			)
-			.subscribe((h: any) => {
+			.subscribe(() => {
 
 				// then
 				expect(actualHeroes).toEqual(expectedHeores);
 				done();
 			});
+	});
 
+	it('should use custom operator', (done) => {
+
+		// when
+		heroes$
+			.isHero(...heroNames)
+			.pipe(
+				tap((h: Hero) => actualHeroes.push(h)),
+				count()
+			)
+			.subscribe(() => {
+
+				// then
+				expect(actualHeroes.length).toEqual(2);
+				expect(actualHeroes[0].name).toEqual(heroNames[0]);
+				expect(actualHeroes[1].name).toEqual(heroNames[1]);
+				done();
+			});
 	});
 
 });
