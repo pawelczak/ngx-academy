@@ -1,5 +1,7 @@
 import { ReplaySubject } from 'rxjs';
 
+import { SubjectTester } from './helpers/SubjectTester';
+
 /**
  * Replay subject return n last values when observer subscribes to it.
  */
@@ -14,15 +16,20 @@ describe('ReplaySubject -', () => {
 			givenValueThree
 		];
 
-	let subscriberTester: SubjectTester;
+	let subjectTester: SubjectTester;
 
 	beforeEach(() => {
-		subscriberTester = new SubjectTester();
+		subjectTester = new SubjectTester();
 	});
 
+	/**
+	 * By default Replay subject returns all the values.
+	 */
 	it('should by default return all values', (done) => {
 
 		// given
+		let expectedValues = [...givenValues];
+
 		let subject = new ReplaySubject<string>();
 		subject.next(givenValueOne);
 		subject.next(givenValueTwo);
@@ -31,12 +38,12 @@ describe('ReplaySubject -', () => {
 		// then
 		subject.subscribe((value: string) => {
 
-				subscriberTester.assertValue(value, givenValues);
+				subjectTester.assertValue(value, expectedValues);
 			},
 			() => {
 			},
 			() => {
-				subscriberTester.assertNumberOfAssertions(3);
+				subjectTester.assertNumberOfAssertions(expectedValues.length);
 				done();
 			});
 
@@ -44,6 +51,10 @@ describe('ReplaySubject -', () => {
 		subject.complete();
 	});
 
+	/**
+	 * It's possible to specify exact number of values, that ReplaySubject
+	 * emits on subscription.
+	 */
 	it('should return n values', (done) => {
 
 		// given
@@ -57,30 +68,15 @@ describe('ReplaySubject -', () => {
 		subject.subscribe((value: string) => {
 
 				// when
-				subscriberTester.assertValue(value, givenValues);
+				subjectTester.assertValue(value, givenValues);
 			}, () => {
 			},
 			() => {
-				subscriberTester.assertNumberOfAssertions(cacheSize);
+				subjectTester.assertNumberOfAssertions(cacheSize);
 				done();
 			});
 
 		// when
 		subject.complete();
 	});
-
-
-	class SubjectTester {
-
-		private counter = 0;
-
-		assertValue(value: string, expectedValues: Array<string>): void {
-			expect(value).toEqual(expectedValues[this.counter]);
-			this.counter += 1;
-		}
-
-		assertNumberOfAssertions(assertionNumber: number): void {
-			expect(assertionNumber).toEqual(this.counter, 'Number of assertions');
-		}
-	}
 });
