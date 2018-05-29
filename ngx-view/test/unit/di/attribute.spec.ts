@@ -19,7 +19,8 @@ describe('@Attribute -', () => {
 
 		const givenId = 28,
 			givenCssClass = 'nice-button',
-			givenConfig = '{id: 8, name: \'test\'}';
+			givenConfig = '{id: 8, name: \'test\'}',
+			givenValue = 'Awesome value';
 
 		@Component({
 			selector: 'attr-test',
@@ -31,7 +32,8 @@ describe('@Attribute -', () => {
 						@Attribute('class') public cssClass: string,
 						@Attribute('data-config') public config: string,
 						@Attribute('empty') public empty: string,
-						@Attribute('not-provided') public notProvided: string) {
+						@Attribute('not-provided') public notProvided: string,
+						@Attribute('not-provided') public notProvidedWithDefault: string = givenValue) {
 			}
 		}
 
@@ -92,6 +94,15 @@ describe('@Attribute -', () => {
 		it('should not provided inputs set to null', () => {
 
 			expect(compInstance.notProvided).toBeNull();
+		});
+
+		/**
+		 * Attribute doesn't exist on components tag, but default value is null.
+		 */
+		it('shouldn\'t set value on inputs that doesn\'t exist', () => {
+
+			expect(compInstance.notProvidedWithDefault).not.toBe(givenValue);
+			expect(compInstance.notProvidedWithDefault).toBeNull();
 		});
 
 	});
