@@ -6,8 +6,8 @@ import { TestBed } from '@angular/core/testing';
  * You cannot dynamically change static attribute value on a component
  *
  * <simple-comp
- * 		id='#simple' <- cannot be changed by angular
- * 		>
+ *        id='#simple' <- cannot be changed by angular
+ *        >
  * </simple-comp>
  */
 describe('@Attribute -', () => {
@@ -30,17 +30,19 @@ describe('@Attribute -', () => {
 			constructor(@Attribute('id') public id: string,
 						@Attribute('class') public cssClass: string,
 						@Attribute('data-config') public config: string,
-						@Attribute('empty') public empty: string) {}
+						@Attribute('empty') public empty: string,
+						@Attribute('not-provided') public notProvided: string) {
+			}
 		}
 
 		@Component({
 			selector: 'test',
 			template: `
 				<attr-test
-					id="${givenId}"
-					class="${givenCssClass}"
-					data-config="${givenConfig}"
-					empty >
+						id="${givenId}"
+						class="${givenCssClass}"
+						data-config="${givenConfig}"
+						empty>
 				</attr-test>
 			`
 		})
@@ -48,6 +50,8 @@ describe('@Attribute -', () => {
 			@ViewChild(AttrComponent)
 			attrRef: AttrComponent;
 		}
+
+		let compInstance: any;
 
 		beforeEach(() => {
 			TestBed
@@ -57,16 +61,16 @@ describe('@Attribute -', () => {
 						AttrComponent
 					]
 				});
-		});
-
-		it ('should get attribute from a component', () => {
 
 			// given
-			const fixture = TestBed.createComponent(TestComponent),
-				compInstance = fixture.componentInstance.attrRef;
+			const fixture = TestBed.createComponent(TestComponent);
+			compInstance = fixture.componentInstance.attrRef;
 
 			// when
 			fixture.detectChanges();
+		});
+
+		it('should get attribute from a component', () => {
 
 			// then
 			expect(compInstance.id).toEqual('' + givenId);
@@ -80,6 +84,14 @@ describe('@Attribute -', () => {
 
 			expect(compInstance.empty).toEqual('');
 			expect(typeof compInstance.empty).toEqual('string');
+		});
+
+		/**
+		 * Attribute doesn't exist on components tag.
+		 */
+		it('should not provided inputs set to null', () => {
+
+			expect(compInstance.notProvided).toBeNull();
 		});
 
 	});

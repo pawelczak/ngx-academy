@@ -45,8 +45,4 @@ describe('BehaviorSubject -', () => {
 
 	});
 
-
-
-
-
 });
