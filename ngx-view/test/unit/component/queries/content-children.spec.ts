@@ -787,19 +787,23 @@ describe('ContentChildren -', () => {
 
 			/**
 			 * Changing value in the content component referenced by @ContentChildren,
-			 * will not trigger any changes.
+			 * will trigger changes.
 			 */
-			it('is not possible to observe value changes made in the content', () => {
+			it('is possible to observe value changes made in the content', () => {
 
 				// given
 				const newValue = 'Time Duncan';
+
+				compInstance.flag = true;
+				fixture.detectChanges();
 
 				// when
 				compInstance.value = newValue;
 				fixture.detectChanges();
 
 				// then
-				expect(simpleCompRefs.length).toEqual(0);
+				expect(simpleCompRefs.length).toEqual(1);
+				expect(simpleCompRefs[0].value).toEqual(newValue);
 			});
 
 		});
@@ -901,7 +905,9 @@ describe('ContentChildren -', () => {
 				selector: 'test',
 				template: `
 					<content-template>
-						<ng-container #container></ng-container>
+						<ng-template>
+							<div>{{value}}</div>
+						</ng-template>
 					</content-template>
 
 					<ng-template #template>
@@ -913,11 +919,10 @@ describe('ContentChildren -', () => {
 				@ViewChild(ContentTemplateComponent)
 				compRef: ContentTemplateComponent;
 
-				@ViewChild('container', {read: ViewContainerRef})
-				compVCR: ViewContainerRef;
-
 				@ViewChild(TemplateRef)
 				templRef: TemplateRef<any>;
+
+				value = '1';
 
 				constructor(public changeDetectorRef: ChangeDetectorRef) {
 				}
@@ -956,9 +961,8 @@ describe('ContentChildren -', () => {
 			 */
 			it('isn\'t possible to dynamically add ng-template', () => {
 
-				compInstance.compVCR.createEmbeddedView(compInstance.templRef);
-
 				// when
+				compInstance.value = '2'
 				fixture.detectChanges();
 
 				// then
