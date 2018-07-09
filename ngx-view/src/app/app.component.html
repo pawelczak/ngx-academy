@@ -1,15 +1,20 @@
 <p>Hello Angular</p>
 
-<ct-level-one [input]="'aaa'" >
-	<p>
-		aaa
-	</p>
+<a [routerLink]="['project']" >Project</a>
+<a [routerLink]="['task']" >Task</a>
 
-	<ng-template #text >
-		<p>AAA</p>
-		<!--<div>Template {{renderTemplateInput()}}</div>-->
-	</ng-template>
+<router-outlet></router-outlet>
 
-</ct-level-one>
+<!--<ct-level-one [input]="'aaa'" >-->
+	<!--<p>-->
+		<!--aaa-->
+	<!--</p>-->
+
+	<!--<ng-template #text >-->
+		<!--<p>AAA</p>-->
+		<!--&lt;!&ndash;<div>Template {{renderTemplateInput()}}</div>&ndash;&gt;-->
+	<!--</ng-template>-->
+
+<!--</ct-level-one>-->
 
 <!--<button (click)="changeInput()" >Change Input</button>-->
