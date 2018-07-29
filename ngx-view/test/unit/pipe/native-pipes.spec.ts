@@ -17,6 +17,7 @@ describe('Natives pipes -', () => {
 	 *
 	 * Object:
 	 * - json
+	 * - keyvalue
 	 *
 	 * Number:
 	 * - number
@@ -27,18 +28,18 @@ describe('Natives pipes -', () => {
 	 * - slice
 	 *
 	 */
-	describe ('string -', () => {
+	describe('string -', () => {
 
 		@Component({
 			selector: 'pipes-test',
 			template: `
-			
-			<p>{{text | lowercase}}</p>
-			
-			<p>{{text | uppercase}}</p>
-			
-			<p>{{text | titlecase}}</p>
-			
+
+				<p>{{text | lowercase}}</p>
+
+				<p>{{text | uppercase}}</p>
+
+				<p>{{text | titlecase}}</p>
+
 			`
 		})
 		class PipesTestComponent {
@@ -56,7 +57,7 @@ describe('Natives pipes -', () => {
 				});
 		});
 
-		it ('should modify template value by specific pipe', () => {
+		it('should modify template value by specific pipe', () => {
 
 			// given
 			const fixture = TestBed.createComponent(PipesTestComponent);
@@ -81,52 +82,111 @@ describe('Natives pipes -', () => {
 
 	describe('Object -', () => {
 
-		@Component({
-			selector: 'pipes-test',
-			template: `
-				<p>{{object | json}}</p>
-			`
-		})
-		class PipesTestComponent {
+		describe('json -', () => {
 
-			object = {
-				jaba: 0,
-				the: 1,
-				hut: 2
-			};
-		}
+			const givenData = {
+					jaba: 'the',
+					the: 'han',
+					hut: 'solo'
+				},
+				expectedValue = JSON.stringify(givenData, null, 2);
 
-		beforeEach(() => {
-			TestBed
-				.configureTestingModule({
-					imports: [],
-					declarations: [
-						PipesTestComponent
-					]
-				});
+			@Component({
+				selector: 'pipes-test',
+				template: `
+					<p>{{object | json}}</p>
+				`
+			})
+			class PipesTestComponent {
+
+				object = givenData;
+			}
+
+			beforeEach(() => {
+				TestBed
+					.configureTestingModule({
+						imports: [],
+						declarations: [
+							PipesTestComponent
+						]
+					});
+			});
+
+			it('should modify template value by specific pipe', () => {
+
+				// given
+				const fixture = TestBed.createComponent(PipesTestComponent);
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				const elements = fixture.nativeElement.querySelectorAll('p');
+
+				expect(elements[0].textContent).toBe(expectedValue);
+			});
 		});
 
-		it ('should modify template value by specific pipe', () => {
 
-			// given
-			const fixture = TestBed.createComponent(PipesTestComponent),
-				expectedValue = JSON.stringify(fixture.componentInstance.object, null, 2);
-			/**
-			 * expectedValue
-			 * '{
-				  "jaba": 0,
-				  "the": 1,
-				  "hut": 2
-				}'
-			 */
+		/**
+		 * The pipe keyvalue allows to iterate over object/array/map,
+		 * by "key" rather than value.
+		 * Other thing that should be said is that it serves data sorted, so:
+		 * {
+		 * 	2: 'Cruise'
+		 * 	1: 'Tom'
+		 * }
+		 * will be presentend in order 1: 'Tom', '2: Cruise'
+		 */
+		describe('keyvalue -', () => {
 
-			// when
-			fixture.detectChanges();
+			const givenData = {
+					1: 'Lebron',
+					2: 'James'
+				};
 
-			// then
-			const elements = fixture.nativeElement.querySelectorAll('p');
+			@Component({
+				template: `
+					<div *ngFor="let item of object | keyvalue">
+						<h1 >{{item.key}}</h1>
+						<h2 >{{item.value}}</h2>
+					</div>
+				`
+			})
+			class KeyValuePipeComponent {
 
-			expect(elements[0].textContent).toBe(expectedValue);
+				object = givenData;
+			}
+
+			beforeEach(() => {
+				TestBed
+					.configureTestingModule({
+						imports: [],
+						declarations: [
+							KeyValuePipeComponent
+						]
+					});
+			});
+
+			it('should modify template value by specific pipe', () => {
+
+				// given
+				const fixture = TestBed.createComponent(KeyValuePipeComponent);
+
+				// when
+				fixture.detectChanges();
+
+				// then
+				const keys = fixture.nativeElement.querySelectorAll('h1'),
+					values = fixture.nativeElement.querySelectorAll('h2');
+
+				Object.keys(givenData)
+					.forEach((key, index) => {
+						expect(keys[index].innerText).toBe(key);
+						expect(values[index].innerText).toBe(givenData[key]);
+					})
+			});
+
 		});
 	});
 
