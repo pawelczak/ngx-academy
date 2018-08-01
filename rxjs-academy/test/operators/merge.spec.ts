@@ -1,8 +1,9 @@
 import { cold } from 'jasmine-marbles';
-import { merge } from 'rxjs/operators';
+import { merge as mergeCreator, interval } from 'rxjs/index';
+import { mapTo, merge, take } from 'rxjs/operators';
+
 
 describe('RxJs - operators - merge -', () => {
-
 
 	it ('should merge two observables', () => {
 
@@ -50,5 +51,41 @@ describe('RxJs - operators - merge -', () => {
 
 		// then
 		expect(actualValues).toBeObservable(expectedValues);
+	});
+
+
+	/**
+	 * Merge combines observables:
+	 * Both observables are started when users subscribes to the source
+	 * merged stream completes when the last observable completes.
+	 */
+	it ('should merge two observables created with create functions', (done) => {
+
+		// given
+		const givenValues = [
+			5,
+			12
+		];
+
+		const sourceOne$ = interval(500).pipe(take(1), mapTo(givenValues[0])),
+			sourceTwo$ = interval(1500).pipe(take(1), mapTo(givenValues[1]));
+
+		// when
+		let iterator = 0;
+
+		mergeCreator(
+			sourceOne$,
+			sourceTwo$
+		).subscribe((value: number) => {
+
+			// then
+			expect(value).toEqual(givenValues[iterator]);
+			iterator++;
+
+			if (givenValues.length === iterator) {
+				done();
+			}
+		});
+
 	});
 });
