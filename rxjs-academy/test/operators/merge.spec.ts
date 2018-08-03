@@ -5,12 +5,12 @@ import { mapTo, merge, take } from 'rxjs/operators';
 
 describe('RxJs - operators - merge -', () => {
 
-	it ('should merge two observables', () => {
+	it('should merge two observables', () => {
 
 		// given
-		const inputOne =	 	cold('-a---b---c--|');
-		const inputTwo = 		cold('---x----y---|');
-		const expectedValues = 	cold('-a-x-b--yc--|');
+		const inputOne = cold('-a---b---c--|');
+		const inputTwo = cold('---x----y---|');
+		const expectedValues = cold('-a-x-b--yc--|');
 
 		// when
 		const actualValues = inputOne.pipe(
@@ -21,12 +21,12 @@ describe('RxJs - operators - merge -', () => {
 		expect(actualValues).toBeObservable(expectedValues);
 	});
 
-	it ('should merge two observables that complete on different frames', () => {
+	it('should merge two observables that complete on different frames', () => {
 
 		// given
-		const inputOne =	 	cold('------a-----|');
-		const inputTwo = 		cold('-x--|');
-		const expectedValues = 	cold('-x----a-----|');
+		const inputOne = cold('------a-----|');
+		const inputTwo = cold('-x--|');
+		const expectedValues = cold('-x----a-----|');
 
 		// when
 		const actualValues = inputOne.pipe(
@@ -37,12 +37,12 @@ describe('RxJs - operators - merge -', () => {
 		expect(actualValues).toBeObservable(expectedValues);
 	});
 
-	it ('should merge two observables that emit value on the same frame', () => {
+	it('should merge two observables that emit value on the same frame', () => {
 
 		// given
-		const inputOne =		cold('---a---|');
-		const inputTwo = 		cold('---b---|');
-		const expectedValues = 	cold('---(ab)|');
+		const inputOne = cold('---a---|');
+		const inputTwo = cold('---b---|');
+		const expectedValues = cold('---(ab)|');
 
 		// when
 		const actualValues = inputOne.pipe(
@@ -59,7 +59,7 @@ describe('RxJs - operators - merge -', () => {
 	 * Both observables are started when users subscribes to the source
 	 * merged stream completes when the last observable completes.
 	 */
-	it ('should merge two observables created with create functions', (done) => {
+	it('should merge two observables created with create functions', (done) => {
 
 		// given
 		const givenValues = [
@@ -67,8 +67,8 @@ describe('RxJs - operators - merge -', () => {
 			12
 		];
 
-		const sourceOne$ = interval(500).pipe(take(1), mapTo(givenValues[0])),
-			sourceTwo$ = interval(1500).pipe(take(1), mapTo(givenValues[1]));
+		const sourceOne$ = interval(1).pipe(take(1), mapTo(givenValues[0])),
+			sourceTwo$ = interval(3).pipe(take(1), mapTo(givenValues[1]));
 
 		// when
 		let iterator = 0;
@@ -78,14 +78,15 @@ describe('RxJs - operators - merge -', () => {
 			sourceTwo$
 		).subscribe((value: number) => {
 
-			// then
-			expect(value).toEqual(givenValues[iterator]);
-			iterator++;
-
-			if (givenValues.length === iterator) {
+				// then
+				expect(value).toEqual(givenValues[iterator]);
+				iterator++;
+			},
+			null,
+			() => {
 				done();
 			}
-		});
+		);
 
 	});
 });

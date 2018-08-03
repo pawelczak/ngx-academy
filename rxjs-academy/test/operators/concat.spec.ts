@@ -5,12 +5,12 @@ import { mapTo, take } from 'rxjs/operators';
 
 describe('RxJs - operators - concat -', () => {
 
-	it ('should concat two observables', () => {
+	it('should concat two observables', () => {
 
 		// given
-		const inputOne =	 	cold('-a---b---c--|');
-		const inputTwo = 		cold('---x--y--|');
-		const expectedValues = 	cold('-a---b---c-----x--y--|');
+		const inputOne = cold('-a---b---c--|');
+		const inputTwo = cold('---x--y--|');
+		const expectedValues = cold('-a---b---c-----x--y--|');
 
 		// when
 		const actualValues = concat(
@@ -31,7 +31,7 @@ describe('RxJs - operators - concat -', () => {
 	 * It's bad aproach when you want to use it for http calls because you cannot know
 	 * from which source data will appear first.
 	 */
-	it ('should concat two observables created with create functions', (done) => {
+	it('should concat two observables created with create functions', (done) => {
 
 		// given
 		const givenValues = [
@@ -39,8 +39,8 @@ describe('RxJs - operators - concat -', () => {
 			12
 		];
 
-		const sourceOne$ = interval(500).pipe(take(1), mapTo(givenValues[0])),
-			sourceTwo$ = interval(1500).pipe(take(1), mapTo(givenValues[1]));
+		const sourceOne$ = interval(1).pipe(take(1), mapTo(givenValues[0])),
+			sourceTwo$ = interval(3).pipe(take(1), mapTo(givenValues[1]));
 
 		// when
 		let iterator = 0;
@@ -50,14 +50,15 @@ describe('RxJs - operators - concat -', () => {
 			sourceTwo$
 		).subscribe((value: number) => {
 
-			// then
-			expect(value).toEqual(givenValues[iterator]);
-			iterator++;
-
-			if (givenValues.length === iterator) {
+				// then
+				expect(value).toEqual(givenValues[iterator]);
+				iterator++;
+			},
+			null,
+			() => {
 				done();
 			}
-		});
+		);
 
 	});
 
