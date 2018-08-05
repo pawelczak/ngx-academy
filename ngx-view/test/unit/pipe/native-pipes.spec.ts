@@ -50,7 +50,6 @@ describe('Natives pipes -', () => {
 		beforeEach(() => {
 			TestBed
 				.configureTestingModule({
-					imports: [],
 					declarations: [
 						PipesTestComponent
 					]
