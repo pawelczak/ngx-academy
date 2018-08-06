@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 
-import { LifeCyclesComponent } from '../../../../src/app/components/life-cycles.component';
-import { Logger } from '../../../../src/app/util/logger';
+import { LifeCyclesComponent } from '../../../../src/lifecycle/app/components/life-cycles.component';
+import { Logger } from '../../../../src/lifecycle/app/util/logger';
 
 @Component({
 	selector: 'ct-second-level',

@@ -12,7 +12,8 @@ module.exports = {
 	entry: {
 		'polyfills': './src/polyfills.browser.ts',
 		'vendor': './src/vendor.browser.ts',
-		'main': './src/main.browser.ts'
+		'injectors': './src/injectors/injectors.ts',
+		'lifecycle': './src/lifecycle/lifecycle.ts'
 	},
 
 	output: {
@@ -102,8 +103,16 @@ module.exports = {
 
 	plugins: [
 		new HtmlWebpackPlugin({
-			template: 'src/index.html',
-			chunksSortMode: 'dependency'
+			template: 'src/injectors/index.html',
+			chunks: ['injectors', 'vendor', 'polyfills'],
+			chunksSortMode: 'dependency',
+			filename: 'injectors.html'
+		}),
+		new HtmlWebpackPlugin({
+			template: 'src/lifecycle/index.html',
+			chunks: ['lifecycle', 'vendor', 'polyfills'],
+			chunksSortMode: 'dependency',
+			filename: 'lifecycle.html'
 		}),
 		new webpack.ContextReplacementPlugin(
 			/angular(\\|\/)core(\\|\/)/,

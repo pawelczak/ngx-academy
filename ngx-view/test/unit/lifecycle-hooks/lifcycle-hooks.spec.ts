@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
-import { Logger } from '../../../src/app/util/logger';
+import { Logger } from '../../../src/lifecycle/app/util/logger';
 import { FlatComponent } from './components/flat.component';
 import { FirstLevelComponent } from './components/first-level.component';
 import { SecondLevelComponent } from './components/second-level.component';
