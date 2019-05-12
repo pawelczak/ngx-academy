@@ -10,7 +10,7 @@ describe('Pipes - chaining', () => {
 	@Component({
 		template: `
 			<span class="title">
-				{{ title | lowercase | uppercase | titlecase }}
+				{{ title | lowercase | uppercase | titlecase | lowercase }}
 			</span>
 		`
 	})
@@ -26,7 +26,7 @@ describe('Pipes - chaining', () => {
 		})
 	});
 
-	it('should be possible to chain pipes', () => {
+	fit('should be possible to chain pipes', () => {
 
 		// given
 		const fixture = TestBed.createComponent(PipeChainComponent);
