@@ -112,20 +112,33 @@ describe('Builder', () => {
 		};
 	}
 
-	it('should create immutable hero', () => {
+	// given
+	let heroName = 'Batman',
+		heroPower = 'money';
 
-		// given
-		let heroName = 'Batman',
-			heroPower = 'money';
+	it('should create immutable hero', () => {
 
 		// when
 		let immutableHero = new ImmutableHero.Builder(heroName).withPower(heroPower)
-											 .build();
+															   .build();
 
 		// then
 		expect(immutableHero instanceof ImmutableHero).toBeTruthy();
 		expect(immutableHero.getName()).toEqual(heroName);
 		expect(immutableHero.getPower()).toEqual(heroPower);
+	});
+
+	it('should be able to change heroes values', () => {
+
+		// given
+		let immutableHero = new ImmutableHero.Builder(heroName).withPower(heroPower)
+															   .build();
+
+		// when
+		(immutableHero as any).name = 'Clark Kent';
+
+		// then
+		expect(immutableHero.getName()).toEqual(heroName);
 	});
 
 });
