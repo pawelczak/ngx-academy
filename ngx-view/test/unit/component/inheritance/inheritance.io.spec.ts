@@ -1,4 +1,4 @@
-describe('Inheritence I/O -', () => {
+describe('Inheritance I/O -', () => {
 
 
 

@@ -6,7 +6,7 @@ import { BaseComponent } from './base-component';
 import { BaseComponentProperties } from './base-component-properties';
 
 
-fdescribe('@BaseComponent -', () => {
+describe('@BaseComponent -', () => {
 
 	const givenHero = 'Bruce Wayne';
 
