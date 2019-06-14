@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 
-fdescribe('Component Inheritance - LifecycleHooks -', () => {
+describe('Component Inheritance - LifecycleHooks -', () => {
 
 	describe('basic', () => {
 
