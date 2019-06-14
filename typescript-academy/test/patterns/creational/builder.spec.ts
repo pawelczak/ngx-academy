@@ -1,9 +1,8 @@
 describe('Builder', () => {
 
-
 	abstract class ImmutableBuilder<T> {
 
-		abstract buildObject(): T;
+		protected abstract buildObject(): T;
 
 		build(): T {
 			let obj = this.buildObject();
@@ -13,12 +12,13 @@ describe('Builder', () => {
 
 	}
 
-
 	class Hero {
 
 		private name: string;
 
 		private power: string;
+
+		private constructor() {}
 
 		getName(): string {
 			return this.name;
@@ -52,8 +52,17 @@ describe('Builder', () => {
 				return hero;
 			}
 		};
-	}
 
+		static OtherBuilder = class OtherBuilder extends Hero.Builder {
+
+			private static readonly defaultName = 'Bruce';
+
+			constructor() {
+				super(OtherBuilder.defaultName);
+			}
+
+		}
+	}
 
 	it('should create hero', () => {
 
@@ -76,6 +85,9 @@ describe('Builder', () => {
 		private name: string;
 
 		private power: string;
+
+		private constructor() {
+		}
 
 		getName(): string {
 			return this.name;

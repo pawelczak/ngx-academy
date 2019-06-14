@@ -1,0 +1,5 @@
+describe('Inheritence I/O -', () => {
+
+
+
+});

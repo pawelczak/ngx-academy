@@ -3,13 +3,9 @@ import { takeUntil } from 'rxjs/operators';
 
 describe('Unsubscribe - takeUntil -', () => {
 
-
 	const unsubscribe$ = new Subject();
 
-
-
-
-	fit ('should complete subscribed observable', (done) => {
+	it ('should complete subscribed observable', (done) => {
 
 		const source$ = interval(3);
 
