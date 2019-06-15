@@ -2,7 +2,7 @@ import { Component, ContentChild, ElementRef, TemplateRef, ViewChild } from '@an
 import { TestBed } from '@angular/core/testing';
 
 
-describe('Inheritance Queries -', () => {
+describe('Component Inheritance - Queries -', () => {
 
 	describe('ViewChild -', () => {
 
@@ -20,13 +20,13 @@ describe('Inheritance Queries -', () => {
 				</div>
 			`
 		})
-		class TestComponent extends ViewChildComponent {
+		class SubViewChildComponent extends ViewChildComponent {
 		}
 
 		beforeEach(() => {
 			TestBed.configureTestingModule({
 				declarations: [
-					TestComponent
+					SubViewChildComponent
 				]
 			});
 		});
@@ -34,7 +34,7 @@ describe('Inheritance Queries -', () => {
 		it('should create template component', () => {
 
 			// given
-			const fixture = TestBed.createComponent(TestComponent);
+			const fixture = TestBed.createComponent(SubViewChildComponent);
 
 			// when
 			fixture.detectChanges();
@@ -56,33 +56,33 @@ describe('Inheritance Queries -', () => {
 		}
 
 		@Component({
-			selector: 'content-child-inherited',
+			selector: 'sub-content-child',
 			template: ``
 		})
-		class TestContentChildComponent extends ContentChildComponent {
+		class SubContentChildComponent extends ContentChildComponent {
 		}
 
 		@Component({
 			template: `
-				<content-child-inherited>
+				<sub-content-child>
 					
 					<ng-template #template>
 						Because I'm Batman
 					</ng-template>
 					
-				</content-child-inherited>
+				</sub-content-child>
 			`
 		})
 		class TestComponent {
-			@ViewChild(TestContentChildComponent)
-			contentChild: TestContentChildComponent;
+			@ViewChild(SubContentChildComponent)
+			contentChild: SubContentChildComponent;
 		}
 
 		beforeEach(() => {
 			TestBed.configureTestingModule({
 				declarations: [
 					TestComponent,
-					TestContentChildComponent
+					SubContentChildComponent
 				]
 			});
 		});

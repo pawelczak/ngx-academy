@@ -1,6 +1,7 @@
 import { Component, HostBinding, HostListener } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
+
 describe('Inheritance Host -', () => {
 
 	describe('HostBinding -', () => {
@@ -16,13 +17,13 @@ describe('Inheritance Host -', () => {
 		@Component({
 			template: ``
 		})
-		class InheritedHostBindingComponent extends HostBindingComponent {
+		class SubHostBindingComponent extends HostBindingComponent {
 		}
 
 		beforeEach(() => {
 			TestBed.configureTestingModule({
 				declarations: [
-					InheritedHostBindingComponent
+					SubHostBindingComponent
 				]
 			});
 		});
@@ -30,7 +31,7 @@ describe('Inheritance Host -', () => {
 		it('should create template component', () => {
 
 			// given
-			const fixture = TestBed.createComponent(InheritedHostBindingComponent);
+			const fixture = TestBed.createComponent(SubHostBindingComponent);
 
 			// when
 			fixture.componentInstance.className = className;
@@ -56,13 +57,13 @@ describe('Inheritance Host -', () => {
 		@Component({
 			template: ``
 		})
-		class InheritedHostListenerComponent extends HostListenerComponent {
+		class SubHostListenerComponent extends HostListenerComponent {
 		}
 
 		beforeEach(() => {
 			TestBed.configureTestingModule({
 				declarations: [
-					InheritedHostListenerComponent
+					SubHostListenerComponent
 				]
 			});
 		});
@@ -70,7 +71,7 @@ describe('Inheritance Host -', () => {
 		it('should create template component', () => {
 
 			// given
-			const fixture = TestBed.createComponent(InheritedHostListenerComponent);
+			const fixture = TestBed.createComponent(SubHostListenerComponent);
 			fixture.detectChanges();
 
 			// when

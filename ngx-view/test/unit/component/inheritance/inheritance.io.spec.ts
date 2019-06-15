@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
 
-describe('Inheritance I/O -', () => {
+describe('Component Inheritance - I/O -', () => {
 
 	describe('input -', () => {
 
@@ -16,17 +16,17 @@ describe('Inheritance I/O -', () => {
 		}
 
 		@Component({
-			selector: 'inherited-input',
+			selector: 'sub-input',
 			template: `
 				{{value}}
 			`
 		})
-		class InheritedInputComponent extends InputComponent {
+		class SubInputComponent extends InputComponent {
 		}
 
 		@Component({
 			template: `
-				<inherited-input [value]="value"></inherited-input>
+				<sub-input [value]="value"></sub-input>
 			`
 		})
 		class TestComponent {
@@ -37,7 +37,7 @@ describe('Inheritance I/O -', () => {
 		beforeEach(() => {
 			TestBed.configureTestingModule({
 				declarations: [
-					InheritedInputComponent,
+					SubInputComponent,
 					TestComponent
 				]
 			});
@@ -68,12 +68,12 @@ describe('Inheritance I/O -', () => {
 		}
 
 		@Component({
-			selector: 'inherited-output',
+			selector: 'sub-output',
 			template: `
 				<button (click)="emit()"></button>
 			`
 		})
-		class InheritedOutputComponent extends OutputComponent {
+		class SubOutputComponent extends OutputComponent {
 
 			emit(): void {
 				this.valueChanged.emit(givenValue)
@@ -82,7 +82,7 @@ describe('Inheritance I/O -', () => {
 
 		@Component({
 			template: `
-				<inherited-output (valueChanged)="onValueChanged($event)" ></inherited-output>
+				<sub-output (valueChanged)="onValueChanged($event)" ></sub-output>
 			`
 		})
 		class TestComponent {
@@ -97,7 +97,7 @@ describe('Inheritance I/O -', () => {
 		beforeEach(() => {
 			TestBed.configureTestingModule({
 				declarations: [
-					InheritedOutputComponent,
+					SubOutputComponent,
 					TestComponent
 				]
 			});

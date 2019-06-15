@@ -18,13 +18,13 @@ describe('Component Inheritance - LifecycleHooks -', () => {
 		@Component({
 			template: ``
 		})
-		class TestOnInitComponent extends OnInitComponent {
+		class SubOnInitComponent extends OnInitComponent {
 		}
 
 		beforeEach(() => {
 			TestBed.configureTestingModule({
 				declarations: [
-					TestOnInitComponent
+					SubOnInitComponent
 				]
 			});
 		});
@@ -32,7 +32,7 @@ describe('Component Inheritance - LifecycleHooks -', () => {
 		it('should trigger OnInit', () => {
 
 			// given
-			const fixture = TestBed.createComponent(TestOnInitComponent);
+			const fixture = TestBed.createComponent(SubOnInitComponent);
 
 			// when
 			fixture.detectChanges();
@@ -44,7 +44,7 @@ describe('Component Inheritance - LifecycleHooks -', () => {
 	});
 
 
-	describe('polymorphism', () => {
+	describe('polymorphism -', () => {
 
 		class OnDestroyComponent implements OnDestroy {
 
@@ -58,7 +58,7 @@ describe('Component Inheritance - LifecycleHooks -', () => {
 		@Component({
 			template: ``
 		})
-		class TestOnDestroyComponent extends OnDestroyComponent {
+		class SubOnDestroyComponent extends OnDestroyComponent {
 
 			ngOnDestroy() {
 				console.log('my destroy');
@@ -69,7 +69,7 @@ describe('Component Inheritance - LifecycleHooks -', () => {
 		beforeEach(() => {
 			TestBed.configureTestingModule({
 				declarations: [
-					TestOnDestroyComponent
+					SubOnDestroyComponent
 				]
 			});
 		});
@@ -77,7 +77,7 @@ describe('Component Inheritance - LifecycleHooks -', () => {
 		it('should trigger OnDestroy', () => {
 
 			// given
-			const fixture = TestBed.createComponent(TestOnDestroyComponent);
+			const fixture = TestBed.createComponent(SubOnDestroyComponent);
 
 			// when
 			fixture.destroy();
