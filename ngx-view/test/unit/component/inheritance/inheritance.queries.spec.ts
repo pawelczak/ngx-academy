@@ -2,7 +2,7 @@ import { Component, ContentChild, ElementRef, TemplateRef, ViewChild } from '@an
 import { TestBed } from '@angular/core/testing';
 
 
-fdescribe('Inheritance Queries -', () => {
+describe('Inheritance Queries -', () => {
 
 	describe('ViewChild -', () => {
 
@@ -48,7 +48,7 @@ fdescribe('Inheritance Queries -', () => {
 		});
 	});
 
-	fdescribe('ContentChild -', () => {
+	describe('ContentChild -', () => {
 
 		class ContentChildComponent {
 			@ContentChild('template')
