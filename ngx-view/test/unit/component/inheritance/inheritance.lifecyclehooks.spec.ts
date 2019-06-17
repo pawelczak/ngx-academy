@@ -61,7 +61,7 @@ describe('Component Inheritance - LifecycleHooks -', () => {
 		class SubOnDestroyComponent extends OnDestroyComponent {
 
 			ngOnDestroy() {
-				console.log('my destroy');
+				// console.log('my destroy');
 				super.ngOnDestroy();
 			}
 		}

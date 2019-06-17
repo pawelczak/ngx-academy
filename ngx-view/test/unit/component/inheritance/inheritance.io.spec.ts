@@ -43,7 +43,7 @@ describe('Component Inheritance - I/O -', () => {
 			});
 		});
 
-		it('should inherited inputs', () => {
+		it('should inherit inputs', () => {
 
 			// given
 			const fixture = TestBed.createComponent(TestComponent);
@@ -52,10 +52,11 @@ describe('Component Inheritance - I/O -', () => {
 			fixture.detectChanges();
 
 			// then
-			const text = fixture.debugElement.query(By.css('inherited-input')).nativeElement.textContent.trim();
+			const text = fixture.debugElement.query(By.css('sub-input')).nativeElement.textContent.trim();
 			expect(text).toEqual(givenValue);
 		});
 	});
+
 
 	describe('output -', () => {
 
