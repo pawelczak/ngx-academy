@@ -38,7 +38,9 @@ describe('Inheritance Host -', () => {
 			fixture.detectChanges();
 
 			// then
-			expect(fixture.debugElement.nativeElement.classList).toContain(className);
+			const cssClassList = fixture.debugElement.nativeElement.classList;
+
+			expect(cssClassList).toContain(className);
 		});
 	});
 
