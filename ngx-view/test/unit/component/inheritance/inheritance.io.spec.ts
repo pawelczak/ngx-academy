@@ -104,7 +104,7 @@ describe('Component Inheritance - I/O -', () => {
 			});
 		});
 
-		it('should inherited inputs', () => {
+		it('should inherit outputs', () => {
 
 			// given
 			const fixture = TestBed.createComponent(TestComponent);

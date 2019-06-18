@@ -61,10 +61,13 @@ describe('Component Inheritance - Metadata -', () => {
 		@Component({
 			selector: 'my-comp',
 			template: `
-				<span>
-					${givenValue}
-				</span>
-			`
+				<div>
+					${givenValue} !!!
+				</div>
+			`,
+			styles: [
+				`div {color: purple}`
+			]
 		})
 		class MyComponent extends BaseComponent {
 		}
@@ -77,7 +80,7 @@ describe('Component Inheritance - Metadata -', () => {
 			});
 		});
 
-		it('should inherited inputs', () => {
+		it('should inherit', () => {
 
 			// given
 			const fixture = TestBed.createComponent(MyComponent);
@@ -86,11 +89,11 @@ describe('Component Inheritance - Metadata -', () => {
 			fixture.detectChanges();
 
 			// then
-			const text = fixture.debugElement.query(By.css('span')).nativeElement.textContent.trim();
-			expect(text).toEqual(givenValue);
+			const text = fixture.debugElement.query(By.css('div')).nativeElement.textContent.trim();
+			expect(text).toEqual(givenValue + ' !!!');
 
-			const div = fixture.nativeElement.querySelector('span');
-			expect(div.getAttribute('_ngcontent-c0')).toBeNull('span tag');
+			const div = fixture.nativeElement.querySelector('div');
+			expect(div.getAttribute('_ngcontent-c0')).toBeNull('div tag');
 		});
 	});
 
