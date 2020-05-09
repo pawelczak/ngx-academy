@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { throwError } from 'rxjs';
+import { Observable ,  throwError } from 'rxjs';
 
 export class User {
 	login: string;
