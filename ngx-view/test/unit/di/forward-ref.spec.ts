@@ -79,10 +79,10 @@ describe('ForwardRef -', () => {
 				template: `<span forwarded #dirRef="dirRef" catch #catchRef="catchRef"></span>`
 			})
 			class TestComponent {
-				@ViewChild(ForwardedDirective)
+				@ViewChild(ForwardedDirective, { static: true })
 				dirRef: ForwardedDirective;
 
-				@ViewChild(CatchDirective)
+				@ViewChild(CatchDirective, { static: true })
 				catchRef: CatchDirective;
 			}
 

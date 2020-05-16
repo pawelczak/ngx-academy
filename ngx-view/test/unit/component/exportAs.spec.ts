@@ -29,13 +29,13 @@ describe('Component -', () => {
 		})
 		class TestComponent {
 
-			@ViewChild('refOne')
+			@ViewChild('refOne', { static: true })
 			refOne: ExportAsComponent;
 
-			@ViewChild('refTwo')
+			@ViewChild('refTwo', { static: true })
 			refTwo: ExportAsComponent;
 
-			@ViewChild('ref')
+			@ViewChild('ref', { static: true })
 			ref: ExportAsComponent;
 
 		}

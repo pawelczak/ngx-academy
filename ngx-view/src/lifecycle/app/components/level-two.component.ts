@@ -20,7 +20,7 @@ import { Logger } from '../util/logger';
 export class LevelTwoComponent extends LifeCyclesComponent {
 
 
-	@ContentChild('template')
+	@ContentChild('template', { static: true })
 	template: TemplateRef<any>;
 
 	@Input()

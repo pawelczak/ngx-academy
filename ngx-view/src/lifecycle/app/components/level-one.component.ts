@@ -33,7 +33,7 @@ import { GithubApiService } from '../http/github-api.service';
 })
 export class LevelOneComponent extends LifeCyclesComponent {
 
-	@ContentChild('text')
+	@ContentChild('text', { static: true })
 	text: ComponentRef<any>;
 
 

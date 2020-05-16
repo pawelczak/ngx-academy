@@ -7,6 +7,6 @@ import { ChildComponent } from './child.component';
 	template: ``
 })
 export class ParentComponent {
-	@ContentChild(ChildComponent)
+	@ContentChild(ChildComponent, { static: true })
 	compRef: ChildComponent;
 }

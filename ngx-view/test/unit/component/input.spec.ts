@@ -199,7 +199,7 @@ describe('Component - input -', () => {
 			`
 		})
 		class TestComponent {
-			@ViewChild('compRef')
+			@ViewChild('compRef', { static: true })
 			compRef: AliasComponent;
 		}
 
@@ -292,10 +292,10 @@ describe('Component - input -', () => {
 			`
 		})
 		class TestComponent {
-			@ViewChild(InputComponent)
+			@ViewChild(InputComponent, { static: true })
 			compRef: InputComponent;
 
-			@ViewChild(InputDirective)
+			@ViewChild(InputDirective, { static: true })
 			dirRef: InputDirective;
 		}
 

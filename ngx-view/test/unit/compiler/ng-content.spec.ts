@@ -415,7 +415,7 @@ describe('ng-content -', () => {
 				`
 			})
 			class ParentComponent {
-				@ViewChild(ProjectorComponent)
+				@ViewChild(ProjectorComponent, { static: true })
 				projectorRef: ProjectorComponent;
 			}
 
@@ -485,7 +485,7 @@ describe('ng-content -', () => {
 			`
 		})
 		class ProjectorComponent {
-			@ContentChild(SimpleComponent)
+			@ContentChild(SimpleComponent, { static: true })
 			simpleRef: SimpleComponent;
 		}
 
@@ -498,10 +498,10 @@ describe('ng-content -', () => {
 			`
 		})
 		class ParentComponent {
-			@ViewChild(ProjectorComponent)
+			@ViewChild(ProjectorComponent, { static: true })
 			projectorRef: ProjectorComponent;
 
-			@ViewChild(SimpleComponent)
+			@ViewChild(SimpleComponent, { static: true })
 			simpleRef: SimpleComponent;
 		}
 
@@ -577,7 +577,7 @@ describe('ng-content -', () => {
 			}]
 		})
 		class ParentComponent {
-			@ViewChild(SimpleComponent)
+			@ViewChild(SimpleComponent, { static: true })
 			simpleRef: SimpleComponent;
 		}
 

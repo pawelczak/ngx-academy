@@ -16,7 +16,7 @@ describe('Compiler - component factory -', () => {
 	})
 	class DynamicCompilerComponent {
 
-		@ViewChild('container', {read: ViewContainerRef})
+		@ViewChild('container', {read: ViewContainerRef, static: true})
 		container: ViewContainerRef;
 
 		constructor(private compiler: Compiler) {

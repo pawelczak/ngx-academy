@@ -9,7 +9,7 @@ describe('Component Inheritance - Queries -', () => {
 		const givenValue = 'To the Bat-mobile !';
 
 		class ViewChildComponent {
-			@ViewChild('template')
+			@ViewChild('template', { static: true })
 			template: ElementRef;
 		}
 
@@ -51,7 +51,7 @@ describe('Component Inheritance - Queries -', () => {
 	describe('ContentChild -', () => {
 
 		class ContentChildComponent {
-			@ContentChild('template')
+			@ContentChild('template', { static: true })
 			template: TemplateRef<any>;
 		}
 
@@ -74,7 +74,7 @@ describe('Component Inheritance - Queries -', () => {
 			`
 		})
 		class TestComponent {
-			@ViewChild(SubContentChildComponent)
+			@ViewChild(SubContentChildComponent, { static: true })
 			contentChild: SubContentChildComponent;
 		}
 
@@ -180,7 +180,7 @@ describe('Component Inheritance - Queries -', () => {
 				`
 			})
 			class TestComponent {
-				@ViewChild(SubContentChildrenComponent)
+				@ViewChild(SubContentChildrenComponent, { static: true })
 				subComp: SubContentChildrenComponent;
 			}
 

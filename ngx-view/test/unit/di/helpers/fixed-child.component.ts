@@ -7,6 +7,6 @@ import { ParentComponent } from './parent.component';
 	template: ``
 })
 export class FixedChildComponent {
-	@ContentChild(forwardRef(() => ParentComponent))
+	@ContentChild(forwardRef(() => ParentComponent), { static: true })
 	compRef: ParentComponent;
 }

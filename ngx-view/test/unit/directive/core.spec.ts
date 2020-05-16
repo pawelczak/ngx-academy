@@ -29,7 +29,7 @@ describe('Directive -', () => {
 		`
 	})
 	class TestComponent {
-		@ViewChild('dirRef')
+		@ViewChild('dirRef', { static: true })
 		dirRef: SimpleDirective;
 	}
 

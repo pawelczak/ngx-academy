@@ -210,7 +210,7 @@ describe('Dependency injection - providers - multi -', () => {
 				}]
 			})
 			class ParentComponent {
-				@ViewChild(MultiComponent)
+				@ViewChild(MultiComponent, { static: true })
 				multiComp: MultiComponent;
 			}
 

@@ -186,7 +186,7 @@ describe('NgComponentOutlet -', () => {
 			]
 		})
 		class TestComponent {
-			@ViewChild('tmplRef')
+			@ViewChild('tmplRef', { static: true })
 			templateRef: TemplateRef<any>;
 
 			contentNodes: Array<Array<any>>;

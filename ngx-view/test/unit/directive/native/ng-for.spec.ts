@@ -1,8 +1,7 @@
 import { componentFactoryName } from '@angular/compiler';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Injectable, Input } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CommonModule } from '@angular/common';
-import { ComponentFixture } from '@angular/core/testing/src/component_fixture';
 import { By } from '@angular/platform-browser';
 
 

@@ -1,4 +1,4 @@
-import { Component, forwardRef, Host, Inject, InjectionToken, Injector, Optional, ViewChild } from '@angular/core';
+import { Component, Inject, InjectionToken, Injector, Optional, ViewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 
@@ -24,7 +24,8 @@ describe('Component - reference -', () => {
 
 			@Component({
 				selector: 'parent',
-				template: `<child ></child>`
+				template: `
+					<child></child>`
 			})
 			class ParentComponent {
 			}
@@ -56,7 +57,7 @@ describe('Component - reference -', () => {
 				fixture.detectChanges();
 			});
 
-			it ('should get parent component from the DI context', () => {
+			it('should get parent component from the DI context', () => {
 
 				// when & then
 				const parentRef = childRef.parentComponent;
@@ -64,7 +65,7 @@ describe('Component - reference -', () => {
 				expect(parentRef instanceof ParentComponent).toBeTruthy();
 			});
 
-			it ('should add component to the injector', () => {
+			it('should add component to the injector', () => {
 
 				// when & then
 				const parentRef = childRef.injector.get(ParentComponent);
@@ -81,7 +82,7 @@ describe('Component - reference -', () => {
 		 */
 		describe('circular dependency', () => {
 
-			it ('should be possible to ParentComponent by using DI', () => {
+			it('should be possible to ParentComponent by using DI', () => {
 
 				const parentToken = new InjectionToken<ParentComponent>('parentRef');
 
@@ -90,19 +91,21 @@ describe('Component - reference -', () => {
 					template: ``
 				})
 				class ChildComponent {
-					constructor(@Inject(parentToken) public parentComponent: any) {}
+					constructor(@Inject(parentToken) public parentComponent: any) {
+					}
 				}
 
 				@Component({
 					selector: 'parent',
-					template: `<child></child>`,
+					template: `
+						<child></child>`,
 					providers: [{
 						provide: parentToken,
 						useExisting: ParentComponent
 					}]
 				})
 				class ParentComponent {
-					@ViewChild(ChildComponent)
+					@ViewChild(ChildComponent, { static: true })
 					childRef: ChildComponent;
 				}
 

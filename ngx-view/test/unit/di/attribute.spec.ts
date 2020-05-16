@@ -49,7 +49,7 @@ describe('@Attribute -', () => {
 			`
 		})
 		class TestComponent {
-			@ViewChild(AttrComponent)
+			@ViewChild(AttrComponent, { static: true })
 			attrRef: AttrComponent;
 		}
 

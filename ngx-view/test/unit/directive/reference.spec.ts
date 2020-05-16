@@ -18,7 +18,7 @@ describe('Directive - reference -', () => {
 			template: `<span export-dir #dirRef="exportRef"></span>`
 		})
 		class TestComponent {
-			@ViewChild(ExportDirective)
+			@ViewChild(ExportDirective, { static: true })
 			dirRef: ExportDirective;
 		}
 
@@ -92,7 +92,7 @@ describe('Directive - reference -', () => {
 				`
 			})
 			class TestComponent {
-				@ViewChild(forwardRef(() => TestChildComponent))
+				@ViewChild(forwardRef(() => TestChildComponent), { static: true })
 				testChild: TestChildComponent;
 
 				constructor(public injector: Injector) {}
@@ -146,7 +146,7 @@ describe('Directive - reference -', () => {
 			template: `<shared-node-child></shared-node-child>`
 		})
 		class SharedNodeComponent {
-			@ViewChild(forwardRef(() => SharedNodeChildComponent))
+			@ViewChild(forwardRef(() => SharedNodeChildComponent), { static: true })
 			sharedChild: SharedNodeChildComponent;
 
 			constructor(@Host() public diDirective: DIDirective) {}
@@ -157,7 +157,7 @@ describe('Directive - reference -', () => {
 			template: `<shared-node di-dir #compRef ></shared-node>`
 		})
 		class TestComponent {
-			@ViewChild('compRef')
+			@ViewChild('compRef', { static: true })
 			compRef: SharedNodeComponent;
 		}
 

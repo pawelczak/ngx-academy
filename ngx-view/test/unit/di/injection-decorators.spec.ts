@@ -177,7 +177,7 @@ describe('Injection decorators -', () => {
 				}]
 			})
 			class ParentSkipComponent {
-				@ViewChild(SkipComponent)
+				@ViewChild(SkipComponent, { static: true })
 				skipCompRef: SkipComponent;
 			}
 
@@ -306,7 +306,7 @@ describe('Injection decorators -', () => {
 			}]
 		})
 		class ParentComponent {
-			@ViewChild(HostComponent)
+			@ViewChild(HostComponent, { static: true })
 			hostCompRef: HostComponent;
 		}
 
@@ -347,7 +347,7 @@ describe('Injection decorators -', () => {
 		 *     <host></host>
 		 * </parent-host>
 		 *
-		 * HostComponent is projected, because it is declaren in the content of another component,
+		 * HostComponent is projected, because it is declared in the content of another component,
 		 * so objects marked with @Host() will be injected from ParentComponent.
 		 *
 		 * If requested object doesn't live in the ParentComponents context, it will not be taken
@@ -366,7 +366,7 @@ describe('Injection decorators -', () => {
 				`
 			})
 			class TestComponent {
-				@ViewChild(HostComponent)
+				@ViewChild(HostComponent, { static: true })
 				hostCompRef: HostComponent;
 			}
 

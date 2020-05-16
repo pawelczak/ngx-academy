@@ -16,9 +16,9 @@ describe('Component queries -', () => {
 			<simple></simple>
 		`,
 		queries: {
-			contentChild: new ContentChild(SimpleComponent),
+			contentChild: new ContentChild(SimpleComponent, { static: true }),
 			contentChildren: new ContentChildren(SimpleComponent),
-			viewChild: new ViewChild(SimpleComponent),
+			viewChild: new ViewChild(SimpleComponent, { static: true }),
 			viewChildren: new ViewChildren(SimpleComponent)
 		}
 	})
@@ -39,7 +39,7 @@ describe('Component queries -', () => {
 		`
 	})
 	class TestComponent {
-		@ViewChild(QueriesComponent)
+		@ViewChild(QueriesComponent, { static: true })
 		queriesRef: QueriesComponent;
 	}
 

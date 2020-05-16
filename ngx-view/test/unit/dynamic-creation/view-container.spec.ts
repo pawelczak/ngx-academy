@@ -25,7 +25,7 @@ describe('Dynamic component - ViewContainerRef -', () => {
 			`
 		})
 		class CreatorComponent implements AfterViewInit {
-			@ViewChild('container', { read: ViewContainerRef})
+			@ViewChild('container', { read: ViewContainerRef, static: true})
 			container: ViewContainerRef;
 
 			constructor(private componentFactoryResolver: ComponentFactoryResolver) {}

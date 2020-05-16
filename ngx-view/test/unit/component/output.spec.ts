@@ -7,7 +7,7 @@ describe('Component - output -', () => {
 	/**
 	 * It's possible to alias outputs.
 	 */
-	describe ('naming -', () => {
+	describe('naming -', () => {
 
 		const compValue = 'Value';
 
@@ -28,11 +28,11 @@ describe('Component - output -', () => {
 		@Component({
 			selector: 'test',
 			template: `
-					<output-alias #compRef (output-one)="onEmit($event)" ></output-alias>
-				`
+				<output-alias #compRef (output-one)="onEmit($event)"></output-alias>
+			`
 		})
 		class TestComponent {
-			@ViewChild('compRef')
+			@ViewChild('compRef', { static: true })
 			compRef: OutputAliasComponent;
 
 			value: string;
@@ -52,7 +52,7 @@ describe('Component - output -', () => {
 				});
 		});
 
-		it ('should be possible to alias outputs', () => {
+		it('should be possible to alias outputs', () => {
 
 			// given
 			const fixture = TestBed.createComponent(TestComponent),

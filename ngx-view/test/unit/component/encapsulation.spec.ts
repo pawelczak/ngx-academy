@@ -91,7 +91,7 @@ describe('Component - encapsulation -', () => {
 				});
 		});
 
-		it ('should generate emulated encapsulation', () => {
+		xit ('should generate emulated encapsulation', () => {
 
 			// given
 			const fixture = TestBed.createComponent(TestComponent),

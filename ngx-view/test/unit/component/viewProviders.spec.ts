@@ -34,13 +34,15 @@ describe('Component -', () => {
 			viewProviders: [
 				ViewProvidersService
 			],
-			template: `<child></child>`
+			template: `
+				<child></child>`
 		})
 		class ParentComponent {
-			@ViewChild(ChildComponent)
+			@ViewChild(ChildComponent, { static: true })
 			childRef: ChildComponent;
 
-			constructor(public viewProvidersService: ViewProvidersService) {}
+			constructor(public viewProvidersService: ViewProvidersService) {
+			}
 		}
 
 		beforeEach(() => {
@@ -88,11 +90,12 @@ describe('Component -', () => {
 			`
 		})
 		class ParentComponent {
-			@ContentChild(ChildComponent)
+			@ContentChild(ChildComponent, { static: true })
 			contentChildRef: ChildComponent;
 
 			constructor(public providersService: ProvidersService,
-						public viewProvidersService: ViewProvidersService) {}
+						public viewProvidersService: ViewProvidersService) {
+			}
 		}
 
 		@Component({
@@ -103,7 +106,7 @@ describe('Component -', () => {
 			`
 		})
 		class TestComponent {
-			@ViewChild(ParentComponent)
+			@ViewChild(ParentComponent, { static: true })
 			compRef: ParentComponent;
 		}
 
@@ -123,7 +126,7 @@ describe('Component -', () => {
 		 * Services provided in component property providers and viewProviders
 		 * should be accessible to the component.
 		 */
-		it ('should be possible for parent component to use services from providers and viewProviders', () => {
+		it('should be possible for parent component to use services from providers and viewProviders', () => {
 
 			// given
 			const fixture = TestBed.createComponent(TestComponent);
@@ -141,7 +144,7 @@ describe('Component -', () => {
 		/**
 		 * Projected component shouldn't have access to the services provided in the viewProviders.
 		 */
-		it ('should not be possible to access viewProviders from projected content', () => {
+		it('should not be possible to access viewProviders from projected content', () => {
 
 			// given
 			const fixture = TestBed.createComponent(TestComponent);

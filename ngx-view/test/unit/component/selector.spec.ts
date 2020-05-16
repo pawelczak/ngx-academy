@@ -35,16 +35,16 @@ describe('Component - selector -', () => {
 		})
 		class TestComponent {
 
-			@ViewChild('compOneRef')
+			@ViewChild('compOneRef', { static: true })
 			compOneRef: BasicComponent;
 
-			@ViewChild('compTwoRef')
+			@ViewChild('compTwoRef', { static: true })
 			compTwoRef: BasicComponent;
 
-			@ViewChild('compThreeRef')
+			@ViewChild('compThreeRef', { static: true })
 			compThreeRef: BasicComponent;
 
-			@ViewChild('compFourRef')
+			@ViewChild('compFourRef', { static: true })
 			compFourRef: BasicComponent;
 		}
 
@@ -124,7 +124,7 @@ describe('Component - selector -', () => {
 			`
 		})
 		class TestComponent {
-			@ViewChild('compOneRef')
+			@ViewChild('compOneRef', { static: true })
 			compOneRef: ComplexSelectorComponent;
 		}
 

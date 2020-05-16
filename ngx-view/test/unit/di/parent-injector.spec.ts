@@ -18,7 +18,7 @@ describe('Parent injector -' , () => {
 		]
 	})
 	class ParentComponent {
-		@ViewChild(forwardRef(() => ChildComponent))
+		@ViewChild(forwardRef(() => ChildComponent), { static: true })
 		childRef: ChildComponent;
 
 		constructor(public injector: Injector) {}

@@ -103,7 +103,7 @@ describe('Dependency Injection - native services -', () => {
 			`
 		})
 		class TestInjectDirectiveComponent {
-			@ViewChild('dirRef')
+			@ViewChild('dirRef', { static: true })
 			dirRef: InjectDirective;
 		}
 

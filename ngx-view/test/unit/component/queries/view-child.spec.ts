@@ -29,67 +29,67 @@ describe('ViewChild -', () => {
 			/**
 			 * HTML tag - reference
 			 */
-			@ViewChild('elementRef')
+			@ViewChild('elementRef', { static: true })
 			elementRef: ElementRef;
 
-			@ViewChild('elementRef', { read: TemplateRef })
+			@ViewChild('elementRef', { read: TemplateRef, static: true })
 			elementRefAsTempRef: TemplateRef<any>;
 
-			@ViewChild('elementRef', { read: ViewContainerRef })
+			@ViewChild('elementRef', { read: ViewContainerRef, static: true })
 			elementRefAsVcr: ViewContainerRef;
 
-			@ViewChild('elementRef', { read: BlankComponent })
+			@ViewChild('elementRef', { read: BlankComponent, static: true })
 			elementRefAsBlankComponent: BlankComponent;
 
 
 			/**
 			 * <ng-template> - reference
 			 */
-			@ViewChild('templateRef')
+			@ViewChild('templateRef', { static: true })
 			templateRef: TemplateRef<any>;
 
-			@ViewChild('templateRef', { read: ElementRef })
+			@ViewChild('templateRef', { read: ElementRef, static: true })
 			templateRefAsElemRef: ElementRef;
 
-			@ViewChild('templateRef', { read: ViewContainerRef })
+			@ViewChild('templateRef', { read: ViewContainerRef, static: true })
 			templateRefAsVcr: ViewContainerRef;
 
-			@ViewChild('templateRef', { read: BlankComponent })
+			@ViewChild('templateRef', { read: BlankComponent, static: true })
 			templateRefAsBlankComponent: BlankComponent;
 
 
 			/**
 			 * <ng-container> - reference
 			 */
-			@ViewChild('containerRef')
+			@ViewChild('containerRef', { static: true })
 			containerRef: ElementRef;
 
-			@ViewChild('containerRef', { read: TemplateRef })
+			@ViewChild('containerRef', { read: TemplateRef, static: true })
 			containerRefAsTempRef: TemplateRef<any>;
 
-			@ViewChild('containerRef', { read: ViewContainerRef })
+			@ViewChild('containerRef', { read: ViewContainerRef, static: true })
 			containerRefAsVcr: ViewContainerRef;
 
-			@ViewChild('containerRef', { read: BlankComponent })
+			@ViewChild('containerRef', { read: BlankComponent, static: true })
 			viewContainerRefAsBlankComponent: BlankComponent;
 
 
 			/**
 			 * Component template - reference
 			 */
-			@ViewChild('compRef')
+			@ViewChild('compRef', { static: true })
 			compRef: BlankComponent;
 
-			@ViewChild('compRef', { read: ElementRef })
+			@ViewChild('compRef', { read: ElementRef, static: true })
 			compRefAsElemRef: ElementRef;
 
-			@ViewChild('compRef', { read: TemplateRef })
+			@ViewChild('compRef', { read: TemplateRef, static: true })
 			compRefAsTemplateRef: TemplateRef<any>;
 
-			@ViewChild('compRef', { read: ViewContainerRef })
+			@ViewChild('compRef', { read: ViewContainerRef, static: true })
 			compRefAsVcr: ViewContainerRef;
 
-			@ViewChild('p')
+			@ViewChild('p', { static: true })
 			pTag: ElementRef;
 
 		}
@@ -194,7 +194,7 @@ describe('ViewChild -', () => {
 			`
 		})
 		class CompRefComponent {
-			@ViewChild('compVal')
+			@ViewChild('compVal', { static: true })
 			compWithVal: CompWithValueComponent;
 		}
 

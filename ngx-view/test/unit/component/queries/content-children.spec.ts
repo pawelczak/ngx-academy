@@ -1,6 +1,15 @@
 import {
 	AfterContentInit,
-	ChangeDetectorRef, Component, ContentChildren, Directive, ElementRef, InjectionToken, Input, QueryList, TemplateRef, ViewChild,
+	ChangeDetectorRef,
+	Component,
+	ContentChildren,
+	Directive,
+	ElementRef,
+	InjectionToken,
+	Input,
+	QueryList,
+	TemplateRef,
+	ViewChild,
 	ViewContainerRef
 } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -51,7 +60,7 @@ describe('ContentChildren -', () => {
 			`
 		})
 		class TestComponent {
-			@ViewChild(ContentChildrenComponent)
+			@ViewChild(ContentChildrenComponent, { static: true })
 			compRefs: ContentChildrenComponent;
 		}
 
@@ -193,7 +202,7 @@ describe('ContentChildren -', () => {
 				`
 			})
 			class TestComponent {
-				@ViewChild(ContentChildrenComponent)
+				@ViewChild(ContentChildrenComponent, { static: true })
 				compRef: ContentChildrenComponent;
 			}
 
@@ -338,7 +347,7 @@ describe('ContentChildren -', () => {
 				`
 			})
 			class TestComponent {
-				@ViewChild(ContainerComponent)
+				@ViewChild(ContainerComponent, { static: true })
 				compRef: ContainerComponent;
 			}
 
@@ -460,7 +469,7 @@ describe('ContentChildren -', () => {
 				`
 			})
 			class TestComponent {
-				@ViewChild(Heroes)
+				@ViewChild(Heroes, { static: true })
 				multiRef: Heroes;
 			}
 
@@ -531,13 +540,13 @@ describe('ContentChildren -', () => {
 			/**
 			 * read service
 			 */
-			@ContentChildren(ReadComponent, {read: Service})
+			@ContentChildren(ReadComponent, { read: Service })
 			serviceQL: QueryList<Service>;
 
 			/**
 			 * read native objects
 			 */
-			@ContentChildren(ReadComponent, {read: ElementRef})
+			@ContentChildren(ReadComponent, { read: ElementRef })
 			elRefQL: QueryList<Service>;
 		}
 
@@ -550,7 +559,7 @@ describe('ContentChildren -', () => {
 			`
 		})
 		class TestComponent {
-			@ViewChild(ContentChildrenComponent)
+			@ViewChild(ContentChildrenComponent, { static: true })
 			compRef: ContentChildrenComponent;
 		}
 
@@ -629,13 +638,13 @@ describe('ContentChildren -', () => {
 			/**
 			 * component references with descendants false
 			 */
-			@ContentChildren(SimpleComponent, {descendants: false})
+			@ContentChildren(SimpleComponent, { descendants: false })
 			simpleComponent: QueryList<SimpleComponent>;
 
 			/**
 			 * component references with descendants true
 			 */
-			@ContentChildren(SimpleComponent, {descendants: true})
+			@ContentChildren(SimpleComponent, { descendants: true })
 			simpleComponentWithDescendants: QueryList<SimpleComponent>;
 		}
 
@@ -657,7 +666,7 @@ describe('ContentChildren -', () => {
 			`
 		})
 		class TestComponent {
-			@ViewChild(ContentChildrenDescendantsComponent)
+			@ViewChild(ContentChildrenDescendantsComponent, { static: true })
 			compRef: ContentChildrenDescendantsComponent;
 		}
 
@@ -718,17 +727,17 @@ describe('ContentChildren -', () => {
 			@Component({
 				selector: 'test',
 				template: `
-	
+
 					<content-children>
 						<simple *ngIf="flag"
 								[value]="value">
 						</simple>
 					</content-children>
-	
+
 				`
 			})
 			class TestComponent {
-				@ViewChild(ContentChildrenComponent)
+				@ViewChild(ContentChildrenComponent, { static: true })
 				compRef: ContentChildrenComponent;
 
 				flag: boolean = true;
@@ -820,17 +829,17 @@ describe('ContentChildren -', () => {
 			@Component({
 				selector: 'test',
 				template: `
-	
+
 					<content-children>
 						<simple *ngFor="let value of values"
 								[value]="value">
 						</simple>
 					</content-children>
-	
+
 				`
 			})
 			class TestComponent {
-				@ViewChild(ContentChildrenComponent)
+				@ViewChild(ContentChildrenComponent, { static: true })
 				compRef: ContentChildrenComponent;
 
 				values: Array<string> = [];
@@ -916,10 +925,10 @@ describe('ContentChildren -', () => {
 				`
 			})
 			class TestComponent {
-				@ViewChild(ContentTemplateComponent)
+				@ViewChild(ContentTemplateComponent, { static: true })
 				compRef: ContentTemplateComponent;
 
-				@ViewChild(TemplateRef)
+				@ViewChild(TemplateRef, { static: true })
 				templRef: TemplateRef<any>;
 
 				value = '1';
@@ -962,7 +971,7 @@ describe('ContentChildren -', () => {
 			it('isn\'t possible to dynamically add ng-template', () => {
 
 				// when
-				compInstance.value = '2'
+				compInstance.value = '2';
 				fixture.detectChanges();
 
 				// then
@@ -1035,28 +1044,28 @@ describe('ContentChildren -', () => {
 
 			@Component({
 				template: `
-				
+
 					<parent-shifter>
-						
-						<shifter [value]="value" #container *ngIf="flag" >
-							
+
+						<shifter [value]="value" #container *ngIf="flag">
+
 							<!-- Cannot use structural directives, like *ngIf -->
 							<ng-template></ng-template>
-							
+
 						</shifter>
-						
+
 					</parent-shifter>
-					
+
 				`
 			})
 			class TestComponent {
-				@ViewChild(ParentShifterComponent)
+				@ViewChild(ParentShifterComponent, { static: true })
 				parent: ParentShifterComponent;
 
-				@ViewChild(TemplateRef)
+				@ViewChild(TemplateRef, { static: true })
 				template: TemplateRef<any>;
 
-				@ViewChild('container', {read: ViewContainerRef})
+				@ViewChild('container', { read: ViewContainerRef, static: true })
 				container: ViewContainerRef;
 
 				value = givenValue;
@@ -1137,19 +1146,19 @@ describe('ContentChildren -', () => {
 				/**
 				 * component references as ElementRefs
 				 */
-				@ContentChildren(SimpleComponent, {read: ElementRef})
+				@ContentChildren(SimpleComponent, { read: ElementRef })
 				compAsElementRefs: QueryList<ElementRef>;
 
 				/**
 				 * component references as ElementRefs
 				 */
-				@ContentChildren(SimpleComponent, {read: TemplateRef})
+				@ContentChildren(SimpleComponent, { read: TemplateRef })
 				compAsTempRefs: QueryList<TemplateRef<any>>;
 
 				/**
 				 * component references as ViewContainerRef
 				 */
-				@ContentChildren(SimpleComponent, {read: ViewContainerRef})
+				@ContentChildren(SimpleComponent, { read: ViewContainerRef })
 				compAsVcrs: QueryList<ViewContainerRef>;
 
 				/**
@@ -1176,7 +1185,7 @@ describe('ContentChildren -', () => {
 				`
 			})
 			class TestComponent {
-				@ViewChild(ContentChildrenComponent)
+				@ViewChild(ContentChildrenComponent, { static: true })
 				compRef: ContentChildrenComponent;
 			}
 
@@ -1256,19 +1265,19 @@ describe('ContentChildren -', () => {
 				/**
 				 * directive references as ElementRefs
 				 */
-				@ContentChildren(PropDirective, {read: ElementRef})
+				@ContentChildren(PropDirective, { read: ElementRef })
 				dirAsElementRefs: QueryList<ElementRef>;
 
 				/**
 				 * directive references as ElementRefs
 				 */
-				@ContentChildren(PropDirective, {read: TemplateRef})
+				@ContentChildren(PropDirective, { read: TemplateRef })
 				dirAsTempRefs: QueryList<TemplateRef<any>>;
 
 				/**
 				 * directive references as ViewContainerRef
 				 */
-				@ContentChildren(PropDirective, {read: ViewContainerRef})
+				@ContentChildren(PropDirective, { read: ViewContainerRef })
 				dirAsVcrs: QueryList<ViewContainerRef>;
 
 				/**
@@ -1291,7 +1300,7 @@ describe('ContentChildren -', () => {
 				`
 			})
 			class TestComponent {
-				@ViewChild(ContentChildrenForDirectiveComponent)
+				@ViewChild(ContentChildrenForDirectiveComponent, { static: true })
 				compRef: ContentChildrenForDirectiveComponent;
 			}
 
@@ -1365,19 +1374,19 @@ describe('ContentChildren -', () => {
 				/**
 				 * ng-template references as ElementRefs
 				 */
-				@ContentChildren(TemplateRef, {read: ElementRef})
+				@ContentChildren(TemplateRef, { read: ElementRef })
 				templAsElementRefs: QueryList<ElementRef>;
 
 				/**
 				 * ng-template references as ElementRefs
 				 */
-				@ContentChildren(TemplateRef, {read: SimpleComponent})
+				@ContentChildren(TemplateRef, { read: SimpleComponent })
 				templAsCompRefs: QueryList<SimpleComponent>;
 
 				/**
 				 * ng-template references as ViewContainerRef
 				 */
-				@ContentChildren(TemplateRef, {read: ViewContainerRef})
+				@ContentChildren(TemplateRef, { read: ViewContainerRef })
 				templAsVcrs: QueryList<ViewContainerRef>;
 
 				/**
@@ -1404,7 +1413,7 @@ describe('ContentChildren -', () => {
 				`
 			})
 			class TestComponent {
-				@ViewChild(ContentChildrenComponent)
+				@ViewChild(ContentChildrenComponent, { static: true })
 				compRef: ContentChildrenComponent;
 			}
 
@@ -1457,7 +1466,7 @@ describe('ContentChildren -', () => {
 				let templByTemplVarRefs = compInstance.compRef.templByTemplVarRefs.toArray();
 				expect(templByTemplVarRefs.length).toEqual(1);
 				expect(templByTemplVarRefs[0] instanceof TemplateRef).toBe(true, 'TemplateRef as TemplateRef'); // TRUE
-			})
+			});
 
 		});
 
